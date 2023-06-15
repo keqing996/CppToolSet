@@ -42,7 +42,7 @@
 #include <cxxabi.h>
 #endif
 
-namespace cmdline
+namespace CmdLine
 {
     namespace detail
     {
