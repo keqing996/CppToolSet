@@ -1,38 +1,39 @@
 
 #include <iostream>
-#include "../tinyxml2/tinyxml2.h"
+#include "rapidxml/rapidxml.hpp"
+#include "rapidxml/rapidxml_utils.hpp" // file
+#include "rapidxml/rapidxml_print.hpp" // print
 
 int main()
 {
-    tinyxml2::XMLDocument doc;
-    tinyxml2::XMLError error = doc.LoadFile("./config/config.xml");
-    if (error != tinyxml2::XMLError::XML_SUCCESS)
-        return 1;
+    rapidxml::file<> file("./config/config.xml");
+    rapidxml::xml_document<> doc;
+    doc.parse<0>(file.data()); // 0 means default parse flags
 
-    const tinyxml2::XMLElement* root = doc.RootElement();
-    std::cout << "root:" << root->Name() << std::endl;
+    const rapidxml::xml_node<>* root = doc.first_node();
+    std::cout << "root:" << root->name() << std::endl;
 
-    const tinyxml2::XMLElement* nodeGroupA = root->FirstChildElement("GroupA");
+    const rapidxml::xml_node<>* nodeGroupA = root->first_node("GroupA");
     if (nodeGroupA != nullptr)
     {
-        std::cout << "groupA:" << nodeGroupA->Name() << std::endl;
+        std::cout << "groupA:" << nodeGroupA->name() << std::endl;
 
-        const tinyxml2::XMLAttribute* groupRootAttrType = nodeGroupA->FindAttribute("Type");
+        const rapidxml::xml_attribute<>* groupRootAttrType = nodeGroupA->first_attribute("Type");
         if (groupRootAttrType != nullptr)
-            std::cout << "groupA Type:" << groupRootAttrType->Name() << std::endl;
+            std::cout << "groupA Type:" << groupRootAttrType->name() << std::endl;
 
-        const tinyxml2::XMLAttribute* groupRootAttrTest = nodeGroupA->FindAttribute("Test");
+        const rapidxml::xml_attribute<>* groupRootAttrTest = nodeGroupA->first_attribute("Test");
         if (groupRootAttrTest != nullptr)
-            std::cout << "groupA Test:" << groupRootAttrTest->Name() << std::endl;
+            std::cout << "groupA Test:" << groupRootAttrTest->name() << std::endl;
 
-        const tinyxml2::XMLElement* nameNode = nodeGroupA->FirstChildElement("Name");
+        const rapidxml::xml_node<>* nameNode = nodeGroupA->first_node("Name");
         while (nameNode != nullptr)
         {
-            const tinyxml2::XMLElement* contentNode = nameNode->FirstChildElement("Content");
+            const rapidxml::xml_node<>* contentNode = nameNode->first_node("Content");
             if (contentNode != nullptr)
-                std::cout << "content:" << contentNode->GetText() << std::endl;
+                std::cout << "content:" << contentNode->value() << std::endl;
 
-            nameNode = nameNode->NextSiblingElement("Name");
+            nameNode = nameNode->next_sibling("Name");
         }
     }
 

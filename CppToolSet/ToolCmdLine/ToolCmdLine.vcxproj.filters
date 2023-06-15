@@ -6,8 +6,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\cmdline.h">
-      <Filter>src</Filter>
-    </ClInclude>
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
 </Project>

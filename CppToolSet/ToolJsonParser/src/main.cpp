@@ -3,7 +3,7 @@
 #include <iostream>
 #include <functional>
 
-#include "../nlohmann_json/json.hpp"
+#include "nlohmann_json/json.hpp"
 
 int main()
 {
