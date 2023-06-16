@@ -196,7 +196,7 @@ int main()
 
         const auto& path = entry.path();
 #if _DEBUG
-        if (path.extension() == ".sln.xml")
+        if (path.extension() == ".sln.txt")
 #else
         if (path.extension() == ".sln")
 #endif
