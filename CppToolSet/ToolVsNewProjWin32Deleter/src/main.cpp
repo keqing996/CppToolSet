@@ -83,9 +83,15 @@ void ProcessVcxproj(const std::filesystem::path& path)
     readStream.close();
 
     rapidxml::xml_document<wchar_t> doc;
-    doc.parse<0>(file.data());
+    const int parse_full = rapidxml::parse_declaration_node
+        | rapidxml::parse_comment_nodes
+        | rapidxml::parse_doctype_node
+        | rapidxml::parse_pi_nodes
+        | rapidxml::parse_validate_closing_tags;
+    
+    doc.parse<parse_full>(file.data());
 
-    xml_node* nodeProj = doc.first_node();
+    xml_node* nodeProj = doc.first_node(L"Project");
     if (nodeProj == nullptr)
     {
         std::cout << "Vcxproj no root" << std::endl;
@@ -121,36 +127,23 @@ void ProcessVcxproj(const std::filesystem::path& path)
     }
 
     // add out dir
-    std::vector<xml_node*> deleteNodeVec;
-    for (xml_node* nodePropertyGroup = nodeProj->first_node(L"PropertyGroup");
-        nodePropertyGroup != nullptr;
-        nodePropertyGroup = nodePropertyGroup->next_sibling(L"PropertyGroup"))
+
+    const wchar_t* OUT_DIR_VALUE = L"$(ProjectDir)\\bin\\$(Configuration)\\";
+    const wchar_t* INT_DIR_VALUE = L"$(ProjectDir)\\intermediates\\$(Configuration)\\";
+
+    auto AddOutDirNode = [&OUT_DIR_VALUE](rapidxml::xml_document<wchar_t>& doc, xml_node* parentNode) -> void
     {
-        // only condition attr
-        xml_attr* firstAttr = nodePropertyGroup->first_attribute();
-        if (firstAttr == nullptr)
-            continue;
+        xml_node* nodePropertyGroupNewDebugOutDir = doc.allocate_node(rapidxml::node_element, L"OutDir", OUT_DIR_VALUE);
+        parentNode->append_node(nodePropertyGroupNewDebugOutDir);
+    };
 
-        if (std::wstring(firstAttr->name()) != L"Condition")
-            continue;
-        
-        xml_node* nodeOutDir = nodePropertyGroup->first_node(L"OutDir");
-        if (nodeOutDir != nullptr)
-            nodePropertyGroup->remove_node(nodeOutDir);
-
-        xml_node* nodeIntDir = nodePropertyGroup->first_node(L"IntDir");
-        if (nodeIntDir != nullptr)
-            nodePropertyGroup->remove_node(nodeIntDir);
-
-        xml_node* anyChild = nodePropertyGroup->first_node();
-        if (anyChild == nullptr)
-            deleteNodeVec.push_back(nodePropertyGroup);
-    }
-
-    for (auto node : deleteNodeVec)
-        nodeProj->remove_node(node);
-
-    auto AddDirProperty = [](rapidxml::xml_document<wchar_t>& doc, xml_node* nodeProj, const wchar_t* condition) -> void
+    auto AddIntDirNode = [&INT_DIR_VALUE](rapidxml::xml_document<wchar_t>& doc, xml_node* parentNode) -> void
+    {
+        xml_node* nodePropertyGroupNewDebugInDir = doc.allocate_node(rapidxml::node_element, L"IntDir", INT_DIR_VALUE);
+        parentNode->append_node(nodePropertyGroupNewDebugInDir);
+    };
+    
+    auto AddDirProperty = [&AddOutDirNode, &AddIntDirNode](rapidxml::xml_document<wchar_t>& doc, xml_node* nodeProj, const wchar_t* condition) -> void
     {
         xml_node* nodePropertyGroupNewDebug = doc.allocate_node(rapidxml::node_element, L"PropertyGroup");
         nodeProj->append_node(nodePropertyGroupNewDebug);
@@ -158,15 +151,52 @@ void ProcessVcxproj(const std::filesystem::path& path)
         xml_attr* attrPropertyGroupNewDebug = doc.allocate_attribute(L"Condition", condition);
         nodePropertyGroupNewDebug->append_attribute(attrPropertyGroupNewDebug);
 
-        xml_node* nodePropertyGroupNewDebugOutDir = doc.allocate_node(rapidxml::node_element, L"OutDir", L"$(ProjectDir)\\bin\\$(Configuration)\\");
-        nodePropertyGroupNewDebug->append_node(nodePropertyGroupNewDebugOutDir);
+        AddOutDirNode(doc, nodePropertyGroupNewDebug);
 
-        xml_node* nodePropertyGroupNewDebugInDir = doc.allocate_node(rapidxml::node_element, L"IntDir", L"$(ProjectDir)\\intermediates\\$(Configuration)\\");
-        nodePropertyGroupNewDebug->append_node(nodePropertyGroupNewDebugInDir);
+        AddIntDirNode(doc, nodePropertyGroupNewDebug);
     };
+    
+    bool debugIntOutDirReady = false;
+    bool releaseIntOutDirReady = false;
+    
+    for (xml_node* nodePropertyGroup = nodeProj->first_node(L"PropertyGroup");
+        nodePropertyGroup != nullptr;
+        nodePropertyGroup = nodePropertyGroup->next_sibling(L"PropertyGroup"))
+    {
+        // only condition attr
+        xml_attr* firstAttr = nodePropertyGroup->first_attribute();
+        if (firstAttr == nullptr || firstAttr->next_attribute() != nullptr)
+            continue;
 
-    AddDirProperty(doc, nodeProj, L"'$(Configuration)|$(Platform)'=='Debug|x64'");
-    AddDirProperty(doc, nodeProj, L"'$(Configuration)|$(Platform)'=='Release|x64'");
+        std::wstring attrName(firstAttr->name());
+        std::wstring attrValue(firstAttr->value());
+        
+        if (attrName != L"Condition")
+            continue;
+        
+        xml_node* nodeOutDir = nodePropertyGroup->first_node(L"OutDir");
+        if (nodeOutDir != nullptr)
+            nodeOutDir->value(OUT_DIR_VALUE);
+        else
+            AddOutDirNode(doc, nodePropertyGroup);
+
+        xml_node* nodeIntDir = nodePropertyGroup->first_node(L"IntDir");
+        if (nodeIntDir != nullptr)
+            nodeOutDir->value(INT_DIR_VALUE);
+        else
+            AddIntDirNode(doc, nodePropertyGroup);
+
+        if (attrValue.find(L"Debug") != std::wstring::npos)
+            debugIntOutDirReady = true;
+        else
+            releaseIntOutDirReady = true;
+    }
+
+    if (!debugIntOutDirReady)
+        AddDirProperty(doc, nodeProj, L"'$(Configuration)|$(Platform)'=='Debug|x64'");
+
+    if (!releaseIntOutDirReady)
+        AddDirProperty(doc, nodeProj, L"'$(Configuration)|$(Platform)'=='Release|x64'");
 
     // save
     std::wofstream writeStream;
@@ -174,6 +204,16 @@ void ProcessVcxproj(const std::filesystem::path& path)
 
     std::wstring resultStr;
     rapidxml::print(std::back_inserter(resultStr), doc);
+
+    // replace
+    size_t start_pos = 0;
+    std::wstring from(L"\t");
+    std::wstring to(L"  ");
+    while((start_pos = resultStr.find(from, start_pos)) != std::string::npos)
+    {
+        resultStr.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
     
     writeStream << resultStr;
 
@@ -196,14 +236,14 @@ int main()
 
         const auto& path = entry.path();
 #if _DEBUG
-        if (path.extension() == ".sln.txt")
+        if (path.extension() == ".txt")
 #else
         if (path.extension() == ".sln")
 #endif
             ProcessSln(path);
 
 #if _DEBUG
-        if (path.extension() == ".vcxproj.xml")
+        if (path.extension() == ".xml")
 #else
         if (path.extension() == ".vcxproj")
 #endif
