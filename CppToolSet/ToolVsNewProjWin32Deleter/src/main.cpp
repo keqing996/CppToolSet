@@ -145,8 +145,12 @@ void ProcessVcxproj(const std::filesystem::path& path)
     
     auto AddDirProperty = [&AddOutDirNode, &AddIntDirNode](rapidxml::xml_document<wchar_t>& doc, xml_node* nodeProj, const wchar_t* condition) -> void
     {
+        xml_node* itemDefNode = nodeProj->first_node(L"ItemDefinitionGroup");
+        if (itemDefNode == nullptr)
+            return;
+        
         xml_node* nodePropertyGroupNewDebug = doc.allocate_node(rapidxml::node_element, L"PropertyGroup");
-        nodeProj->append_node(nodePropertyGroupNewDebug);
+        nodeProj->insert_node(itemDefNode, nodePropertyGroupNewDebug);
 
         xml_attr* attrPropertyGroupNewDebug = doc.allocate_attribute(L"Condition", condition);
         nodePropertyGroupNewDebug->append_attribute(attrPropertyGroupNewDebug);
