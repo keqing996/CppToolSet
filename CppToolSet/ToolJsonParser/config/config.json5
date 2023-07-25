@@ -3,29 +3,30 @@
   "tag2": false,
   "array1": [
     {
+      // comment 测试
       "name": "aaa",
       "desc": "bbb",
       "array": [
         {
           "name": "ccc",
-          "desc": "ccc"
+          "desc": "ccc",
         },
         {
           "name": "dd",
-          "desc": "ddd"
+          "desc": "ddd",
         },
         {
           "name": "ee",
-          "desc": "eee"
+          "desc": "eee",
         },
         {
           "name": "qe",
-          "desc": "qew"
+          "desc": "qew",
         },
         {
           "name": "asd",
-          "desc": "asdasd"
-        }
+          "desc": "asdasd",
+        },
       ]
     }
   ]
