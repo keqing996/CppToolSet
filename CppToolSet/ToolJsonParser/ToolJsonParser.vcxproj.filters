@@ -4,10 +4,29 @@
     <Filter Include="src">
       <UniqueIdentifier>{c8b273eb-ebc7-4a3e-96d8-d1bf7cd847db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{91f16ba6-ec0c-4c5a-989e-64f62da19aa8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\nlohmann_json_test.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rapid_json_test.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config\config.json">
+      <Filter>config</Filter>
+    </None>
+    <None Include="config\config.json5">
+      <Filter>config</Filter>
+    </None>
   </ItemGroup>
 </Project>
