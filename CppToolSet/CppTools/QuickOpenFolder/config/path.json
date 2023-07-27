@@ -1,0 +1,35 @@
+{
+  "BasePath": "C:\\",
+  "BtnGrp": [
+    {
+      "Name": "Windows",
+      "Btn":[
+        {
+          "Name": "Logs",
+          "AddPath": "Windows\\Logs\\"
+        },
+        {
+          "Name": "SKB",
+          "AddPath": "Windows\\SKB\\"
+        }
+      ]
+    },
+    {
+      "Name": "Program",
+      "Btn":[
+        {
+          "Name": "Git",
+          "AddPath": "Program Files\\Git\\"
+        },
+        {
+          "Name": "Java",
+          "AddPath": "Program Files\\Java\\jre-1.8\\"
+        },
+        {
+          "Name": "nodejs",
+          "AddPath": "Program Files\\\nodejs\\"
+        }
+      ]
+    }
+  ]
+}
