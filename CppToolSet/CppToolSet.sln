@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdPartyTest", "ThirdPart
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuickOpenFolder", "CppTools\QuickOpenFolder\QuickOpenFolder.vcxproj", "{D17D7FE6-1C1B-404E-9CFA-470AD49320A1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WxTemplate", "CppThirdPartyTest\WxTemplate\WxTemplate.vcxproj", "{116F4D0A-7F41-4392-89CA-9B4E9F4A08CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -71,6 +73,10 @@ Global
 		{D17D7FE6-1C1B-404E-9CFA-470AD49320A1}.Debug|x64.Build.0 = Debug|x64
 		{D17D7FE6-1C1B-404E-9CFA-470AD49320A1}.Release|x64.ActiveCfg = Release|x64
 		{D17D7FE6-1C1B-404E-9CFA-470AD49320A1}.Release|x64.Build.0 = Release|x64
+		{116F4D0A-7F41-4392-89CA-9B4E9F4A08CE}.Debug|x64.ActiveCfg = Debug|x64
+		{116F4D0A-7F41-4392-89CA-9B4E9F4A08CE}.Debug|x64.Build.0 = Debug|x64
+		{116F4D0A-7F41-4392-89CA-9B4E9F4A08CE}.Release|x64.ActiveCfg = Release|x64
+		{116F4D0A-7F41-4392-89CA-9B4E9F4A08CE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +91,7 @@ Global
 		{B4A09B30-6F5A-4383-86A9-B2868452DCEE} = {6DFEE3C4-84B5-4843-B239-AC72BB9111E3}
 		{11799BB8-4704-4385-AB37-F45EEED6D837} = {B5792A46-6942-4C7B-816F-1FE455E0A1A6}
 		{D17D7FE6-1C1B-404E-9CFA-470AD49320A1} = {6DFEE3C4-84B5-4843-B239-AC72BB9111E3}
+		{116F4D0A-7F41-4392-89CA-9B4E9F4A08CE} = {0D249524-33E6-4171-8883-CD24BBB3BD67}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FF2100E-3059-4047-A233-C72611D692B6}
