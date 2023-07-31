@@ -5,7 +5,7 @@
 #include "../resource/acfun.xpm"
 
 AppFrame::AppFrame()
-    : wxFrame(nullptr, wxID_ANY, "Quick Open Folder Tool")
+    : wxFrame(nullptr, wxID_ANY, "Quick Open Folder - Ver 3.0.2")
 {
     int userScreenWidth = wxSystemSettings::GetMetric(wxSYS_SCREEN_X, nullptr);
 
@@ -16,9 +16,11 @@ AppFrame::AppFrame()
     
     wxTopLevelWindowBase::SetMinSize(wxSize{width, minHeight});
 
-    _vsCodeInfo = GetVsCodePath();
-    
     InitJson();
+    
+    _vsCodeInfo = GetVsCodePath();
+    _sublimeTextInfo = GetSublimeTextPath();
+    
     InitLayout();
 }
 
@@ -39,6 +41,8 @@ void AppFrame::InitJson()
 void AppFrame::InitLayout()
 {
     auto [pMainPanel, pMainPanelSizer] = CreateMainLayout(this);
+    _pMainPanel = pMainPanel;
+    _pMainPanelSizer = pMainPanelSizer;
 
     // Title
     pMainPanelSizer->AddSpacer(20);
@@ -75,6 +79,8 @@ void AppFrame::InitLayout()
                         const std::wstring folderToOpen = basePath + additionPath;
                         if (_pVsCodeEnableCheckBox->GetValue())
                             WindowsDependent::WinExecute(_vsCodeInfo.appName, _vsCodeInfo.appPath, folderToOpen);
+                        else if (_pSublimeTextEnableCheckBox->IsShown() && _pSublimeTextEnableCheckBox->GetValue())
+                            WindowsDependent::WinExecute(_sublimeTextInfo.appName, _sublimeTextInfo.appPath, folderToOpen);
                         else
                             WindowsDependent::WinExecute(L"explorer.exe", folderToOpen);
                     });
@@ -91,17 +97,49 @@ void AppFrame::InitLayout()
     
     // Vs Code Path
     pMainPanelSizer->AddSpacer(20);
-    auto [pVsCodeInfoPanel, pVsCodeInfoPanelSizer] = CreateVsCodeInfoLayout(pMainPanel, pMainPanelSizer);
-    _pVsCodePanel = pVsCodeInfoPanel;
-    _pVsCodePanelSizer = pVsCodeInfoPanelSizer;
-    _pVsCodeEnableCheckBox = CreateVsCodeCheckBox(_pVsCodePanel, _pVsCodePanelSizer);
-    _pVsCodeDesc = CreateVsCodePathDesc(_pVsCodePanel, _pVsCodePanelSizer, _vsCodeInfo);
+    
+    auto [pOpenFolderPanel, pOpenFolderPanelSizer] = CreateOpenFolderPanel(pMainPanel, pMainPanelSizer);
+    _pOpenFolderPanel = pOpenFolderPanel;
+    _pOpenFolderPanelSizer = pOpenFolderPanelSizer;
+    
+    _pVsCodeEnableCheckBox = CreateVsCodeCheckBox(_pOpenFolderPanel, _pOpenFolderPanelSizer);
+    _pVsCodeDesc = CreateVsCodePathDesc(_pOpenFolderPanel, _pOpenFolderPanelSizer, _vsCodeInfo);
+    _pVsCodeDesc->Show(false);
     _pVsCodeEnableCheckBox->Bind(wxEVT_CHECKBOX,
         [this](wxCommandEvent& event)
         {
-            _pVsCodeDesc->Show(_pVsCodeEnableCheckBox->GetValue());
-            Layout();
+            bool enableVsCode = _pVsCodeEnableCheckBox->GetValue();
+            _pVsCodeDesc->Show(enableVsCode);
+
+            if (enableVsCode && _pSublimeTextEnableCheckBox->GetValue())
+            {
+                _pSublimeTextEnableCheckBox->SetValue(false);
+                _pSublimeTextDesc->Show(false);
+            }
+
+            _pMainPanelSizer->Layout();
       });
+
+    _pSublimeTextEnableCheckBox = CreateSublimeTextCheckBox(_pOpenFolderPanel, _pOpenFolderPanelSizer);
+    _pSublimeTextDesc = CreateSublimeTextPathDesc(_pOpenFolderPanel, _pOpenFolderPanelSizer, _sublimeTextInfo);
+    _pSublimeTextDesc->Show(false);
+    _pSublimeTextEnableCheckBox->Bind(wxEVT_CHECKBOX,
+        [this](wxCommandEvent& event)
+        {
+            bool enableSublime = _pSublimeTextEnableCheckBox->GetValue();
+            _pSublimeTextDesc->Show(enableSublime);
+
+            if (enableSublime && _pVsCodeEnableCheckBox->GetValue())
+            {
+                _pVsCodeEnableCheckBox->SetValue(false);
+                _pVsCodeDesc->Show(false);
+            }
+
+            _pMainPanelSizer->Layout();
+      });
+
+    _pSublimeTextEnableCheckBox->Show(!_sublimeTextInfo.appPath.empty());
+    
     pMainPanelSizer->AddSpacer(20);
 
     pMainPanelSizer->AddSpacer(15);
@@ -126,16 +164,31 @@ wxStaticText* AppFrame::CreateTopTitle(wxPanel* mainPanel, wxBoxSizer* mainPanel
     return pTitle;
 }
 
-AppFrame::VsCodeAppInfo AppFrame::GetVsCodePath()
+AppFrame::OpenFolderAppInfo AppFrame::GetVsCodePath()
 {
-    std::wstring prefix{L"C:\\Users\\"};
-    std::wstring userName = WindowsDependent::WinGetUserName();
-    std::wstring affix{L"\\AppData\\Local\\Programs\\Microsoft VS Code\\"};
+    const std::wstring& jsonPath = _pJsonParser->GetVsCodePath();
     std::wstring vsCodeAppName{L"Code.exe"};
-    return {vsCodeAppName, prefix + userName + affix};
+    if (jsonPath.empty())
+    {
+        std::wstring prefix{L"C:\\Users\\"};
+        std::wstring userName = WindowsDependent::WinGetUserName();
+        std::wstring affix{L"\\AppData\\Local\\Programs\\Microsoft VS Code\\"};
+        
+        return {vsCodeAppName, prefix + userName + affix};    
+    }
+    else
+    {
+        return {vsCodeAppName, jsonPath}; 
+    }
 }
 
-wxStaticText* AppFrame::CreateVsCodePathDesc(wxPanel* mainPanel, wxBoxSizer* mainPanelSizer, const VsCodeAppInfo& vsCodePath)
+AppFrame::OpenFolderAppInfo AppFrame::GetSublimeTextPath()
+{
+    const std::wstring& jsonPath = _pJsonParser->GetSublimeTextPath();
+    return {L"subl.exe", jsonPath};
+}
+
+wxStaticText* AppFrame::CreateVsCodePathDesc(wxPanel* mainPanel, wxBoxSizer* mainPanelSizer, const OpenFolderAppInfo& vsCodePath)
 {
     std::wstring desc = L"Current Vs Code Path:\n" + vsCodePath.appPath + vsCodePath.appName;
     
@@ -147,9 +200,27 @@ wxStaticText* AppFrame::CreateVsCodePathDesc(wxPanel* mainPanel, wxBoxSizer* mai
 
 wxCheckBox* AppFrame::CreateVsCodeCheckBox(wxPanel* vsCodeInfoPanel, wxBoxSizer* vsCodeInfoPanelSizer)
 {
-    wxCheckBox* checkBox = new wxCheckBox(vsCodeInfoPanel, wxID_ANY, wxString("Open with VsCode"));
+    wxCheckBox* checkBox = new wxCheckBox(vsCodeInfoPanel, wxID_ANY, wxString(L"Open with VsCode"));
     vsCodeInfoPanelSizer->Add(checkBox, 0, wxALIGN_CENTER);
-    checkBox->SetValue(true);
+    checkBox->SetValue(false);
+    return checkBox;
+}
+
+wxStaticText* AppFrame::CreateSublimeTextPathDesc(wxPanel* mainPanel, wxBoxSizer* mainPanelSizer, const OpenFolderAppInfo& sublimeTextPath)
+{
+    std::wstring desc = L"Current Sublime Text Path:\n" + sublimeTextPath.appPath + sublimeTextPath.appName;
+    
+    wxStaticText* pSublimeTextPath = new wxStaticText(mainPanel, wxID_ANY, wxString(desc));
+    pSublimeTextPath->SetFont(wxFont{10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_MEDIUM});
+    mainPanelSizer->Add(pSublimeTextPath, 0, wxALIGN_CENTER);
+    return pSublimeTextPath;
+}
+
+wxCheckBox* AppFrame::CreateSublimeTextCheckBox(wxPanel* topPanel, wxBoxSizer* topPanelSizer)
+{
+    wxCheckBox* checkBox = new wxCheckBox(topPanel, wxID_ANY, wxString(L"Open with Sublime"));
+    topPanelSizer->Add(checkBox, 0, wxALIGN_CENTER);
+    checkBox->SetValue(false);
     return checkBox;
 }
 
@@ -190,7 +261,7 @@ wxButton* AppFrame::CreateButton(wxWindow* parent, const std::wstring& label)
     return pButton;
 }
 
-std::pair<wxPanel*, wxBoxSizer*> AppFrame::CreateVsCodeInfoLayout(wxPanel* topPanel, wxBoxSizer* topSizer)
+std::pair<wxPanel*, wxBoxSizer*> AppFrame::CreateOpenFolderPanel(wxPanel* topPanel, wxBoxSizer* topSizer)
 {
     auto pVsCodeInfoPanel = new wxPanel(topPanel);
     auto pVsCodeInfoPanelSizer = new wxBoxSizer(wxVERTICAL);
