@@ -78,11 +78,22 @@ void AppFrame::InitLayout()
                     {
                         const std::wstring folderToOpen = basePath + additionPath;
                         if (_pVsCodeEnableCheckBox->GetValue())
-                            WindowsDependent::WinExecute(_vsCodeInfo.appName, _vsCodeInfo.appPath, folderToOpen);
+                            WindowsDependent::WinShellExecute(_vsCodeInfo.appName, folderToOpen, _vsCodeInfo.appPath);
                         else if (_pSublimeTextEnableCheckBox->IsShown() && _pSublimeTextEnableCheckBox->GetValue())
-                            WindowsDependent::WinExecute(_sublimeTextInfo.appName, _sublimeTextInfo.appPath, folderToOpen);
+                        {
+                            std::wstring cmd {_sublimeTextInfo.appPath + _sublimeTextInfo.appName + L" -n \"" + folderToOpen + L"\""};
+
+                            // sublime text command line seems do not support back slash, doom app
+                            for (auto& c : cmd)
+                            {
+                                if (c == L'\\')
+                                    c = L'/';
+                            }
+                            
+                            WindowsDependent::WinCreateProcess(cmd);
+                        }
                         else
-                            WindowsDependent::WinExecute(L"explorer.exe", folderToOpen);
+                            WindowsDependent::WinShellExecute(L"explorer.exe", folderToOpen);
                     });
                 pBtnListSizer->AddStretchSpacer();
                 pBtnListSizer->Add(pButton, 1,  wxALIGN_CENTER_VERTICAL);

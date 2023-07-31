@@ -5,6 +5,7 @@
 namespace WindowsDependent
 {
     std::wstring WinGetUserName();
-    void WinExecute(std::wstring app, std::wstring appPath, std::wstring appPara);
-    void WinExecute(std::wstring app, std::wstring appPara);
+    void WinShellExecute(std::wstring app, std::wstring appPara, std::wstring appPath);
+    void WinShellExecute(std::wstring app, std::wstring appPara);
+    bool WinCreateProcess(const std::wstring& cmd);
 }
