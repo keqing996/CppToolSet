@@ -81,7 +81,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\utilWin32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\utilWin32.h" />

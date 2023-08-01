@@ -4,5 +4,6 @@
 
 namespace Grf::UtilWin32
 {
-	std::wstring GetUserName();
+	std::wstring WinGetUserName();
+	bool WinCreateProcess(std::wstring cmdLine);
 }
