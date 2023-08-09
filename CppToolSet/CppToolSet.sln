@@ -41,6 +41,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UtilWin32", "CppUtils\UtilW
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Win32ApiTest", "CppWin32\Win32ApiTest\Win32ApiTest.vcxproj", "{5B0B3924-7F86-4E02-9306-07D6147891A7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGuiTemplate", "CppThirdPartyTest\ImGuiTemplate\ImGuiTemplate.vcxproj", "{E72F53ED-D55C-4FD7-9422-E6F55D1A8C3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -107,6 +109,10 @@ Global
 		{5B0B3924-7F86-4E02-9306-07D6147891A7}.Debug|x64.Build.0 = Debug|x64
 		{5B0B3924-7F86-4E02-9306-07D6147891A7}.Release|x64.ActiveCfg = Release|x64
 		{5B0B3924-7F86-4E02-9306-07D6147891A7}.Release|x64.Build.0 = Release|x64
+		{E72F53ED-D55C-4FD7-9422-E6F55D1A8C3C}.Debug|x64.ActiveCfg = Debug|x64
+		{E72F53ED-D55C-4FD7-9422-E6F55D1A8C3C}.Debug|x64.Build.0 = Debug|x64
+		{E72F53ED-D55C-4FD7-9422-E6F55D1A8C3C}.Release|x64.ActiveCfg = Release|x64
+		{E72F53ED-D55C-4FD7-9422-E6F55D1A8C3C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +133,7 @@ Global
 		{60F9F25D-3B63-41E2-8F82-BE07644D9E1E} = {2CCEB292-A41B-4A83-9891-1A34ED5DFBAB}
 		{9946C1E7-A2CA-4C78-9577-190208D69F03} = {B5792A46-6942-4C7B-816F-1FE455E0A1A6}
 		{5B0B3924-7F86-4E02-9306-07D6147891A7} = {2CCEB292-A41B-4A83-9891-1A34ED5DFBAB}
+		{E72F53ED-D55C-4FD7-9422-E6F55D1A8C3C} = {0D249524-33E6-4171-8883-CD24BBB3BD67}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FF2100E-3059-4047-A233-C72611D692B6}
