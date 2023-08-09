@@ -12,7 +12,7 @@ namespace Grf::UtilWin32
     {
         wchar_t userNameBuffer[255];
         DWORD userNameBufferLen;
-        ::GetUserName(userNameBuffer, &userNameBufferLen);
+        ::GetUserNameW(userNameBuffer, &userNameBufferLen);
         return { userNameBuffer };
     }
 
@@ -26,7 +26,7 @@ namespace Grf::UtilWin32
         ::ZeroMemory( &pi, sizeof(pi) );
 
         // Start the child process. 
-        if( !::CreateProcess(
+        if( !::CreateProcessW(
             nullptr,                                // No module name (use command line)
             const_cast<LPWSTR>(cmd.c_str()),        // Command line
             nullptr,                                // Process handle not inheritable

@@ -5,5 +5,11 @@
 namespace Grf::UtilWin32
 {
 	std::wstring WinGetUserName();
+	
 	bool WinCreateProcess(std::wstring cmdLine);
+
+	namespace Socket
+	{
+		
+	}
 }
