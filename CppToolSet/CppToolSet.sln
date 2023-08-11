@@ -51,6 +51,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StdPromiseFuture", "CppTech
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StdCoroutine", "CppTechRecord\StdCoroutine\StdCoroutine.vcxproj", "{5F90CACD-365B-4050-BC60-3DDD430CE1B5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StdThread", "CppTechRecord\StdThread\StdThread.vcxproj", "{5FC7C477-E353-4267-90F6-F87A78817901}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -133,6 +135,10 @@ Global
 		{5F90CACD-365B-4050-BC60-3DDD430CE1B5}.Debug|x64.Build.0 = Debug|x64
 		{5F90CACD-365B-4050-BC60-3DDD430CE1B5}.Release|x64.ActiveCfg = Release|x64
 		{5F90CACD-365B-4050-BC60-3DDD430CE1B5}.Release|x64.Build.0 = Release|x64
+		{5FC7C477-E353-4267-90F6-F87A78817901}.Debug|x64.ActiveCfg = Debug|x64
+		{5FC7C477-E353-4267-90F6-F87A78817901}.Debug|x64.Build.0 = Debug|x64
+		{5FC7C477-E353-4267-90F6-F87A78817901}.Release|x64.ActiveCfg = Release|x64
+		{5FC7C477-E353-4267-90F6-F87A78817901}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,6 +163,7 @@ Global
 		{76D7F80B-B567-41C4-A046-CE433EA53058} = {18EB907B-56A3-4E55-BD3C-08C7CBD468A7}
 		{CB2C0024-D2BB-4451-9152-13BF9BD9BF65} = {18EB907B-56A3-4E55-BD3C-08C7CBD468A7}
 		{5F90CACD-365B-4050-BC60-3DDD430CE1B5} = {18EB907B-56A3-4E55-BD3C-08C7CBD468A7}
+		{5FC7C477-E353-4267-90F6-F87A78817901} = {18EB907B-56A3-4E55-BD3C-08C7CBD468A7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FF2100E-3059-4047-A233-C72611D692B6}
