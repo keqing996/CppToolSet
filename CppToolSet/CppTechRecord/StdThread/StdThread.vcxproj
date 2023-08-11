@@ -80,7 +80,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\example_1_thread_create.cpp" />
+    <ClCompile Include="src\example_2_atomic_mutex.cpp" />
+    <ClCompile Include="src\example_3_condition_variable.cpp" />
+    <ClCompile Include="src\example_4_semaphore.cpp" />
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\example_1_thread_create.h" />
+    <ClInclude Include="src\example_2_atomic_mutex.h" />
+    <ClInclude Include="src\example_3_condition_variable.h" />
+    <ClInclude Include="src\example_4_semaphore.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
