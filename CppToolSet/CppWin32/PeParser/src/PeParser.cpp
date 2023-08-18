@@ -6,12 +6,6 @@ namespace PeParser
 
     void PEParser::PrintInfo() const
     {
-        PrintFileHeader();
-        printf("\n");
-
-        PrintOptionalHeader();
-        printf("\n");
-
         PrintSectionInfo();
         printf("\n");
 
@@ -23,26 +17,6 @@ namespace PeParser
 
         PrintBaseRelocTable();
         printf("\n");
-    }
-
-    void PEParser::PrintFileHeader() const
-    {
-        printf("FileHeader: \n");
-        printf(" - Machine: 0x%hx\n", _pFileHeader->Machine);
-        printf(" - Section Number: %d\n", _pFileHeader->NumberOfSections);
-        printf(" - Optional Header Size: %d\n", _pFileHeader->SizeOfOptionalHeader);
-    }
-
-    void PEParser::PrintOptionalHeader() const
-    {
-        printf("OptionalHeader: \n");
-        printf(" - AddressOfEntryPoint: 0x%lx\n", _pOptionalHeader->AddressOfEntryPoint);
-        printf(" - ImageBase: 0x%llx\n", _pOptionalHeader->ImageBase);
-        printf(" - SectionAlignment: 0x%lx\n", _pOptionalHeader->SectionAlignment);
-        printf(" - FileAlignment: 0x%lx\n", _pOptionalHeader->FileAlignment);
-        printf(" - SizeOfImage: %lu\n", _pOptionalHeader->SizeOfImage);
-        printf(" - SizeOfHeaders: %lu\n", _pOptionalHeader->SizeOfHeaders);
-        printf(" - NumberOfRvaAndSizes: %lu\n", _pOptionalHeader->NumberOfRvaAndSizes);
     }
 
     void PEParser::PrintSectionInfo() const
