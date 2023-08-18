@@ -1,53 +1,8 @@
-﻿#include "PeParser.h"
+﻿#include "PeParser.hpp"
 
 namespace PeParser
 {
-    PEParser::PEParser()
-    {
-        _fileBuffer = nullptr;
-        _fileSize = 0;
-
-        _pDosHeader = nullptr;
-        _pNtHeader = nullptr;
-        _pFileHeader = nullptr;
-        _pOptionalHeader = nullptr;
-        _pSectionHeader = nullptr;
-    }
-
-    PEParser::~PEParser()
-    {
-        if (_fileBuffer != nullptr)
-        {
-            delete[] _fileBuffer;
-            _fileBuffer = nullptr;
-        }
-    }
-
-    BOOL PEParser::LoadFile(const char* path)
-    {
-        HANDLE hFile = CreateFileA(path, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-        if (hFile == INVALID_HANDLE_VALUE)
-        {
-            printf("file open fail, error code = %lu \n", GetLastError());
-            return FALSE;
-        }
-
-        _fileSize = GetFileSize(hFile, nullptr);
-        _fileBuffer = new char[_fileSize]{0};
-
-        DWORD realReadBytes;
-        BOOL readFileSuccess = ReadFile(hFile, _fileBuffer, _fileSize, &realReadBytes, nullptr);
-        if (!readFileSuccess)
-        {
-            delete[] _fileBuffer;
-            _fileBuffer = nullptr;
-            return FALSE;
-        }
-
-        CloseHandle(hFile);
-
-        return LoadPEInfo();
-    }
+    
 
     void PEParser::PrintInfo() const
     {
@@ -68,31 +23,6 @@ namespace PeParser
 
         PrintBaseRelocTable();
         printf("\n");
-    }
-
-    BOOL PEParser::LoadPEInfo()
-    {
-        // 文件开头就是DOS头
-        _pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(_fileBuffer);
-        if (_pDosHeader->e_magic != IMAGE_DOS_SIGNATURE /* MZ 5a 4d */)
-            return FALSE;
-
-        // Dos头的最后是Nt头的偏移
-        _pNtHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(_fileBuffer + _pDosHeader->e_lfanew);
-        if (_pNtHeader->Signature != IMAGE_NT_SIGNATURE /* PE00 0x00004550 */)
-            return FALSE;
-
-        // 标准PE头
-        _pFileHeader = &_pNtHeader->FileHeader;
-
-        // 可选PE头
-        _pOptionalHeader = &_pNtHeader->OptionalHeader;
-
-        // Section头 -> 紧挨着NT头，是一个数组，长度在fileHeader->NumberOfSections
-        _pSectionHeader = reinterpret_cast<PIMAGE_SECTION_HEADER>(reinterpret_cast<ULONGLONG>(_pNtHeader) + sizeof(
-            IMAGE_NT_HEADERS));
-
-        return TRUE;
     }
 
     void PEParser::PrintFileHeader() const
@@ -139,13 +69,13 @@ namespace PeParser
         DWORD exportTableFov;
         if (RVAToFOV(exportTableDataDirectory.VirtualAddress, &exportTableFov))
         {
-            auto pExportDirectory = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(exportTableFov + _fileBuffer);
+            auto pExportDirectory = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(exportTableFov + _pFileContent);
 
             // 导出表文件名
             DWORD fileNameFov;
             if (RVAToFOV(pExportDirectory->Name, &fileNameFov))
             {
-                const char* fileName = _fileBuffer + fileNameFov;
+                const char* fileName = _pFileContent + fileNameFov;
                 printf(" - Name: %s\n", fileName);
             }
 
@@ -162,7 +92,7 @@ namespace PeParser
             DWORD functionAddrFov;
             if (RVAToFOV(pExportDirectory->AddressOfFunctions, &functionAddrFov))
             {
-                auto ptr = reinterpret_cast<const DWORD*>(functionAddrFov + _fileBuffer);
+                auto ptr = reinterpret_cast<const DWORD*>(functionAddrFov + _pFileContent);
                 for (DWORD i = 0; i < pExportDirectory->NumberOfFunctions; i++)
                     printf(" - FunctionAddr: 0x%lx\n", *(ptr + i));
             }
@@ -171,7 +101,7 @@ namespace PeParser
             DWORD ordinalAddrFov;
             if (RVAToFOV(pExportDirectory->AddressOfNameOrdinals, &ordinalAddrFov))
             {
-                auto ptr = reinterpret_cast<const WORD*>(ordinalAddrFov + _fileBuffer);
+                auto ptr = reinterpret_cast<const WORD*>(ordinalAddrFov + _pFileContent);
                 for (DWORD i = 0; i < pExportDirectory->NumberOfFunctions; i++)
                     printf(" - FunctionOrdinal: %u\n", *(ptr + i));
             }
@@ -180,13 +110,13 @@ namespace PeParser
             DWORD functionNameTableFov;
             if (RVAToFOV(pExportDirectory->AddressOfNames, &functionNameTableFov))
             {
-                auto pFunctionNameTable = reinterpret_cast<DWORD*>(functionNameTableFov + _fileBuffer);
+                auto pFunctionNameTable = reinterpret_cast<DWORD*>(functionNameTableFov + _pFileContent);
                 for (DWORD i = 0; i < pExportDirectory->NumberOfNames; i++)
                 {
                     DWORD functionNameRva = *(pFunctionNameTable + i);
                     DWORD functionNameFov;
                     if (RVAToFOV(functionNameRva, &functionNameFov))
-                        printf(" - FunctionName: %s\n", functionNameFov + _fileBuffer);
+                        printf(" - FunctionName: %s\n", functionNameFov + _pFileContent);
                 }
             }
         }
@@ -211,19 +141,19 @@ namespace PeParser
         DWORD importTableFov;
         if (RVAToFOV(importTableDataDirectory.VirtualAddress, &importTableFov))
         {
-            auto pImportDescriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(importTableFov + _fileBuffer);
+            auto pImportDescriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(importTableFov + _pFileContent);
 
             // 遍历链表
             while (IsImportDescriptorValid(pImportDescriptor))
             {
                 DWORD dllNameFov;
                 if (RVAToFOV(pImportDescriptor->Name, &dllNameFov))
-                    printf(" - Dll Name: %s\n", dllNameFov + _fileBuffer);
+                    printf(" - Dll Name: %s\n", dllNameFov + _pFileContent);
 
                 DWORD thunkFov;
                 if (RVAToFOV(pImportDescriptor->OriginalFirstThunk, &thunkFov))
                 {
-                    auto pThunk = reinterpret_cast<PIMAGE_THUNK_DATA>(thunkFov + _fileBuffer);
+                    auto pThunk = reinterpret_cast<PIMAGE_THUNK_DATA>(thunkFov + _pFileContent);
 
                     // 遍历链表
                     while (IsThunkDataValid(pThunk))
@@ -237,7 +167,7 @@ namespace PeParser
                             if (RVAToFOV(pThunk->u1.AddressOfData, &dataAddrFov))
                             {
                                 auto pNameImport = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(dataAddrFov +
-                                    _fileBuffer);
+                                    _pFileContent);
                                 printf(" - Import By Name: %s\n", pNameImport->Name);
                             }
                         }
