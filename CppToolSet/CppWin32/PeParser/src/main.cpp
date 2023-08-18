@@ -49,7 +49,29 @@ int main()
 	printf("\n");
 
 	// export table
-	
+	printf("ExportTable: \n");
+	printf(" - Name: %s\n", peParser.GetExportDirectoryName().c_str());
+	printf(" - Function Order Base: %lld\n", peParser.GetExportedFunctionBaseOrdinal());
+	printf(" - Function Number: %lld\n", peParser.GetExportedFunctionsNum());
+	printf(" - Name Export Number: %lld\n", peParser.GetExportedByNameFunctionsNum());
+
+	auto [pExportedFunAddrArray, pExportedFunAddrArraySize] = peParser.GetExportedFunctionsAddrArray();
+	for (int i = 0; i < pExportedFunAddrArraySize; i++)
+	{
+		printf(" - FunctionAddr %d: 0x%lx\n", i, *(pExportedFunAddrArray + i));
+	}
+
+	auto [pExportedFunOrdinalArray, pExportedFunOrdinalArraySize] = peParser.GetExportedFunctionsOrdinalArray();
+	for (int i = 0; i < pExportedFunOrdinalArraySize; i++)
+	{
+		printf(" - FunctionOrdinal %d: %u\n", i, *(pExportedFunOrdinalArray + i));
+	}
+
+	const auto& exportedFunNameVec = peParser.GetExportedFunctionsNameVec();
+	for (int i = 0; i < exportedFunNameVec.size(); i++)
+	{
+		printf(" - FunctionName %d: %s\n", i, exportedFunNameVec[i].c_str());
+	}
 
 	return 0;
 }

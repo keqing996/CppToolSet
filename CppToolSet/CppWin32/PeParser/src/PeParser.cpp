@@ -6,74 +6,11 @@ namespace PeParser
 
     void PEParser::PrintInfo() const
     {
-        PrintExportTable();
-        printf("\n");
-
         PrintImportTables();
         printf("\n");
 
         PrintBaseRelocTable();
         printf("\n");
-    }
-
-    void PEParser::PrintExportTable() const
-    {
-        printf("ExportTable: \n");
-        IMAGE_DATA_DIRECTORY exportTableDataDirectory = _pOptionalHeader->DataDirectory[0];
-        DWORD exportTableFov;
-        if (RVAToFOV(exportTableDataDirectory.VirtualAddress, &exportTableFov))
-        {
-            auto pExportDirectory = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(exportTableFov + _pFileContent);
-
-            // 导出表文件名
-            DWORD fileNameFov;
-            if (RVAToFOV(pExportDirectory->Name, &fileNameFov))
-            {
-                const char* fileName = _pFileContent + fileNameFov;
-                printf(" - Name: %s\n", fileName);
-            }
-
-            // 函数起始序号
-            printf(" - Function Order Base: %lu\n", pExportDirectory->Base);
-
-            // 导出函数的个数
-            printf(" - Function Number: %lu\n", pExportDirectory->NumberOfFunctions);
-
-            // 导出函数的个数
-            printf(" - Name Export Number: %lu\n", pExportDirectory->NumberOfNames);
-
-            // 地址表（长度 = NumberOfFunctions
-            DWORD functionAddrFov;
-            if (RVAToFOV(pExportDirectory->AddressOfFunctions, &functionAddrFov))
-            {
-                auto ptr = reinterpret_cast<const DWORD*>(functionAddrFov + _pFileContent);
-                for (DWORD i = 0; i < pExportDirectory->NumberOfFunctions; i++)
-                    printf(" - FunctionAddr: 0x%lx\n", *(ptr + i));
-            }
-
-            // 序号表（长度 = NumberOfFunctions
-            DWORD ordinalAddrFov;
-            if (RVAToFOV(pExportDirectory->AddressOfNameOrdinals, &ordinalAddrFov))
-            {
-                auto ptr = reinterpret_cast<const WORD*>(ordinalAddrFov + _pFileContent);
-                for (DWORD i = 0; i < pExportDirectory->NumberOfFunctions; i++)
-                    printf(" - FunctionOrdinal: %u\n", *(ptr + i));
-            }
-
-            // 名称表（长度 = NumberOfNames
-            DWORD functionNameTableFov;
-            if (RVAToFOV(pExportDirectory->AddressOfNames, &functionNameTableFov))
-            {
-                auto pFunctionNameTable = reinterpret_cast<DWORD*>(functionNameTableFov + _pFileContent);
-                for (DWORD i = 0; i < pExportDirectory->NumberOfNames; i++)
-                {
-                    DWORD functionNameRva = *(pFunctionNameTable + i);
-                    DWORD functionNameFov;
-                    if (RVAToFOV(functionNameRva, &functionNameFov))
-                        printf(" - FunctionName: %s\n", functionNameFov + _pFileContent);
-                }
-            }
-        }
     }
 
     void PEParser::PrintImportTables() const

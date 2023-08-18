@@ -64,11 +64,12 @@ namespace PeParser
         long long _exportTableStartOrdinal = 0;
         
         long long _exportFunctionNum = 0;
-        unsigned long* _pExportedFunctionAddrArray = nullptr;
-        unsigned long* _pExportedFunctionOrdinalArray = nullptr;
+        DWORD* _pExportedFunctionAddrArray = nullptr;
+        WORD* _pExportedFunctionOrdinalArray = nullptr;
         
         long long _exportFunctionByNameNum = 0;
-        unsigned long* _pExportedFunctionNameArray = nullptr;
+        DWORD* _pExportedFunctionNameArray = nullptr;
+        std::vector<std::string> _pExportedFunctionNameVec {};
 
     public:
         bool IsFileLoaded() const
@@ -116,19 +117,39 @@ namespace PeParser
             return { _pSectionArray, _sectionNum };
         }
 
-        std::pair<unsigned long*, long long> GetExportedFunctionsAddrArray() const
+        const std::string& GetExportDirectoryName() const
+        {
+            return _exportTableFileName;
+        }
+        
+        long long GetExportedFunctionBaseOrdinal() const
+        {
+            return _exportTableStartOrdinal;
+        }
+
+        long long GetExportedFunctionsNum() const
+        {
+            return _exportFunctionNum;
+        }
+
+        long long GetExportedByNameFunctionsNum() const
+        {
+            return _exportFunctionByNameNum;
+        }
+
+        std::pair<DWORD*, long long> GetExportedFunctionsAddrArray() const
         {
             return { _pExportedFunctionAddrArray, _exportFunctionNum };
         }
 
-        std::pair<unsigned long*, long long> GetExportedFunctionsOrdinalArray() const
+        std::pair<WORD*, long long> GetExportedFunctionsOrdinalArray() const
         {
             return { _pExportedFunctionOrdinalArray, _exportFunctionNum };
         }
 
-        std::pair<unsigned long*, long long> GetExportedFunctionsNameArray() const
+        const std::vector<std::string>& GetExportedFunctionsNameVec() const
         {
-            return { _pExportedFunctionNameArray, _exportFunctionByNameNum };
+            return _pExportedFunctionNameVec;
         }
 
         Result Process()
@@ -246,7 +267,7 @@ namespace PeParser
             if (!functionAddrFovPair.first)
                 return Result::RVA_TO_FOV_FAILED;
 
-            _pExportedFunctionAddrArray = reinterpret_cast<unsigned long*>(
+            _pExportedFunctionAddrArray = reinterpret_cast<DWORD*>(
                 _pFileContent + functionAddrFovPair.second
                 );
 
@@ -255,7 +276,7 @@ namespace PeParser
             if (!ordinalAddrFovPair.first)
                 return Result::RVA_TO_FOV_FAILED;
 
-            _pExportedFunctionOrdinalArray = reinterpret_cast<unsigned long*>(
+            _pExportedFunctionOrdinalArray = reinterpret_cast<WORD*>(
                 _pFileContent + ordinalAddrFovPair.second
                 );
 
@@ -267,14 +288,23 @@ namespace PeParser
             if (!functionNameTableFovPair.first)
                 return Result::RVA_TO_FOV_FAILED;
 
-            _pExportedFunctionNameArray = reinterpret_cast<unsigned long*>(
+            _pExportedFunctionNameArray = reinterpret_cast<DWORD*>(
                 _pFileContent + functionNameTableFovPair.second
                 );
 
+            for (int i = 0; i < _exportFunctionByNameNum; i++)
+            {
+                DWORD functionNameRva = *(_pExportedFunctionNameArray + i);
+                auto functionNameFovPair = RVAToFOV(functionNameRva);
+                if (!functionNameFovPair.first)
+                    return Result::RVA_TO_FOV_FAILED;
+
+                char* pName = reinterpret_cast<char*>(_pFileContent + functionNameFovPair.second);
+                _pExportedFunctionNameVec.emplace_back(pName);
+            }
+
             return Result::SUCCESS;
         }
-
-        void PrintExportTable() const;
 
         void PrintImportTables() const;
 
