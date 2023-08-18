@@ -2,16 +2,6 @@
 
 namespace PeParser
 {
-    
-
-    void PEParser::PrintInfo() const
-    {
-        PrintImportTables();
-        printf("\n");
-
-        PrintBaseRelocTable();
-        printf("\n");
-    }
 
     void PEParser::PrintImportTables() const
     {
@@ -70,9 +60,5 @@ namespace PeParser
                 pImportDescriptor++;
             }
         }
-    }
-
-    void PEParser::PrintBaseRelocTable() const
-    {
     }
 }

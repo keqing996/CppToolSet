@@ -35,8 +35,6 @@ namespace PeParser
             }
         }
 
-        void PrintInfo() const;
-
     private:
 
         /* File path */
@@ -165,9 +163,26 @@ namespace PeParser
             result = ProcessExportTable();
             if (result != Result::SUCCESS)
                 return result;
-            
+
+            result = ProcessImportTable();
+            if (result != Result::SUCCESS)
+                return result;
 
             return Result::SUCCESS;
+        }
+
+        DWORD GetExportFunctionAddrByName(const std::string& name) const
+        {
+            for (int i = 0; i < _pExportedFunctionNameVec.size(); i++)
+            {
+                if (_pExportedFunctionNameVec[i] == name)
+                {
+                    WORD index = *(_pExportedFunctionOrdinalArray + i);
+                    return *(_pExportedFunctionAddrArray + index);
+                }
+            }
+
+            return 0;
         }
 
         std::pair<bool, unsigned long> RVAToFOV(unsigned long rva) const
@@ -306,8 +321,20 @@ namespace PeParser
             return Result::SUCCESS;
         }
 
-        void PrintImportTables() const;
+        Result ProcessImportTable()
+        {
+            return Result::SUCCESS;
+        }
 
-        void PrintBaseRelocTable() const;
+    private:
+        static bool IsImportDescriptorValid(PIMAGE_IMPORT_DESCRIPTOR pImportDescriptor)
+        {
+            return pImportDescriptor->OriginalFirstThunk != 0;
+        }
+
+        static bool IsThunkDataValid(PIMAGE_THUNK_DATA pThunkData)
+        {
+            return pThunkData->u1.Function != 0;
+        }
     };
 }
