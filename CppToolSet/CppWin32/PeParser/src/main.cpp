@@ -30,7 +30,25 @@ int main()
 	printf(" - SizeOfHeaders: %lu\n", _pOptionalHeader->SizeOfHeaders);
 	printf(" - NumberOfRvaAndSizes: %lu\n", _pOptionalHeader->NumberOfRvaAndSizes);
 	printf("\n");
-	
+
+	// print section info
+	printf("SectionTable: \n");
+	auto [pSectionAry, sectionLength] = peParser.GetSectionArray();
+	for (int i = 0; i < sectionLength; i++)
+	{
+		PIMAGE_SECTION_HEADER pSectionHeader = pSectionAry + i;
+		
+		// Section头可能填充满，没有\0
+		char sectionName[9]{'\0'};
+		memcpy_s(sectionName, 8, pSectionHeader->Name, 8);
+		printf(" - %s\n", sectionName);
+		printf("   - VirtualAddress: 0x%lX\n", pSectionHeader->VirtualAddress);
+		printf("   - VirtualAddress: %lu\n", pSectionHeader->SizeOfRawData);
+		printf("   - VirtualAddress: 0x%lX\n", pSectionHeader->PointerToRawData);
+	}
+	printf("\n");
+
+	// export table
 	
 
 	return 0;

@@ -7,7 +7,7 @@
 
 namespace PeParser
 {
-    using Byte = char;
+    // using byte definition in windows.h, which type define byte as unsigned char
 
     enum class Result : int
     {
@@ -15,6 +15,7 @@ namespace PeParser
         FILE_OPEN_FAILED,
         MAGIC_HEADER_NO_PE,
         NT_HEADER_NO_PE,
+        RVA_TO_FOV_FAILED,
     };
     
     class PEParser
@@ -37,19 +38,37 @@ namespace PeParser
         void PrintInfo() const;
 
     private:
+
+        /* File path */
         std::wstring _filePath;
-        
-        Byte* _pFileContent = nullptr;
-        
+
+        /* Pointer to file content */
+        byte* _pFileContent = nullptr;
+
+        /* File size in byte */
         long long _fileSize = 0;
 
+        /* PE headers */
         PIMAGE_DOS_HEADER _pDosHeader = nullptr;
         PIMAGE_NT_HEADERS _pNtHeader = nullptr;
         PIMAGE_FILE_HEADER _pFileHeader = nullptr;
         PIMAGE_OPTIONAL_HEADER _pOptionalHeader = nullptr;
-        PIMAGE_SECTION_HEADER _pSectionHeader = nullptr;
-
         
+        /* Section info */
+        long long _sectionNum = 0;
+        PIMAGE_SECTION_HEADER _pSectionArray = nullptr;
+
+        /* Export table */
+        PIMAGE_EXPORT_DIRECTORY _pExportDirectory = nullptr;
+        std::string _exportTableFileName {};
+        long long _exportTableStartOrdinal = 0;
+        
+        long long _exportFunctionNum = 0;
+        unsigned long* _pExportedFunctionAddrArray = nullptr;
+        unsigned long* _pExportedFunctionOrdinalArray = nullptr;
+        
+        long long _exportFunctionByNameNum = 0;
+        unsigned long* _pExportedFunctionNameArray = nullptr;
 
     public:
         bool IsFileLoaded() const
@@ -62,7 +81,7 @@ namespace PeParser
             return _filePath;
         }
         
-        const Byte* GetFileContent() const
+        const byte* GetFileContent() const
         {
             return _pFileContent;
         }
@@ -92,9 +111,24 @@ namespace PeParser
             return _pOptionalHeader;
         }
 
-        PIMAGE_SECTION_HEADER GetSectionHeader() const
+        std::pair<PIMAGE_SECTION_HEADER, long long> GetSectionArray() const
         {
-            return _pSectionHeader;
+            return { _pSectionArray, _sectionNum };
+        }
+
+        std::pair<unsigned long*, long long> GetExportedFunctionsAddrArray() const
+        {
+            return { _pExportedFunctionAddrArray, _exportFunctionNum };
+        }
+
+        std::pair<unsigned long*, long long> GetExportedFunctionsOrdinalArray() const
+        {
+            return { _pExportedFunctionOrdinalArray, _exportFunctionNum };
+        }
+
+        std::pair<unsigned long*, long long> GetExportedFunctionsNameArray() const
+        {
+            return { _pExportedFunctionNameArray, _exportFunctionByNameNum };
         }
 
         Result Process()
@@ -107,9 +141,28 @@ namespace PeParser
             if (result != Result::SUCCESS)
                 return result;
 
+            result = ProcessExportTable();
+            if (result != Result::SUCCESS)
+                return result;
             
 
             return Result::SUCCESS;
+        }
+
+        std::pair<bool, unsigned long> RVAToFOV(unsigned long rva) const
+        {
+            for (int i = 0; i < _pNtHeader->FileHeader.NumberOfSections; i++)
+            {
+                // 找rva落在哪个section区间内
+                if (rva >= _pSectionArray[i].VirtualAddress
+                    && rva < (_pSectionArray[i].VirtualAddress + _pSectionArray[i].SizeOfRawData))
+                {
+                    unsigned long result = _pSectionArray[i].PointerToRawData + (rva - _pSectionArray[i].VirtualAddress);
+                    return { true, result };
+                }
+            }
+            
+            return { false, 0 };
         }
 
     private:
@@ -124,9 +177,10 @@ namespace PeParser
             readStream.seekg(0, std::ios::end);
             _fileSize = readStream.tellg();
             
-            _pFileContent = new Byte[_fileSize];
+            char* pFileContentInChar = new char[_fileSize];
             readStream.seekg(0, std::ios::beg);
-            readStream.read(_pFileContent, _fileSize);
+            readStream.read(pFileContentInChar, _fileSize);
+            _pFileContent = reinterpret_cast<byte*>(pFileContentInChar);
             
             readStream.close();
 
@@ -147,28 +201,83 @@ namespace PeParser
 
             // 标准PE头
             _pFileHeader = &_pNtHeader->FileHeader;
+            _sectionNum = _pFileHeader->NumberOfSections;
 
             // 可选PE头
             _pOptionalHeader = &_pNtHeader->OptionalHeader;
 
             // Section头 -> 紧挨着NT头，是一个数组，长度在fileHeader->NumberOfSections
-            _pSectionHeader = reinterpret_cast<PIMAGE_SECTION_HEADER>(
+            _pSectionArray = reinterpret_cast<PIMAGE_SECTION_HEADER>(
                 reinterpret_cast<ULONGLONG>(_pNtHeader) + sizeof(IMAGE_NT_HEADERS)
                 );
 
             return Result::SUCCESS;
         }
 
-        
+        Result ProcessExportTable()
+        {
+            IMAGE_DATA_DIRECTORY exportTableDataDirectory = _pOptionalHeader->DataDirectory[0];
+            auto exportTableFovPair = RVAToFOV(exportTableDataDirectory.VirtualAddress);
+            if (!exportTableFovPair.first)
+                return Result::RVA_TO_FOV_FAILED;
 
-        void PrintSectionInfo() const;
+            auto exportTableFov = exportTableFovPair.second;
+            _pExportDirectory = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(
+                _pFileContent + exportTableFov
+                );
+
+            // export table file name
+            auto fileNameFovPair = RVAToFOV(_pExportDirectory->Name);
+            if (!fileNameFovPair.first)
+                return Result::RVA_TO_FOV_FAILED;
+
+            auto fileNameFov = fileNameFovPair.second;
+            const char* fileName = reinterpret_cast<const char*>(_pFileContent + fileNameFov);
+            _exportTableFileName = std::string{fileName};
+
+            // total number of exported functions
+            _exportFunctionNum = _pExportDirectory->NumberOfFunctions;
+
+            // export function start ordinal
+            _exportTableStartOrdinal = _pExportDirectory->Base;
+
+            // exported functions addr table
+            auto functionAddrFovPair = RVAToFOV(_pExportDirectory->AddressOfFunctions);
+            if (!functionAddrFovPair.first)
+                return Result::RVA_TO_FOV_FAILED;
+
+            _pExportedFunctionAddrArray = reinterpret_cast<unsigned long*>(
+                _pFileContent + functionAddrFovPair.second
+                );
+
+            // exported functions name table
+            auto ordinalAddrFovPair = RVAToFOV(_pExportDirectory->AddressOfNameOrdinals);
+            if (!ordinalAddrFovPair.first)
+                return Result::RVA_TO_FOV_FAILED;
+
+            _pExportedFunctionOrdinalArray = reinterpret_cast<unsigned long*>(
+                _pFileContent + ordinalAddrFovPair.second
+                );
+
+            // total number of name-exported functions
+            _exportFunctionByNameNum = _pExportDirectory->NumberOfNames;
+
+            // exported functions name table 
+            auto functionNameTableFovPair = RVAToFOV(_pExportDirectory->AddressOfNames);
+            if (!functionNameTableFovPair.first)
+                return Result::RVA_TO_FOV_FAILED;
+
+            _pExportedFunctionNameArray = reinterpret_cast<unsigned long*>(
+                _pFileContent + functionNameTableFovPair.second
+                );
+
+            return Result::SUCCESS;
+        }
 
         void PrintExportTable() const;
 
         void PrintImportTables() const;
 
         void PrintBaseRelocTable() const;
-
-        BOOL RVAToFOV(DWORD rva, DWORD* result) const;
     };
 }

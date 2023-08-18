@@ -6,9 +6,6 @@ namespace PeParser
 
     void PEParser::PrintInfo() const
     {
-        PrintSectionInfo();
-        printf("\n");
-
         PrintExportTable();
         printf("\n");
 
@@ -17,23 +14,6 @@ namespace PeParser
 
         PrintBaseRelocTable();
         printf("\n");
-    }
-
-    void PEParser::PrintSectionInfo() const
-    {
-        printf("SectionTable: \n");
-        for (int i = 0; i < _pFileHeader->NumberOfSections; i++)
-        {
-            PIMAGE_SECTION_HEADER pSingleSectionHeader = _pSectionHeader + i;
-
-            // Section头可能填充满，没有\0
-            char sectionName[9]{'\0'};
-            memcpy_s(sectionName, 8, pSingleSectionHeader->Name, 8);
-            printf(" - %s\n", sectionName);
-            printf("   - VirtualAddress: 0x%lX\n", pSingleSectionHeader->VirtualAddress);
-            printf("   - VirtualAddress: %lu\n", pSingleSectionHeader->SizeOfRawData);
-            printf("   - VirtualAddress: 0x%lX\n", pSingleSectionHeader->PointerToRawData);
-        }
     }
 
     void PEParser::PrintExportTable() const
@@ -157,22 +137,5 @@ namespace PeParser
 
     void PEParser::PrintBaseRelocTable() const
     {
-    }
-
-    BOOL PEParser::RVAToFOV(DWORD rva, DWORD* result) const
-    {
-        for (int i = 0; i < _pNtHeader->FileHeader.NumberOfSections; i++)
-        {
-            // 找rva落在哪个section区间内
-            if (rva >= _pSectionHeader[i].VirtualAddress && rva < (_pSectionHeader[i].VirtualAddress +
-                _pSectionHeader[i].SizeOfRawData))
-            {
-                *result = _pSectionHeader[i].PointerToRawData + (rva - _pSectionHeader[i].VirtualAddress);
-                return TRUE;
-            }
-        }
-
-        *result = 0;
-        return FALSE;
     }
 }
