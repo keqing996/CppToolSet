@@ -29,26 +29,20 @@ namespace MemoryApiTest
 
         std::cout << std::format("rbp: {:#x}", currentRbpValue) << std::endl;
         std::cout << std::format("rsp: {:#x}", currentRspValue) << std::endl;
-        std::cout << std::format("distance: {} B", distanceRbpRsp) << std::endl
+        std::cout << std::format("distance: {} B", distanceRbpRsp) << std::endl;
 
         std::cout << std::endl;
         std::cout << "This thread stack" << std::endl;
-
         
-/*
-        
-        NT_TIB* teb = reinterpret_cast<NT_TIB*>(NtCurrentTeb());
-        DWORD allStackTop = reinterpret_cast<DWORD>(teb->StackBase);
-        DWORD stackBase = reinterpret_cast<DWORD>(teb->StackLimit);
-        DWORD distance = allStackTop - stackBase;
+        NT_TIB* teb = reinterpret_cast<NT_TIB*>(::NtCurrentTeb());
+        DWORD stackBase = reinterpret_cast<DWORD>(teb->StackBase);
+        DWORD stackLimit = reinterpret_cast<DWORD>(teb->StackLimit);
+        DWORD distance = (stackLimit - stackBase) / 1024 / 1024;
 
-        std::cout << std::format("stack top: {:#x}", allStackTop) << std::endl;
         std::cout << std::format("stack base: {:#x}", stackBase) << std::endl;
-        std::cout << std::format("distance: {}", distance) << std::endl;
-    */    
-
+        std::cout << std::format("stack limit: {:#x}", stackLimit) << std::endl;
+        std::cout << std::format("distance: {} MB", distance) << std::endl;
         
-
 
         
     }
