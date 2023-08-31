@@ -9,6 +9,31 @@
 namespace MemoryApiTest
 {
 
+    SIZE_T GetHeapSize(HANDLE hHeap)
+    {
+        if (hHeap == nullptr)
+            return 0;
+        
+        HeapLock(hHeap);
+        
+        PROCESS_HEAP_ENTRY entry;
+        entry.lpData = nullptr;
+
+        // trans all memory block
+        SIZE_T totalSize = 0;
+        while (HeapWalk(hHeap, &entry))
+        {
+            if (entry.wFlags & PROCESS_HEAP_ENTRY_BUSY)
+            {
+                totalSize += entry.cbData;
+            }
+        }
+        
+        HeapUnlock(hHeap);
+
+        return totalSize;
+    }
+    
     void Test()
     {
         std::cout << "This stack frame" << std::endl;
@@ -56,10 +81,11 @@ namespace MemoryApiTest
         
         for (int i = 0; i < numberOfHeaps; i++)
         {
+            auto heapSize = GetHeapSize(heaps[i]) / 1024;
             if (defaultHeap == heaps[i])
-                std::cout << std::format("[Default] heap {} addr: {:#x}", i, reinterpret_cast<DWORD>(heaps[i]));
+                std::cout << std::format("[Default] heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), heapSize);
             else
-                std::cout << std::format("heap {} addr: {:#x}", i, reinterpret_cast<DWORD>(heaps[i]));
+                std::cout << std::format("          heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), heapSize);
             
             std::cout << std::endl;
         }
