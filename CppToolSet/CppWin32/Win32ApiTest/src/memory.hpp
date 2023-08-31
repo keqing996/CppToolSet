@@ -43,7 +43,28 @@ namespace MemoryApiTest
         std::cout << std::format("stack limit: {:#x}", stackLimit) << std::endl;
         std::cout << std::format("distance: {} MB", distance) << std::endl;
         
+        std::cout << std::endl;
+        std::cout << "Process heaps" << std::endl;
 
+        DWORD numberOfHeaps = ::GetProcessHeaps(0, nullptr);
+        std::cout << std::format("current process heaps number = {}", numberOfHeaps) << std::endl;
+
+        HANDLE* heaps = new HANDLE[numberOfHeaps];
+        ::GetProcessHeaps(numberOfHeaps, heaps);
+
+        HANDLE defaultHeap = ::GetProcessHeap();
+        
+        for (int i = 0; i < numberOfHeaps; i++)
+        {
+            if (defaultHeap == heaps[i])
+                std::cout << std::format("[Default] heap {} addr: {:#x}", i, reinterpret_cast<DWORD>(heaps[i]));
+            else
+                std::cout << std::format("heap {} addr: {:#x}", i, reinterpret_cast<DWORD>(heaps[i]));
+            
+            std::cout << std::endl;
+        }
+
+        
         
     }
 
