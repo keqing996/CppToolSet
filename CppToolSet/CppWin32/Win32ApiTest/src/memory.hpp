@@ -70,7 +70,7 @@ namespace MemoryApiTest
             auto thisHeapSize = GetHeapSize(heaps[i]);
             totalSize += thisHeapSize;
             
-            auto thisHeapSizeKB = thisHeapSize / 1024;
+            auto thisHeapSizeKB = thisHeapSize / 1024.0;
             if (defaultHeap == heaps[i])
                 std::cout << std::format("[Default] heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), thisHeapSizeKB);
             else
@@ -79,7 +79,7 @@ namespace MemoryApiTest
             std::cout << std::endl;
         }
 
-        std::cout << std::format("Total Heap Size: {} KB", totalSize / 1024);
+        std::cout << std::format("Total Heap Size: {} KB", totalSize / 1024.0);
         std::cout << std::endl;
     }
     
@@ -105,10 +105,17 @@ namespace MemoryApiTest
         std::cout << std::format("rsp: {:#x}", currentRspValue) << std::endl;
         std::cout << std::format("distance: {} B", distanceRbpRsp) << std::endl;
 
+        // TIB
         ShowThreadTIB();
+
+        // Heap
+        HANDLE hPrivateHeap = HeapCreate(0, 0, 0);
+        void* buffer = HeapAlloc(hPrivateHeap, 0, 100); // allocate 100B
         
         ShowProcessHeapsInfo();
-        
+        HeapFree(hPrivateHeap, 0, buffer);
+        HeapDestroy(hPrivateHeap);
+
         
     }
 
