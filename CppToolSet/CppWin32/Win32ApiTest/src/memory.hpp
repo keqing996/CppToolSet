@@ -159,6 +159,18 @@ namespace MemoryApiTest
         HeapFree(hPrivateHeap, 0, buffer);
         HeapDestroy(hPrivateHeap);
 
+        // Virtual Memory
+        SYSTEM_INFO sSysInfo;
+        ::GetSystemInfo(&sSysInfo);
+
+        DWORD dwPageSize = sSysInfo.dwPageSize;
+
+        
+        LPVOID lpvBase;
+        lpvBase = ::VirtualAlloc(nullptr, 80 * dwPageSize, MEM_RESERVE, PAGE_NOACCESS);
+
+        ::VirtualFree(lpvBase, 0, MEM_RELEASE);
+        
         // Process Memory
         ShowProcessMemoryInfo();
     }
