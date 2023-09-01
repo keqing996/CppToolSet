@@ -31,14 +31,14 @@ namespace MemoryApiTest
         if (hHeap == nullptr)
             return 0;
         
-        HeapLock(hHeap);
+        ::HeapLock(hHeap);
         
         PROCESS_HEAP_ENTRY entry;
         entry.lpData = nullptr;
 
         // trans all memory block
         SIZE_T totalSize = 0;
-        while (HeapWalk(hHeap, &entry))
+        while (::HeapWalk(hHeap, &entry))
         {
             if (entry.wFlags & PROCESS_HEAP_ENTRY_BUSY)
             {
@@ -46,9 +46,18 @@ namespace MemoryApiTest
             }
         }
         
-        HeapUnlock(hHeap);
+        ::HeapUnlock(hHeap);
 
         return totalSize;
+    }
+
+    HEAP_SUMMARY GetHeapSummary(HANDLE hHeap)
+    {
+        HEAP_SUMMARY heapSummary;
+        heapSummary.cb = sizeof(HEAP_SUMMARY);
+        ::HeapSummary(hHeap, 0, &heapSummary);
+
+        return heapSummary;
     }
 
     void ShowProcessHeapsInfo()
@@ -67,14 +76,22 @@ namespace MemoryApiTest
         size_t totalSize = 0;
         for (int i = 0; i < numberOfHeaps; i++)
         {
+            if (defaultHeap == heaps[i])
+                std::cout << "[Default] ";
+            else
+                std::cout << "          ";
+            
             auto thisHeapSize = GetHeapSize(heaps[i]);
             totalSize += thisHeapSize;
             
             auto thisHeapSizeKB = thisHeapSize / 1024.0;
-            if (defaultHeap == heaps[i])
-                std::cout << std::format("[Default] heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), thisHeapSizeKB);
-            else
-                std::cout << std::format("          heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), thisHeapSizeKB);
+            std::cout << std::format("heap {:3} addr: {:#x}, size: {:9.5} KB, ", i, reinterpret_cast<DWORD>(heaps[i]), thisHeapSizeKB);
+
+            HEAP_SUMMARY thisHeapSummary = GetHeapSummary(heaps[i]);
+            std::cout << std::format("allocated: {:9.5} KB, ", thisHeapSummary.cbAllocated / 1024.0);
+            std::cout << std::format("committed: {:9.5} KB, ", thisHeapSummary.cbCommitted / 1024.0);
+            std::cout << std::format("reserved: {:9.5} KB, ", thisHeapSummary.cbReserved / 1024.0);
+            std::cout << std::format("max reserved: {:9.5} KB, ", thisHeapSummary.cbMaxReserve / 1024.0);
             
             std::cout << std::endl;
         }
