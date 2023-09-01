@@ -8,7 +8,24 @@
 
 namespace MemoryApiTest
 {
+    
+    void ShowThreadTIB()
+    {
+        std::cout << std::endl;
+        std::cout << "Thread TIB:" << std::endl;
+        
+        NT_TIB* teb = reinterpret_cast<NT_TIB*>(::NtCurrentTeb());
+        DWORD stackBase = reinterpret_cast<DWORD>(teb->StackBase);
+        DWORD stackLimit = reinterpret_cast<DWORD>(teb->StackLimit);
+        DWORD distance = (stackLimit - stackBase) / 1024 / 1024;
 
+        std::cout << std::format("stack base: {:#x}", stackBase) << std::endl;
+        std::cout << std::format("stack limit: {:#x}", stackLimit) << std::endl;
+        std::cout << std::format("distance: {} MB", distance) << std::endl;
+
+        std::cout << std::endl;
+    }
+    
     SIZE_T GetHeapSize(HANDLE hHeap)
     {
         if (hHeap == nullptr)
@@ -33,10 +50,42 @@ namespace MemoryApiTest
 
         return totalSize;
     }
+
+    void ShowProcessHeapsInfo()
+    {
+        std::cout << std::endl;
+        std::cout << "Process heaps" << std::endl;
+
+        DWORD numberOfHeaps = ::GetProcessHeaps(0, nullptr);
+        std::cout << std::format("current process heaps number = {}", numberOfHeaps) << std::endl;
+
+        HANDLE* heaps = new HANDLE[numberOfHeaps];
+        ::GetProcessHeaps(numberOfHeaps, heaps);
+
+        HANDLE defaultHeap = ::GetProcessHeap();
+
+        size_t totalSize = 0;
+        for (int i = 0; i < numberOfHeaps; i++)
+        {
+            auto thisHeapSize = GetHeapSize(heaps[i]);
+            totalSize += thisHeapSize;
+            
+            auto thisHeapSizeKB = thisHeapSize / 1024;
+            if (defaultHeap == heaps[i])
+                std::cout << std::format("[Default] heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), thisHeapSizeKB);
+            else
+                std::cout << std::format("          heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), thisHeapSizeKB);
+            
+            std::cout << std::endl;
+        }
+
+        std::cout << std::format("Total Heap Size: {} KB", totalSize / 1024);
+        std::cout << std::endl;
+    }
     
     void Test()
     {
-        std::cout << "This stack frame" << std::endl;
+        std::cout << "This stack frame:" << std::endl;
 
         void* currentRbp;
         void* currentRsp;
@@ -56,40 +105,9 @@ namespace MemoryApiTest
         std::cout << std::format("rsp: {:#x}", currentRspValue) << std::endl;
         std::cout << std::format("distance: {} B", distanceRbpRsp) << std::endl;
 
-        std::cout << std::endl;
-        std::cout << "This thread stack" << std::endl;
+        ShowThreadTIB();
         
-        NT_TIB* teb = reinterpret_cast<NT_TIB*>(::NtCurrentTeb());
-        DWORD stackBase = reinterpret_cast<DWORD>(teb->StackBase);
-        DWORD stackLimit = reinterpret_cast<DWORD>(teb->StackLimit);
-        DWORD distance = (stackLimit - stackBase) / 1024 / 1024;
-
-        std::cout << std::format("stack base: {:#x}", stackBase) << std::endl;
-        std::cout << std::format("stack limit: {:#x}", stackLimit) << std::endl;
-        std::cout << std::format("distance: {} MB", distance) << std::endl;
-        
-        std::cout << std::endl;
-        std::cout << "Process heaps" << std::endl;
-
-        DWORD numberOfHeaps = ::GetProcessHeaps(0, nullptr);
-        std::cout << std::format("current process heaps number = {}", numberOfHeaps) << std::endl;
-
-        HANDLE* heaps = new HANDLE[numberOfHeaps];
-        ::GetProcessHeaps(numberOfHeaps, heaps);
-
-        HANDLE defaultHeap = ::GetProcessHeap();
-        
-        for (int i = 0; i < numberOfHeaps; i++)
-        {
-            auto heapSize = GetHeapSize(heaps[i]) / 1024;
-            if (defaultHeap == heaps[i])
-                std::cout << std::format("[Default] heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), heapSize);
-            else
-                std::cout << std::format("          heap {} addr: {:#x}, size: {} KB", i, reinterpret_cast<DWORD>(heaps[i]), heapSize);
-            
-            std::cout << std::endl;
-        }
-
+        ShowProcessHeapsInfo();
         
         
     }
