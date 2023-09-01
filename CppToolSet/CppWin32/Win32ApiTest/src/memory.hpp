@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <intrin.h>
+#include <Psapi.h>
 #include <winternl.h>
 #include <format>
 #include <iostream>
@@ -99,6 +100,31 @@ namespace MemoryApiTest
         std::cout << std::format("Total Heap Size: {} KB", totalSize / 1024.0);
         std::cout << std::endl;
     }
+
+    void ShowProcessMemoryInfo()
+    {
+        PROCESS_MEMORY_COUNTERS_EX memInfo;
+        memInfo.cb = sizeof(memInfo);
+
+        HANDLE hProcess = ::GetCurrentProcess();
+        PROCESS_MEMORY_COUNTERS* pMemInfo = reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&memInfo);
+        ::GetProcessMemoryInfo(hProcess, pMemInfo, sizeof(memInfo));
+
+        std::cout << std::endl;
+        std::cout << "Process memory" << std::endl;
+
+        std::cout << std::format("PageFaultCount: {}", memInfo.PageFaultCount) << std::endl;
+        std::cout << std::format("PeakWorkingSetSize: {}", memInfo.PeakWorkingSetSize) << std::endl;
+        std::cout << std::format("WorkingSetSize: {}", memInfo.WorkingSetSize) << std::endl;
+        std::cout << std::format("QuotaPeakPagedPoolUsage: {}", memInfo.QuotaPeakPagedPoolUsage) << std::endl;
+        std::cout << std::format("QuotaPagedPoolUsage: {}", memInfo.QuotaPagedPoolUsage) << std::endl;
+        std::cout << std::format("QuotaPeakNonPagedPoolUsage: {}", memInfo.QuotaPeakNonPagedPoolUsage) << std::endl;
+        std::cout << std::format("QuotaNonPagedPoolUsage: {}", memInfo.QuotaNonPagedPoolUsage) << std::endl;
+        std::cout << std::format("PagefileUsage: {}", memInfo.PagefileUsage) << std::endl;
+        std::cout << std::format("PeakPagefileUsage: {}", memInfo.PeakPagefileUsage) << std::endl;
+
+        std::cout << std::endl;
+    }
     
     void Test()
     {
@@ -133,7 +159,8 @@ namespace MemoryApiTest
         HeapFree(hPrivateHeap, 0, buffer);
         HeapDestroy(hPrivateHeap);
 
-        
+        // Process Memory
+        ShowProcessMemoryInfo();
     }
 
 
