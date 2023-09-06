@@ -1,6 +1,49 @@
 #include <format> // cpp 20
 #include <iostream>
 
+struct Product
+{
+	std::string brand;
+	int value;
+	std::string name;
+};
+
+namespace std
+{
+	template<>
+	struct std::formatter<Product>
+	{
+		bool detailed { false };
+
+		constexpr auto parse(std::format_parse_context& context)
+		{
+			auto it = context.begin();
+			auto end = context.end();
+
+			if (it != end && *it == 'd')
+			{
+				detailed = true;
+				++it;
+			}
+
+			return it;
+		}
+
+		template<class FormatContext>
+		auto format(const Product& p, FormatContext& context)
+		{
+			if (detailed)
+			{
+				return format_to(context.out(), "product ({}, {}, {})", p.brand, p.name, p.value);
+			}
+			else
+			{
+				return format_to(context.out(), "product {}", p.name);
+			}
+		}
+	};
+}
+
 int main()
 {
 	// general string & number
@@ -46,6 +89,13 @@ int main()
 	// set cn
 	std::wcout.imbue(std::locale("zh_CN"));
 	std::wcout << std::format(L"wstring: {}", L"测试") << std::endl;
+	std::cout << std::endl;
+
+	// custom structure
+	Product p{ "Brand", 233, "test_name" };
+
+	std::cout << std::format("{:d}", p) << std::endl;
+	std::cout << std::format("{}", p) << std::endl;
 	
 	return 0;
 }
