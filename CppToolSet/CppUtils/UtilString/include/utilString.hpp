@@ -1,10 +1,8 @@
 #pragma once
 
-#include <algorithm>
 #include <sstream>
 #include <string>
 #include <vector>
-
 #include <ranges>
 
 namespace StringUtil
@@ -94,12 +92,24 @@ namespace StringUtil
     }
 
     template<typename Encoding>
+    auto TrimInPlace(std::basic_string<Encoding>& inStr) -> void
+    {
+        TrimInPlace<Encoding>(inStr, " ");
+    }
+
+    template<typename Encoding>
     auto Trim(
         std::basic_string<Encoding>& inStr,
         const std::basic_string<Encoding>& trimStr)
     -> std::basic_string<Encoding>
     {
         return Replace<Encoding>(inStr, trimStr, "");
+    }
+
+    template<typename Encoding>
+    auto Trim(std::basic_string<Encoding>& inStr) -> std::basic_string<Encoding>
+    {
+        return Trim<Encoding>(inStr, " ");
     }
     
 }

@@ -23,6 +23,10 @@ int main()
 
 	StringUtil::TrimInPlace<char>(replaceStr, "#");
 	std::cout << replaceStr << std::endl;
+
+	std::string str2 {"asdasd qwe zxf wsd   "};
+	StringUtil::TrimInPlace<char>(str2);
+	std::cout << str2 << std::endl;
 	
 	return 0;
 }
