@@ -20,6 +20,9 @@ int main()
 
 	auto replaceStr = StringUtil::Replace<char>(joinStr, "*", "#");
 	std::cout << replaceStr << std::endl;
+
+	StringUtil::TrimInPlace<char>(replaceStr, "#");
+	std::cout << replaceStr << std::endl;
 	
 	return 0;
 }

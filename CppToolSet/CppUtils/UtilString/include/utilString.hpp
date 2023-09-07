@@ -83,6 +83,24 @@ namespace StringUtil
         ReplaceInPlace(result, from, to);
         return result;
     }
+
+    template<typename Encoding>
+    auto TrimInPlace(
+        std::basic_string<Encoding>& inStr,
+        const std::basic_string<Encoding>& trimStr)
+    -> void
+    {
+        ReplaceInPlace<Encoding>(inStr, trimStr, "");
+    }
+
+    template<typename Encoding>
+    auto Trim(
+        std::basic_string<Encoding>& inStr,
+        const std::basic_string<Encoding>& trimStr)
+    -> std::basic_string<Encoding>
+    {
+        return Replace<Encoding>(inStr, trimStr, "");
+    }
     
 }
 
