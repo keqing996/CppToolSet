@@ -14,5 +14,12 @@ int main()
 
 	auto joinStr = StringUtil::Join<char>(str1Split, "_");
 	std::cout << joinStr << std::endl;
+
+	StringUtil::ReplaceInPlace<char>(joinStr, "_", "*");
+	std::cout << joinStr << std::endl;
+
+	auto replaceStr = StringUtil::Replace<char>(joinStr, "*", "#");
+	std::cout << replaceStr << std::endl;
+	
 	return 0;
 }

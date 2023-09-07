@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iterator>
+#include <algorithm>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -55,6 +55,33 @@ namespace StringUtil
         }
 
         return oss.str();
+    }
+
+    template<typename Encoding>
+    auto ReplaceInPlace(
+        std::basic_string<Encoding>& inStr,
+        const std::basic_string<Encoding>& from,
+        const std::basic_string<Encoding>& to)
+    -> void
+    {
+        size_t startPos = 0;
+        while((startPos = inStr.find(from, startPos)) != std::string::npos)
+        {
+            inStr.replace(startPos, from.length(), to);
+            startPos += to.length(); 
+        }
+    }
+
+    template<typename Encoding>
+    auto Replace(
+        const std::basic_string<Encoding>& inStr,
+        const std::basic_string<Encoding>& from,
+        const std::basic_string<Encoding>& to)
+    -> std::basic_string<Encoding>
+    {
+        std::basic_string<Encoding> result = inStr;
+        ReplaceInPlace(result, from, to);
+        return result;
     }
     
 }
