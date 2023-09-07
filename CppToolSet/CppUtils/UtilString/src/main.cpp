@@ -12,5 +12,7 @@ int main()
 	for (auto str : str1Split)
 		std::cout << str << std::endl;
 
+	auto joinStr = StringUtil::Join<char>(str1Split, "_");
+	std::cout << joinStr << std::endl;
 	return 0;
 }
