@@ -10,5 +10,5 @@ add_executable(test_cmd_line ${src_files})
 
 target_include_directories(test_cmd_line
         PRIVATE
-        ${CMAKE_SOURCE_DIR}/../../ThirdParty/src/ # library
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/ # library
 )
