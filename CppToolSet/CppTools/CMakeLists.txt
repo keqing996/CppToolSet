@@ -4,3 +4,6 @@ project(CppTools)
 
 add_subdirectory(WxWidgetQuickOpenFolder)
 add_subdirectory(VsNewProjWin32Deleter)
+add_subdirectory(NativeSocketClient)
+add_subdirectory(NativeSocketServer)
+add_subdirectory(PeFileDumper)
