@@ -48,3 +48,5 @@ output/
 bin
 obj
 intermediates
+
+!CppToolSet/Artifacts/*

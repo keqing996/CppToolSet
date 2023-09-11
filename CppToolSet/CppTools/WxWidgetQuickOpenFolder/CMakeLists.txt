@@ -40,3 +40,21 @@ add_custom_command(
         -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/config/"  "${CMAKE_CURRENT_BINARY_DIR}/"
 )
 
+# release copy artifacts
+if (CMAKE_BUILD_TYPE STREQUAL Release)
+    add_custom_command(
+            TARGET ${TargetName} POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            -E copy
+            $<TARGET_FILE:${TargetName}>
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Tool/QuickOpenFolder/${TargetName}.exe"
+    )
+    add_custom_command(
+            TARGET ${TargetName} POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/config/"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Tool/QuickOpenFolder/config/"
+    )
+endif ()
+
