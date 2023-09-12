@@ -7,6 +7,7 @@ set(TargetName winapi_system)
 set(CMAKE_CXX_STANDARD 20)
 
 add_compile_definitions(_UNICODE UNICODE) # for Windows
+add_compile_definitions(NOMINMAX) # for Windows
 
 file (GLOB_RECURSE src_files src/*.cpp)
 
@@ -32,6 +33,6 @@ add_custom_command(
         TARGET ${TargetName} POST_BUILD
         COMMAND ${CMAKE_COMMAND}
         -E copy_directory
-        "system/include/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/"
         "${CMAKE_CURRENT_SOURCE_DIR}/../../../Artifacts/Library/WindowsApi/include/"
 )

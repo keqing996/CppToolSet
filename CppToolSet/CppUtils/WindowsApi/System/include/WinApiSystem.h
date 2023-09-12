@@ -8,10 +8,4 @@ namespace WindowsApi
 
     bool WinCreateProcess(std::wstring cmdLine);
 
-    namespace Socket
-    {
-        bool WinWSAStartUp();
-
-        void WinWSACleanUp();
-    }
 }

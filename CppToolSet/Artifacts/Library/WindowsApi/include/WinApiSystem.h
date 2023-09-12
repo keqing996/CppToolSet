@@ -8,8 +8,4 @@ namespace WindowsApi
 
     bool WinCreateProcess(std::wstring cmdLine);
 
-    namespace Socket
-    {
-
-    }
 }
