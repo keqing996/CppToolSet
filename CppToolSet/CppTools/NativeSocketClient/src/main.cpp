@@ -7,6 +7,7 @@
 
 #include "cmdline/cmdline.h"
 #include "WinApiSocket.h"
+#include "StringUtil.hpp"
 
 WindowsApi::SocketClient* pSocketClient;
 std::atomic<bool> shouldStop = false;
@@ -14,8 +15,19 @@ std::atomic<bool> shouldStop = false;
 int SEND_BUFFER_SIZE = 1024;
 int RECEIVE_BUFFER_SIZE = 4096;
 
-int main()
+int main(int argc, char* argv[])
 {
+    CmdLine::Parser cmd;
+
+    cmd.Add<std::string>("ip", 'i', "ip", true, "");
+    cmd.Add<int>("port", 'p', "port number", true, 80, CmdLine::Range(1, 65535));
+
+    cmd.ParseCheck(argc, argv);
+
+    std::string ipStr = cmd.Get<std::string>("ip");
+    std::wstring ipWStr = StringUtil::StringToWString(ipStr);
+    int port = cmd.Get<int>("port");
+
     pSocketClient = new WindowsApi::SocketClient{};
 
     if (!pSocketClient->HasInit())
@@ -27,7 +39,7 @@ int main()
     }
 
     //auto connectResult = pSocketClient->Connect(L"10.12.66.42", 6666);
-    auto connectResult = pSocketClient->Connect(L"127.0.0.1", 1234);
+    auto connectResult = pSocketClient->Connect(ipWStr, port);
     if (!connectResult.first)
     {
         std::wcout << connectResult.second << std::endl;

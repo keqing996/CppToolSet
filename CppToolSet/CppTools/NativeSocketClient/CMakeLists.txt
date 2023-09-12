@@ -20,6 +20,7 @@ target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/ # cmdline
         ${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Library/WindowsApi/include/ # win socket
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Library/StringUtil/ # string util
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL Debug)

@@ -4,9 +4,32 @@
 #include <string>
 #include <vector>
 #include <ranges>
+#include <algorithm>
 
 namespace StringUtil
 {
+    auto StringToWString(std::string str) -> std::wstring
+    {
+        std::wstring wStr(str.length(), 0);
+        std::transform(str.begin(), str.end(), wStr.begin(), [] (char c)
+        {
+            return (wchar_t)c;
+        });
+
+        return wStr;
+    }
+
+    auto WStringToString(std::wstring wStr) -> std::string
+    {
+        std::string str(wStr.length(), 0);
+        std::transform(wStr.begin(), wStr.end(), str.begin(), [] (wchar_t c)
+        {
+            return (char)c;
+        });
+
+        return str;
+    }
+
     template<typename Encoding, typename DelimType>
     auto SplitView(
             const std::basic_string<Encoding>& inputStr,
