@@ -10,6 +10,8 @@ namespace WindowsApi
 
     namespace Socket
     {
+        bool WinWSAStartUp();
 
+        void WinWSACleanUp();
     }
 }

@@ -1,4 +1,4 @@
-#include "../include/WindowsApi.h"
+#include "../../include/WindowsApi.h"
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -50,5 +50,29 @@ namespace WindowsApi
         ::CloseHandle( pi.hThread );
 
         return true;
+    }
+
+    bool Socket::WinWSAStartUp()
+    {
+        WORD wVersion = MAKEWORD(2, 2);
+        WSADATA wsadata;
+
+        if (0 != ::WSAStartup(wVersion, &wsadata))
+        {
+            return false;
+        }
+
+        if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2)
+        {
+            ::WSACleanup();
+            return false;
+        }
+
+        return true;
+    }
+
+    void Socket::WinWSACleanUp()
+    {
+        ::WSACleanup();
     }
 }
