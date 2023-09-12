@@ -1,70 +1,97 @@
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-
 #include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
 #include <iostream>
 #include <string>
+#include <thread>
+#include <atomic>
 
-#pragma comment(lib, "Ws2_32.lib")
+#include "cmdline/cmdline.h"
+#include "WinApiSocket.h"
+
+WindowsApi::SocketClient* pSocketClient;
+std::atomic<bool> shouldStop = false;
+
+int SEND_BUFFER_SIZE = 1024;
+int RECEIVE_BUFFER_SIZE = 4096;
 
 int main()
 {
-	WORD wVersion = MAKEWORD(2, 2);
-	WSADATA wsadata;
-	if (0 != WSAStartup(wVersion, &wsadata))
-	{
-		std::cout << "socket init failed" << std::endl;
-		system("pause");
-		return 1;
-	}
+    pSocketClient = new WindowsApi::SocketClient{};
 
-	if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2)
-	{
-		std::cout << "socket version failed" << std::endl;
-		WSACleanup();
-		system("pause");
-		return 1;
-	}
+    if (!pSocketClient->HasInit())
+    {
+        std::wcout << L"socket init failed" << std::endl;
+        system("pause");
+        delete pSocketClient;
+        return 1;
+    }
 
-	SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    //auto connectResult = pSocketClient->Connect(L"10.12.66.42", 6666);
+    auto connectResult = pSocketClient->Connect(L"127.0.0.1", 1234);
+    if (!connectResult.first)
+    {
+        std::wcout << connectResult.second << std::endl;
+        system("pause");
+        delete pSocketClient;
+        return 1;
+    }
 
-	PCWSTR src = TEXT("127.0.0.1");
-	in_addr dst;
-	InetPton(AF_INET, src, &dst);
-    
-	SOCKADDR_IN server_addr;
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.S_un.S_addr = dst.S_un.S_addr;
-	server_addr.sin_port = htons(4869);
+    char* sendBuffer = new char[SEND_BUFFER_SIZE];
+    char* receiveBuffer = new char[RECEIVE_BUFFER_SIZE];
 
-	if (connect(clientSocket, reinterpret_cast<SOCKADDR*>(&server_addr), sizeof(SOCKADDR)) == SOCKET_ERROR)
-	{
-		std::cout << "socket connect failed:" << WSAGetLastError() << std::endl;
-		WSACleanup();
-		system("pause");
-		return 1;
-	}
+    std::thread receiveThread([receiveBuffer]() -> void
+    {
+        while (true)
+        {
+            if (shouldStop.load())
+                break;
+
+            ::ZeroMemory(receiveBuffer, RECEIVE_BUFFER_SIZE);
+
+            int receiveSize = -1;
+            auto receiveResult = pSocketClient->Receive(receiveBuffer, RECEIVE_BUFFER_SIZE, &receiveSize);
+            if (!receiveResult.first)
+            {
+                std::wcout << receiveResult.second << std::endl;
+                shouldStop.store(false);
+                break;
+            }
+
+            if (receiveSize > 0)
+            {
+                std::string_view receiveData(receiveBuffer);
+                std::cout << receiveData << std::endl;
+            }
+
+            Sleep(1000);
+        }
+    });
 
 	while (true)
 	{
-		char szSendBuffer[1500];
+        if (shouldStop.load())
+            break;
 
-		std::string src = "hello";
-		memcpy(szSendBuffer, src.c_str(), strlen(src.c_str()));
+        ::ZeroMemory(sendBuffer, SEND_BUFFER_SIZE);
 
-		if (SOCKET_ERROR == send(clientSocket, szSendBuffer, strlen(szSendBuffer) + 1, 0))
-		{
-			printf("send error :%d\n", WSAGetLastError());
-			break;
-		}
+        std::cin.getline(sendBuffer, SEND_BUFFER_SIZE - 2); // final zero will change to \n
 
-		Sleep(2000);
+        std::string_view sendStr {sendBuffer};
+
+        sendBuffer[sendStr.length()] = '\r';
+        sendBuffer[sendStr.length() + 1] = '\n';
+
+        auto sendResult = pSocketClient->Send(sendBuffer, sendStr.length() + 2);
+        if (!sendResult.first)
+        {
+            std::wcout << sendResult.second << std::endl;
+            shouldStop.store(false);
+            break;
+        }
 	}
 
+    receiveThread.join();
+    std::cout << "socket end" << std::endl;
+    system("pause");
 	return 0;
 }

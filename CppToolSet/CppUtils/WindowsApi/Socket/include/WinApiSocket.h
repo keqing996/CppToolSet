@@ -29,6 +29,7 @@ namespace WindowsApi
         virtual ~Socket();
 
     public:
+        bool HasInit() const;
         std::pair<bool, std::wstring> Send(BYTE* dataBuffer, int bufferSize) const;
         std::pair<bool, std::wstring> Receive(BYTE* dataBuffer, int bufferSize, int* receiveSize);
 

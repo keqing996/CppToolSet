@@ -12,7 +12,7 @@ namespace WindowsApi
 
     Socket::Socket()
     {
-
+        InitSocket();
     }
 
     Socket::~Socket()
@@ -81,7 +81,12 @@ namespace WindowsApi
         return {true, L""};
     }
 
-    SocketClient::SocketClient()
+    bool Socket::HasInit() const
+    {
+        return _initSuccess;
+    }
+
+    SocketClient::SocketClient() : Socket()
     {
     }
 
