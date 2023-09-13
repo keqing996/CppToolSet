@@ -12,7 +12,6 @@ namespace WindowsApi
 
     Socket::Socket()
     {
-        InitSocket();
     }
 
     Socket::~Socket()
@@ -21,23 +20,61 @@ namespace WindowsApi
             ::WSACleanup();
     }
 
-    void Socket::InitSocket()
+    std::pair<bool, std::wstring> Socket::InitSocket(SocketMode mode)
     {
         WORD wVersion = MAKEWORD(2, 2);
         WSADATA wsadata;
 
-        if (0 != ::WSAStartup(wVersion, &wsadata))
-            return;
+        auto wsaStartUpResult = ::WSAStartup(wVersion, &wsadata);
+        if (0 != wsaStartUpResult)
+            return { false, std::format(L"was start up error: {}", wsaStartUpResult)};
 
         if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2)
         {
             ::WSACleanup();
-            return;
+            return { false, L"wsa start up: version 2.2 not exist." };
         }
 
-        _socket = ::socket(AF_INET, SOCK_STREAM, 0);
+        int addressFamily = AF_INET;
+        int socketType = SOCK_STREAM;
+        int protocol = IPPROTO_TCP;
+
+        switch (mode)
+        {
+            case SocketMode::IPv4Tcp:
+                addressFamily = AF_INET;
+                socketType = SOCK_STREAM;
+                protocol = IPPROTO_TCP;
+                break;
+            case SocketMode::IPv6Tcp:
+                addressFamily = AF_INET6;
+                socketType = SOCK_DGRAM;
+                protocol = IPPROTO_TCP;
+                break;
+            case SocketMode::IPv4Udp:
+                addressFamily = AF_INET;
+                socketType = SOCK_STREAM;
+                protocol = IPPROTO_UDP;
+                break;
+            case SocketMode::IPv6Udp:
+                addressFamily = AF_INET6;
+                socketType = SOCK_DGRAM;
+                protocol = IPPROTO_UDP;
+                break;
+        }
+
+        _socket = ::socket(addressFamily, socketType, protocol);
+
+        if (_socket == INVALID_SOCKET)
+        {
+            ::WSACleanup();
+            return { false, std::format(L"socket create failed, af = {}, type = {}. protocol = {}",
+                                        addressFamily, socketType, protocol) };
+        }
 
         _initSuccess = true;
+
+        return {true, L""};
     }
 
     std::pair<bool, std::wstring> Socket::Send(BYTE* dataBuffer, int bufferSize) const
@@ -123,6 +160,10 @@ namespace WindowsApi
         }
 
         _connectSuccess = true;
+
+        _ip = ipStr;
+        _port = port;
+
         return {true, L""};
     }
 
@@ -136,5 +177,15 @@ namespace WindowsApi
             return {false, L"socket is not connected."};
 
         return {true, L""};
+    }
+
+    std::wstring SocketClient::GetIp() const
+    {
+        return _ip;
+    }
+
+    int SocketClient::GetPort() const
+    {
+        return _port;
     }
 }

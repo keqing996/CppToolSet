@@ -30,15 +30,15 @@ int main(int argc, char* argv[])
 
     pSocketClient = new WindowsApi::SocketClient{};
 
-    if (!pSocketClient->HasInit())
+    auto initResult = pSocketClient->InitSocket(WindowsApi::SocketMode::IPv4Tcp);
+    if (!initResult.first)
     {
-        std::wcout << L"socket init failed" << std::endl;
+        std::wcout << initResult.second << std::endl;
         system("pause");
         delete pSocketClient;
         return 1;
     }
 
-    //auto connectResult = pSocketClient->Connect(L"10.12.66.42", 6666);
     auto connectResult = pSocketClient->Connect(ipWStr, port);
     if (!connectResult.first)
     {

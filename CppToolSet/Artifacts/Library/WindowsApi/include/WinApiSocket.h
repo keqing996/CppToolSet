@@ -21,6 +21,14 @@
 
 namespace WindowsApi
 {
+    enum class SocketMode: int
+    {
+        IPv4Tcp,
+        IPv6Tcp,
+        IPv4Udp,
+        IPv6Udp,
+    };
+
     class Socket
     {
         using BYTE = char;
@@ -30,14 +38,12 @@ namespace WindowsApi
 
     public:
         bool HasInit() const;
+        std::pair<bool, std::wstring> InitSocket(SocketMode mode);
         std::pair<bool, std::wstring> Send(BYTE* dataBuffer, int bufferSize) const;
         std::pair<bool, std::wstring> Receive(BYTE* dataBuffer, int bufferSize, int* receiveSize);
 
     protected:
         virtual std::pair<bool, std::wstring> ActionCheck() const;
-
-    private:
-        void InitSocket();
 
     protected:
         bool _initSuccess = false;
@@ -53,12 +59,15 @@ namespace WindowsApi
 
     public:
         std::pair<bool, std::wstring> Connect(std::wstring ipStr, int port);
+        std::wstring GetIp() const;
+        int GetPort() const;
 
     protected:
         std::pair<bool, std::wstring> ActionCheck() const override;
 
     protected:
-        int port;
+        std::wstring _ip;
+        int _port;
         bool _connectSuccess = false;
     };
 }
