@@ -12,10 +12,14 @@ namespace WindowsApi
 
     Socket::Socket()
     {
+        _socket = INVALID_SOCKET;
     }
 
     Socket::~Socket()
     {
+        if (_socket != INVALID_SOCKET)
+            ::closesocket(_socket);
+
         if (_initSuccess)
             ::WSACleanup();
     }
@@ -127,14 +131,6 @@ namespace WindowsApi
     {
     }
 
-    SocketClient::~SocketClient()
-    {
-        if (_connectSuccess)
-            ::closesocket(_socket);
-
-        Socket::~Socket();
-    }
-
     std::pair<bool, std::wstring> SocketClient::Connect(std::wstring ipStr, int port)
     {
         if (!_initSuccess)
@@ -188,4 +184,103 @@ namespace WindowsApi
     {
         return _port;
     }
+
+    std::pair<bool, std::wstring> SocketServer::Bind(std::wstring ipStr, int port)
+    {
+        if (!_initSuccess)
+            return {false, L"socket not init."};
+
+        in_addr dst;
+        ::InetPton(AF_INET, ipStr.c_str(), &dst);
+
+        SOCKADDR_IN serverAddr;
+        serverAddr.sin_family = AF_INET;
+        serverAddr.sin_addr.S_un.S_addr = dst.S_un.S_addr;
+        serverAddr.sin_port = ::htons(port);
+
+        auto bindResult = ::bind(
+                _socket,
+                reinterpret_cast<SOCKADDR*>(&serverAddr),
+                sizeof(SOCKADDR));
+
+        if (bindResult == SOCKET_ERROR)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, std::format(L"socket bind error: {}", errorCode)};
+        }
+
+        _bindSuccess = true;
+
+        _ip = ipStr;
+        _port = port;
+
+        return {true, L""};
+    }
+
+    std::pair<bool, std::wstring> SocketServer::ActionCheck() const
+    {
+        auto [baseSuccess, baseErrorStr] = Socket::ActionCheck();
+        if (!baseSuccess)
+            return {baseSuccess, baseErrorStr};
+
+        if (!_bindSuccess)
+            return {false, L"socket is not bound."};
+
+        return {true, L""};
+    }
+
+    std::pair<bool, std::wstring> SocketServer::Listen()
+    {
+        auto bindResult = ::listen(_socket, SOMAXCONN);
+        if (bindResult == SOCKET_ERROR)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, std::format(L"socket listen error: {}", errorCode)};
+        }
+    }
+
+    std::wstring SocketServer::GetIp() const
+    {
+        return _ip;
+    }
+
+    int SocketServer::GetPort() const
+    {
+        return _port;
+    }
+
+    std::pair<bool, std::wstring> SocketServer::SetupEvent()
+    {
+        WSAEVENT serverEvent = ::WSACreateEvent();
+        if (serverEvent == WSA_INVALID_EVENT)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, std::format(L"socket event create error: {}", errorCode)};
+        }
+
+        int bindSelectEvent = ::WSAEventSelect(_socket, serverEvent, FD_ACCEPT);
+        if (bindSelectEvent == SOCKET_ERROR)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, std::format(L"socket bind select event error: {}", errorCode)};
+        }
+
+        
+
+    }
+
+    SocketServer::SocketServer() : Socket()
+    {
+        _serverEvent = WSA_INVALID_EVENT;
+    }
+
+    SocketServer::~SocketServer()
+    {
+        if (_serverEvent != WSA_INVALID_EVENT)
+            ::WSACloseEvent(_serverEvent);
+
+        Socket::~Socket();
+    }
+
+
 }

@@ -70,4 +70,29 @@ namespace WindowsApi
         int _port;
         bool _connectSuccess = false;
     };
+
+    class SocketServer : public Socket
+    {
+    public:
+        SocketServer();
+        ~SocketServer();
+
+    public:
+        std::pair<bool, std::wstring> Bind(std::wstring ipStr, int port);
+        std::pair<bool, std::wstring> Listen();
+        std::wstring GetIp() const;
+        int GetPort() const;
+
+        // Event Model
+        std::pair<bool, std::wstring> SetupEvent();
+
+    protected:
+        std::pair<bool, std::wstring> ActionCheck() const override;
+
+    protected:
+        WSAEVENT _serverEvent;
+        std::wstring _ip;
+        int _port;
+        bool _bindSuccess = false;
+    };
 }
