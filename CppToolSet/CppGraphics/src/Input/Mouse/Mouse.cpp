@@ -6,6 +6,7 @@
 namespace Input
 {
 
+#pragma region [Event]
 
     Mouse::Event::Event()
             : _type(Type::Invalid), _x(0), _y(0)
@@ -17,174 +18,191 @@ namespace Input
     {
     }
 
-    bool Mouse::Event::isValid() const
+    bool Mouse::Event::IsValid() const
     {
         return _type != Type::Invalid;
     }
 
-    Mouse::Event::Type Mouse::Event::getType() const
+    Mouse::Event::Type Mouse::Event::GetType() const
     {
         return _type;
     }
 
-    std::pair<int, int> Mouse::Event::getPosition() const
+    std::pair<int, int> Mouse::Event::GetPosition() const
     {
         return {_x, _y};
     }
 
-    int Mouse::Event::getPositionX() const
+    int Mouse::Event::GetPositionX() const
     {
         return _x;
     }
 
-    int Mouse::Event::getPositionY() const
+    int Mouse::Event::GetPositionY() const
     {
         return _y;
     }
 
-    std::pair<int, int> Mouse::getPosition() const
+#pragma endregion
+
+#pragma region [Accessor]
+
+    Mouse::Accessor::Accessor(Mouse* pMouse)
     {
-        return {_x, _y};
+        _pMouse = pMouse;
     }
 
-    int Mouse::getPositionX() const
+    std::pair<int, int> Mouse::Accessor::GetPosition() const
     {
-        return _x;
+        return {_pMouse->_x, _pMouse->_y};
     }
 
-    int Mouse::getPositionY() const
+    int Mouse::Accessor::GetPositionX() const
     {
-        return _y;
+        return _pMouse->_x;
     }
 
-    bool Mouse::isLeftPressed() const
+    int Mouse::Accessor::GetPositionY() const
     {
-        return _leftPressed;
+        return _pMouse->_y;
     }
 
-    bool Mouse::isMiddlePressed() const
+    bool Mouse::Accessor::IsLeftPressed() const
     {
-        return _middlePressed;
+        return _pMouse->_leftPressed;
     }
 
-    bool Mouse::isRightPressed() const
+    bool Mouse::Accessor::IsMiddlePressed() const
     {
-        return _rightPressed;
+        return _pMouse->_middlePressed;
     }
 
-    bool Mouse::isInWindow() const
+    bool Mouse::Accessor::IsRightPressed() const
     {
-        return _isMouseInWindow;
+        return _pMouse->_rightPressed;
     }
 
-    Mouse::Event Mouse::raiseEvent()
+    bool Mouse::Accessor::IsInWindow() const
     {
-        if (!_buffer.empty())
+        return _pMouse->_isMouseInWindow;
+    }
+
+    Mouse::Event Mouse::Accessor::RaiseEvent()
+    {
+        if (!_pMouse->_buffer.empty())
         {
-            auto evt = _buffer.front();
-            _buffer.pop();
+            auto evt = _pMouse->_buffer.front();
+            _pMouse->_buffer.pop();
             return evt;
-        } else
+        }
+        else
         {
-            return Event();
+            return {};
         }
     }
 
-    bool Mouse::isEmpty() const
+    bool Mouse::Accessor::IsEmpty() const
     {
-        return _buffer.empty();
+        return _pMouse->_buffer.empty();
     }
 
-    void Mouse::clear()
+    void Mouse::Accessor::Clear()
     {
-        while (!_buffer.empty())
-            _buffer.pop();
+        while (!_pMouse->_buffer.empty())
+            _pMouse->_buffer.pop();
     }
 
-    void Mouse::onMouseMove(int x, int y)
+#pragma endregion
+
+    Mouse::Accessor Mouse::GetAccessor()
+    {
+        return Mouse::Accessor{ this };
+    }
+
+    void Mouse::OnMouseMove(int x, int y)
     {
         _x = x;
         _y = y;
 
-        _buffer.push(Event(Event::Type::Move, x, y));
+        _buffer.emplace(Event::Type::Move, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onLeftMousePressed(int x, int y)
+    void Mouse::OnLeftMousePressed(int x, int y)
     {
         _x = x;
         _y = y;
         _leftPressed = true;
 
-        _buffer.push(Event(Event::Type::LeftPress, x, y));
+        _buffer.emplace(Event::Type::LeftPress, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onLeftMouseReleased(int x, int y)
+    void Mouse::OnLeftMouseReleased(int x, int y)
     {
         _x = x;
         _y = y;
         _leftPressed = false;
 
-        _buffer.push(Event(Event::Type::LeftRelease, x, y));
+        _buffer.emplace(Event::Type::LeftRelease, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onMiddleMousePressed(int x, int y)
+    void Mouse::OnMiddleMousePressed(int x, int y)
     {
         _x = x;
         _y = y;
         _middlePressed = true;
 
-        _buffer.push(Event(Event::Type::MiddlePress, x, y));
+        _buffer.emplace(Event::Type::MiddlePress, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onMiddleMouseReleased(int x, int y)
+    void Mouse::OnMiddleMouseReleased(int x, int y)
     {
         _x = x;
         _y = y;
         _middlePressed = false;
 
-        _buffer.push(Event(Event::Type::MiddleRelease, x, y));
+        _buffer.emplace(Event::Type::MiddleRelease, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onRightMousePressed(int x, int y)
+    void Mouse::OnRightMousePressed(int x, int y)
     {
         _x = x;
         _y = y;
         _rightPressed = true;
 
-        _buffer.push(Event(Event::Type::RightPress, x, y));
+        _buffer.emplace(Event::Type::RightPress, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onRightMouseReleased(int x, int y)
+    void Mouse::OnRightMouseReleased(int x, int y)
     {
         _x = x;
         _y = y;
         _rightPressed = true;
 
-        _buffer.push(Event(Event::Type::RightRelease, x, y));
+        _buffer.emplace(Event::Type::RightRelease, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onWheelUp(int x, int y)
+    void Mouse::OnWheelUp(int x, int y)
     {
         _x = x;
         _y = y;
 
-        _buffer.push(Event(Event::Type::WheelUp, x, y));
+        _buffer.emplace(Event::Type::WheelUp, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
-    void Mouse::onWheelDown(int x, int y)
+    void Mouse::OnWheelDown(int x, int y)
     {
         _x = x;
         _y = y;
 
-        _buffer.push(Event(Event::Type::WheelDown, x, y));
+        _buffer.emplace(Event::Type::WheelDown, x, y);
         Util::TrimQueue(_buffer, QUEUE_SIZE);
     }
 
@@ -196,24 +214,23 @@ namespace Input
         while (_wheelDelta >= WHEEL_DELTA)
         {
             _wheelDelta -= WHEEL_DELTA;
-            onWheelUp(x, y);
+            OnWheelUp(x, y);
         }
         while (_wheelDelta <= -WHEEL_DELTA)
         {
             _wheelDelta += WHEEL_DELTA;
-            onWheelDown(x, y);
+            OnWheelDown(x, y);
         }
     }
 
-    void Mouse::onMouseEnter()
+    void Mouse::OnMouseEnter()
     {
         _isMouseInWindow = true;
     }
 
-    void Mouse::onMouseLeave()
+    void Mouse::OnMouseLeave()
     {
         _isMouseInWindow = false;
     }
-
 
 }
