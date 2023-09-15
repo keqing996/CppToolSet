@@ -1,32 +1,26 @@
 #pragma once
 
-#include "../Util/Timer.hpp"
-#include "../Window.hpp"
-#include "../Input/Mouse.h"
-#include "../Input/Keyboard.h"
+#include <Windows.h>
+#include "Util/NonCopyable.h"
+#include "Input/Keyboard/Keyboard.h"
+#include "Input/Mouse/Mouse.h"
 
-class Application
+class Application : public NonCopyable
 {
 public:
-    Application(int windowWidth, int windowHeight, const wchar_t* windowName);
-
-public:
-    int Begin();
-
-private:
-    Window _window;
-    int _width;
-    int _height;
-    int _targetFrame;
-    Keyboard _keyboard;
-    Mouse _mouse;
-    Timer _timer;
+    void InitWindow(int windowWidth, int windowHeight, const wchar_t* name);
+    void RunLoop();
+    int GetWindowHeight() const;
+    int GetWindowWidth() const;
+    const Input::Keyboard* GetKeyboard() const;
+    const Input::Mouse* GetMouse() const;
 
 private:
-    static std::optional<int> ProcessMessage();
-    static LRESULT CALLBACK HandleMsgSetup(HWND, UINT, WPARAM, LPARAM);
-    static LRESULT CALLBACK HandleMsgReally(HWND, UINT, WPARAM, LPARAM);
-    LRESULT HandleMsg(HWND, UINT, WPARAM, LPARAM) noexcept;
+    Application() = default;
+
+private:
+    static LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT HandleMsgDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     /* System */
     LRESULT OnMsgWmClose(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     LRESULT OnMsgWmKillFocus(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -45,4 +39,20 @@ private:
     LRESULT OnMsgWmRButtonUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     LRESULT OnMsgWmMouseWheel(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+private:
+    int _height = 0;
+    int _width = 0;
+    HINSTANCE _hInst = ::GetModuleHandle(nullptr);
+    HWND _hWnd = nullptr;
+
+    Input::Keyboard _keyboard = Input::Keyboard{};
+    Input::Mouse _mouse = Input::Mouse{};
+
+private:
+    static Application* _instance;
+    static constexpr LPCWSTR WND_CLASS_NAME = L"Graphic Renderer";
+
+public:
+    static void CreateInstance();
+    static Application* GetInstance();
 };

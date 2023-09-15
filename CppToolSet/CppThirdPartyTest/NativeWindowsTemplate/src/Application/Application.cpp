@@ -1,85 +1,132 @@
+
 #include "Application.h"
-#include "../../../../CppGraphics/src/Application/Application.h"
 
-#include <string>
-
-Application::Application(int windowWidth, int windowHeight, const wchar_t* windowName)
-        : _window(windowWidth, windowHeight, windowName, HandleMsgSetup)
+void Application::InitWindow(int windowWidth, int windowHeight, const wchar_t* name)
 {
     _width = windowWidth;
     _height = windowHeight;
-    _targetFrame = 120;
+
+    WNDCLASSEX wc;
+
+    wc.cbSize = sizeof(wc);
+    wc.style = CS_OWNDC;
+    wc.lpfnWndProc = HandleMsg;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = _hInst;
+    wc.hIcon = nullptr;
+    wc.hCursor = nullptr;
+    wc.hbrBackground = nullptr;
+    wc.lpszMenuName = nullptr;
+    wc.lpszClassName = WND_CLASS_NAME;
+    wc.hIconSm = nullptr;
+
+    ::RegisterClassExW(&wc);
+
+    RECT rect;
+    rect.left = 100;
+    rect.right = _width + rect.left;
+    rect.top = 100;
+    rect.bottom = _height + rect.top;
+
+    DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
+
+    ::AdjustWindowRect(&rect, style, FALSE);
+
+    // send self via WM_NCCREATE. build the relationship between instance pointer and win api.
+    void* lParam = this;
+
+    _hWnd = ::CreateWindowExW(
+            0,
+            WND_CLASS_NAME,
+            name,
+            style,
+            CW_USEDEFAULT,
+            CW_USEDEFAULT,
+            rect.right - rect.left,
+            rect.bottom - rect.top,
+            nullptr,
+            nullptr,
+            _hInst,
+            lParam
+    );
+
+    ::ShowWindow(_hWnd, SW_SHOWDEFAULT);
 }
 
-int Application::Begin()
+void Application::RunLoop()
 {
-    _timer.SetNow();
-
     while (true)
     {
-        if (const auto msgResult = ProcessMessage())
+        MSG msg;
+        bool shouldStop = false;
+        while (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            return *msgResult;
+            if (msg.message == WM_QUIT)
+            {
+                shouldStop = true;
+                break;
+            }
+
+            ::TranslateMessage(&msg);
+            ::DispatchMessage(&msg);
         }
 
-        float dt = static_cast<float>(_timer.GetIntervalMsAndSetNow());
-
-        float consume = static_cast<float>(_timer.GetInterval());
-        float min = 1000 / static_cast<float>(_targetFrame);
-        while (consume < min)
-        {
-            consume = static_cast<float>(_timer.GetInterval());
-        }
-
-        auto title = std::to_wstring(dt);
-        SetWindowText(_window.GetHWnd(), title.c_str());
+        if (shouldStop)
+            break;
     }
 }
 
-std::optional<int> Application::ProcessMessage()
+#pragma region [Getter]
+
+int Application::GetWindowHeight() const
 {
-    MSG msg;
-    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-    {
-        if (msg.message == WM_QUIT)
-            return static_cast<int>(msg.wParam);
-
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    return {};
+    return _width;
 }
 
-LRESULT Application::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+int Application::GetWindowWidth() const
 {
-    if (msg == WM_NCCREATE)
-    {
-        const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lParam);
-        Application* const pApp = static_cast<Application*>(pCreate->lpCreateParams);
-
-        // put window instance pointer into Windows api side,
-        // so we can always get window instance through hWnd
-        SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pApp));
-
-        // set process function to second
-        SetWindowLongPtrW(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Application::HandleMsgReally));
-
-        return pApp->HandleMsg(hWnd, msg, wParam, lParam);
-    }
-
-    return DefWindowProc(hWnd, msg, wParam, lParam);
+    return _height;
 }
 
-LRESULT Application::HandleMsgReally(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+const Input::Keyboard* Application::GetKeyboard() const
 {
-    Application* const pApp = reinterpret_cast<Application*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
-    return pApp->HandleMsg(hWnd, msg, wParam, lParam);
+    return &_keyboard;
 }
 
-LRESULT Application::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
+const Input::Mouse* Application::GetMouse() const
 {
+    return &_mouse;
+}
 
+#pragma endregion
+
+#pragma region [Static Instance]
+
+Application* Application::_instance = nullptr;
+
+void Application::CreateInstance()
+{
+    if (_instance == nullptr)
+        _instance = new Application();
+}
+
+Application* Application::GetInstance()
+{
+    return _instance;
+}
+
+#pragma endregion
+
+#pragma region [Windows Message]
+
+LRESULT Application::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    return Application::GetInstance()->HandleMsgDispatch(hWnd, msg, wParam, lParam);
+}
+
+LRESULT Application::HandleMsgDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
     switch (msg)
     {
         case WM_CLOSE:
@@ -113,7 +160,7 @@ LRESULT Application::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
         case WM_MOUSEWHEEL:
             return OnMsgWmMouseWheel(hWnd, msg, wParam, lParam);
         default:
-            return DefWindowProc(hWnd, msg, wParam, lParam);
+            return ::DefWindowProc(hWnd, msg, wParam, lParam);
     }
 }
 
@@ -166,12 +213,12 @@ LRESULT Application::OnMsgWmMouseMove(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 {
     POINTS pt = MAKEPOINTS(lParam);
 
-    if (pt.x >= 0 && pt.x < _window.GetWidth() && pt.y > 0 && pt.y < _window.GetHeight())
+    if (pt.x >= 0 && pt.x < _width && pt.y > 0 && pt.y < _height)
     {
         _mouse.onMouseMove(pt.x, pt.y);
         if (!_mouse.isInWindow())
         {
-            SetCapture(_window.GetHWnd());
+            SetCapture(_hWnd);
             _mouse.onMouseEnter();
         }
     } else
@@ -239,4 +286,7 @@ LRESULT Application::OnMsgWmMouseWheel(HWND hWnd, UINT msg, WPARAM wParam, LPARA
     _mouse.OnWheelDelta(pt.x, pt.y, GET_WHEEL_DELTA_WPARAM(wParam));
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
+
+#pragma endregion
+
 

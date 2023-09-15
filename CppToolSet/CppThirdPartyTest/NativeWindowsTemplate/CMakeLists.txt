@@ -9,19 +9,15 @@ set(CMAKE_CXX_STANDARD 20)
 add_compile_definitions(_UNICODE UNICODE) # windows wchar
 add_compile_definitions(NOMINMAX) # cancel windows min max macro
 
+file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
 
-add_executable(${TargetName} ${src_files}
-        src/Application/application.cpp
-        src/Application/application.h
-        src/Application/Application.cpp
-        src/Application/Application.h
-        src/Input/Keyboard.cpp
-        src/Input/Keyboard.h
-        src/Input/Mouse.cpp
-        src/Input/Mouse.h
-        src/Util/Timer.hpp
-        src/Util/Util.hpp)
+add_executable(${TargetName} ${src_files} ${res_files})
+
+target_include_directories(${TargetName}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
+)
 
 set_target_properties(${TargetName} PROPERTIES
         LINK_FLAGS "/SUBSYSTEM:WINDOWS"
