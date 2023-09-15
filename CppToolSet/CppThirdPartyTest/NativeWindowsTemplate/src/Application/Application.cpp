@@ -1,4 +1,6 @@
 #include "Application.h"
+#include "../../../../CppGraphics/src/Application/Application.h"
+
 #include <string>
 
 Application::Application(int windowWidth, int windowHeight, const wchar_t* windowName)
