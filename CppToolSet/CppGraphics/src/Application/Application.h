@@ -12,8 +12,8 @@ public:
     void RunLoop();
     int GetWindowHeight() const;
     int GetWindowWidth() const;
-    const Input::Keyboard* GetKeyboard() const;
-    const Input::Mouse* GetMouse() const;
+    Input::Keyboard::Accessor GetKeyboardAccessor();
+    Input::Mouse::Accessor GetMouseAccessor();
 
 private:
     Application() = default;

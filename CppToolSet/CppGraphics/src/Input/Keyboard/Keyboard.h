@@ -25,6 +25,31 @@ namespace Input
             bool IsValid() const;
         };
 
+        class Accessor
+        {
+        public:
+            explicit Accessor(Keyboard* pKeyboard);
+
+        public:
+            bool IsKeyPressed(unsigned char keycode) const;
+            Event ReadKey();
+            bool IsKeyEmpty() const;
+            void ClearKey();
+
+            wchar_t ReadCharW();
+            bool IsCharEmpty() const;
+            void ClearChar();
+
+            void Clear();
+
+            void EnableAutoRepeat();
+            void DisableAutoRepeat();
+            bool IsAutoRepeatEnabled() const;
+
+        private:
+            Keyboard* _pKeyboard;
+        };
+
     public:
         Keyboard() = default;
         ~Keyboard() = default;
@@ -32,26 +57,11 @@ namespace Input
         Keyboard& operator= (const Keyboard&) = delete;
 
     public:
-        bool isKeyPressed(unsigned char keycode) const;
-        Event readKey();
-        bool isKeyEmpty() const;
-        void clearKey();
-
-        wchar_t readCharW();
-        bool isCharEmpty() const;
-        void clearChar();
-
-        void clear();
-
-        void enableAutoRepeat();
-        void disableAutoRepeat();
-        bool isAutoRepeatEnabled() const;
-
-    public:
-        void onKeyPressed(unsigned char keycode);
-        void onKeyReleased(unsigned char keycode);
-        void onCharW(wchar_t c);
-        void clearState();
+        Accessor GetAccessor();
+        void OnKeyPressed(unsigned char keycode);
+        void OnKeyReleased(unsigned char keycode);
+        void OnCharW(wchar_t c);
+        void ClearState();
 
     private:
         static constexpr unsigned int NUM_OF_KEYS = 256;

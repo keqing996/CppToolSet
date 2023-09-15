@@ -1,10 +1,11 @@
 #pragma once
 
 #include <queue>
+#include "Util/NonCopyable.h"
 
 namespace Input
 {
-    class Mouse
+    class Mouse: public NonCopyable
     {
     public:
         class Event
@@ -36,11 +37,33 @@ namespace Input
             Event(Type t, int x, int y);
 
         public:
-            bool isValid() const;
-            Type getType() const;
-            std::pair<int, int> getPosition() const;
-            int getPositionX() const;
-            int getPositionY() const;
+            bool IsValid() const;
+            Type GetType() const;
+            std::pair<int, int> GetPosition() const;
+            int GetPositionX() const;
+            int GetPositionY() const;
+        };
+
+    public:
+        class Accessor
+        {
+        public:
+            explicit Accessor(Mouse* pMouse);
+
+        public:
+            std::pair<int, int> GetPosition() const;
+            int GetPositionX() const;
+            int GetPositionY() const;
+            bool IsLeftPressed() const;
+            bool IsMiddlePressed() const;
+            bool IsRightPressed() const;
+            bool IsInWindow() const;
+            Mouse::Event RaiseEvent();
+            bool IsEmpty() const;
+            void Clear();
+
+        private:
+            Mouse* _pMouse;
         };
 
     public:
@@ -50,35 +73,25 @@ namespace Input
         Mouse& operator= (const Mouse& mouse) = delete;
 
     public:
-        std::pair<int, int> getPosition() const;
-        int getPositionX() const;
-        int getPositionY() const;
-        bool isLeftPressed() const;
-        bool isMiddlePressed() const;
-        bool isRightPressed() const;
-        bool isInWindow() const;
-        Event raiseEvent();
-        bool isEmpty() const;
-        void clear();
+        Accessor GetAccessor();
 
-    public:
-        void onMouseMove(int x, int y);
+        void OnMouseMove(int x, int y);
 
-        void onLeftMousePressed(int x, int y);
-        void onLeftMouseReleased(int x, int y);
+        void OnLeftMousePressed(int x, int y);
+        void OnLeftMouseReleased(int x, int y);
 
-        void onMiddleMousePressed(int x, int y);
-        void onMiddleMouseReleased(int x, int y);
+        void OnMiddleMousePressed(int x, int y);
+        void OnMiddleMouseReleased(int x, int y);
 
-        void onRightMousePressed(int x, int y);
-        void onRightMouseReleased(int x, int y);
+        void OnRightMousePressed(int x, int y);
+        void OnRightMouseReleased(int x, int y);
 
-        void onWheelUp(int x, int y);
-        void onWheelDown(int x, int y);
+        void OnWheelUp(int x, int y);
+        void OnWheelDown(int x, int y);
         void OnWheelDelta(int x, int y, int wheelDelta);
 
-        void onMouseEnter();
-        void onMouseLeave();
+        void OnMouseEnter();
+        void OnMouseLeave();
 
     private:
         static constexpr unsigned int QUEUE_SIZE = 16;

@@ -4,6 +4,8 @@
 namespace Input
 {
 
+#pragma region [Event]
+
     Keyboard::Event::Event()
             : _type(Type::Invalid), _code(0)
     {
@@ -29,104 +31,121 @@ namespace Input
         return _type != Type::Invalid;
     }
 
-    Keyboard::Event Keyboard::readKey()
+#pragma endregion
+
+#pragma region [Accessor]
+
+    Keyboard::Accessor::Accessor(Keyboard* pKeyboard)
     {
-        if (!_keyBuffer.empty())
+        _pKeyboard = pKeyboard;
+    }
+
+    Keyboard::Event Keyboard::Accessor::ReadKey()
+    {
+        if (!_pKeyboard->_keyBuffer.empty())
         {
-            auto keyboardEvent = _keyBuffer.front();
-            _keyBuffer.pop();
+            auto keyboardEvent = _pKeyboard->_keyBuffer.front();
+            _pKeyboard->_keyBuffer.pop();
             return keyboardEvent;
-        } else
+        }
+        else
         {
-            return Keyboard::Event();
+            return {};
         }
     }
 
-    bool Keyboard::isKeyPressed(unsigned char keycode) const
+    bool Keyboard::Accessor::IsKeyPressed(unsigned char keycode) const
     {
-        return _keyStateSet[keycode];
+        return _pKeyboard->_keyStateSet[keycode];
     }
 
-    bool Keyboard::isKeyEmpty() const
+    bool Keyboard::Accessor::IsKeyEmpty() const
     {
-        return _keyBuffer.empty();
+        return _pKeyboard->_keyBuffer.empty();
     }
 
-    void Keyboard::clearKey()
+    void Keyboard::Accessor::ClearKey()
     {
-        while (!_keyBuffer.empty())
+        while (!_pKeyboard->_keyBuffer.empty())
         {
-            _keyBuffer.pop();
+            _pKeyboard->_keyBuffer.pop();
         }
     }
 
-    wchar_t Keyboard::readCharW()
+    wchar_t Keyboard::Accessor::ReadCharW()
     {
-        if (!_charBuffer.empty())
+        if (!_pKeyboard->_charBuffer.empty())
         {
-            wchar_t top = _charBuffer.front();
-            _charBuffer.pop();
+            wchar_t top = _pKeyboard->_charBuffer.front();
+            _pKeyboard->_charBuffer.pop();
             return top;
         }
 
         return 0;
     }
 
-    bool Keyboard::isCharEmpty() const
+    bool Keyboard::Accessor::IsCharEmpty() const
     {
-        return _charBuffer.empty();
+        return _pKeyboard->_charBuffer.empty();
     }
 
-    void Keyboard::clearChar()
+    void Keyboard::Accessor::ClearChar()
     {
-        while (!_charBuffer.empty())
+        while (!_pKeyboard->_charBuffer.empty())
         {
-            _charBuffer.pop();
+            _pKeyboard->_charBuffer.pop();
         }
     }
 
-    void Keyboard::clear()
+    void Keyboard::Accessor::Clear()
     {
-        clearKey();
-        clearChar();
+        ClearKey();
+        ClearChar();
     }
 
-    void Keyboard::enableAutoRepeat()
+    void Keyboard::Accessor::EnableAutoRepeat()
     {
-        _autoRepeat = true;
+        _pKeyboard->_autoRepeat = true;
     }
 
-    void Keyboard::disableAutoRepeat()
+    void Keyboard::Accessor::DisableAutoRepeat()
     {
-        _autoRepeat = false;
+        _pKeyboard->_autoRepeat = false;
     }
 
-    bool Keyboard::isAutoRepeatEnabled() const
+    bool Keyboard::Accessor::IsAutoRepeatEnabled() const
     {
-        return _autoRepeat;
+        return _pKeyboard->_autoRepeat;
     }
 
-    void Keyboard::onKeyPressed(unsigned char keycode)
+#pragma endregion
+
+    Keyboard::Accessor Keyboard::GetAccessor()
+    {
+        return Keyboard::Accessor{ this };
+    }
+
+    void Keyboard::OnKeyPressed(unsigned char keycode)
     {
         _keyStateSet[keycode] = true;
-        _keyBuffer.push(Event(Event::Type::Press, keycode));
+        _keyBuffer.emplace(Event::Type::Press, keycode);
         Util::TrimQueue(_keyBuffer, QUEUE_SIZE);
     }
 
-    void Keyboard::onKeyReleased(unsigned char keycode)
+    void Keyboard::OnKeyReleased(unsigned char keycode)
     {
         _keyStateSet[keycode] = false;
-        _keyBuffer.push(Event(Event::Type::Release, keycode));
+        _keyBuffer.emplace(Event::Type::Release, keycode);
         Util::TrimQueue(_keyBuffer, QUEUE_SIZE);
     }
 
-    void Keyboard::onCharW(wchar_t c)
+    void Keyboard::OnCharW(wchar_t c)
     {
         _charBuffer.push(c);
         Util::TrimQueue(_charBuffer, QUEUE_SIZE);
     }
 
-    void Keyboard::clearState()
+    void Keyboard::ClearState()
     {
         _keyStateSet.reset();
     }

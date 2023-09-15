@@ -89,14 +89,14 @@ int Application::GetWindowWidth() const
     return _height;
 }
 
-const Input::Keyboard* Application::GetKeyboard() const
+Input::Keyboard::Accessor Application::GetKeyboardAccessor()
 {
-    return &_keyboard;
+    return _keyboard.GetAccessor();
 }
 
-const Input::Mouse* Application::GetMouse() const
+Input::Mouse::Accessor Application::GetMouseAccessor()
 {
-    return &_mouse;
+    return _mouse.GetAccessor();
 }
 
 #pragma endregion
@@ -173,7 +173,7 @@ LRESULT Application::OnMsgWmClose(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 LRESULT Application::OnMsgWmKillFocus(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     // if key down raises other window, then key up will not send here, so here must clear states
-    _keyboard.clearState();
+    _keyboard.ClearState();
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
@@ -189,22 +189,22 @@ LRESULT Application::OnMsgSize(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 LRESULT Application::OnMsgWmKeyDownAndSysKeyDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     // if first press down, lParam & 0x40000000 = 1
-    if (!(lParam & 0x40000000) || _keyboard.isAutoRepeatEnabled())
-        _keyboard.onKeyPressed(static_cast<unsigned char>(wParam));
+    if (!(lParam & 0x40000000) || _keyboard.GetAccessor().IsAutoRepeatEnabled())
+        _keyboard.OnKeyPressed(static_cast<unsigned char>(wParam));
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT Application::OnMsgWmKeyUpAndSysKeyUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    _keyboard.onKeyReleased(static_cast<unsigned char>(wParam));
+    _keyboard.OnKeyReleased(static_cast<unsigned char>(wParam));
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT Application::OnMsgWmChar(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    _keyboard.onCharW(static_cast<wchar_t>(wParam));
+    _keyboard.OnCharW(static_cast<wchar_t>(wParam));
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
@@ -215,11 +215,11 @@ LRESULT Application::OnMsgWmMouseMove(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
     if (pt.x >= 0 && pt.x < _width && pt.y > 0 && pt.y < _height)
     {
-        _mouse.onMouseMove(pt.x, pt.y);
-        if (!_mouse.isInWindow())
+        _mouse.OnMouseMove(pt.x, pt.y);
+        if (!_mouse.GetAccessor().IsInWindow())
         {
             SetCapture(_hWnd);
-            _mouse.onMouseEnter();
+            _mouse.OnMouseEnter();
         }
     } else
     {
@@ -227,11 +227,11 @@ LRESULT Application::OnMsgWmMouseMove(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
         // do not allow mouse leave this window when pressing
         if (wParam & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON))
         {
-            _mouse.onMouseMove(pt.x, pt.y);
+            _mouse.OnMouseMove(pt.x, pt.y);
         } else
         {
             ReleaseCapture();
-            _mouse.onMouseLeave();
+            _mouse.OnMouseLeave();
         }
     }
 
@@ -241,42 +241,42 @@ LRESULT Application::OnMsgWmMouseMove(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 LRESULT Application::OnMsgWmLButtonDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINTS pt = MAKEPOINTS(lParam);
-    _mouse.onLeftMousePressed(pt.x, pt.y);
+    _mouse.OnLeftMousePressed(pt.x, pt.y);
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT Application::OnMsgWmLButtonUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINTS pt = MAKEPOINTS(lParam);
-    _mouse.onLeftMouseReleased(pt.x, pt.y);
+    _mouse.OnLeftMouseReleased(pt.x, pt.y);
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT Application::OnMsgWmMButtonDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINTS pt = MAKEPOINTS(lParam);
-    _mouse.onMiddleMousePressed(pt.x, pt.y);
+    _mouse.OnMiddleMousePressed(pt.x, pt.y);
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT Application::OnMsgWmMButtonUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINTS pt = MAKEPOINTS(lParam);
-    _mouse.onMiddleMouseReleased(pt.x, pt.y);
+    _mouse.OnMiddleMouseReleased(pt.x, pt.y);
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT Application::OnMsgWmRButtonDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINTS pt = MAKEPOINTS(lParam);
-    _mouse.onRightMousePressed(pt.x, pt.y);
+    _mouse.OnRightMousePressed(pt.x, pt.y);
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 LRESULT Application::OnMsgWmRButtonUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     POINTS pt = MAKEPOINTS(lParam);
-    _mouse.onRightMouseReleased(pt.x, pt.y);
+    _mouse.OnRightMouseReleased(pt.x, pt.y);
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
