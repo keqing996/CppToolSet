@@ -8,6 +8,7 @@
 class Application : public NonCopyable
 {
 public:
+    ~Application();
     void InitWindow(int windowWidth, int windowHeight, const wchar_t* name);
     void RunLoop();
     int GetWindowHeight() const;

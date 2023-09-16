@@ -1,6 +1,11 @@
 
 #include "Application.h"
 
+Application::~Application()
+{
+    DestroyWindow(_hWnd);
+}
+
 void Application::InitWindow(int windowWidth, int windowHeight, const wchar_t* name)
 {
     _width = windowWidth;
