@@ -19,11 +19,12 @@ add_executable(${TargetName} ${src_files} ${res_files})
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${OPENGL_INCLUDE_DIR} # openGL
+        ${OPENGL_INCLUDE_DIR} # <gl/GL.h> -> Windows Kits\10\Include\10.0.xxx.0\um\
 )
 
 target_link_libraries(${TargetName}
-        ${OPENGL_LIBRARIES} # openGL
+        # static link opengl library -> Windows Kits\10\Lib\10.0.xxx.0\um\x64\OpenGL32.Lib
+        ${OPENGL_LIBRARIES}
 )
 
 set_target_properties(${TargetName} PROPERTIES
