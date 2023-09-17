@@ -1,5 +1,12 @@
 
 #include "Application.h"
+#include "RendererApi/OpenGL/RhiOpenGL.h"
+
+Application::~Application()
+{
+    DestroyRenderer();
+    DestroyWindow();
+}
 
 void Application::InitWindow(int windowWidth, int windowHeight, const wchar_t* name)
 {
@@ -54,6 +61,31 @@ void Application::InitWindow(int windowWidth, int windowHeight, const wchar_t* n
     ::ShowWindow(_hWnd, SW_SHOWDEFAULT);
 }
 
+void Application::DestroyWindow()
+{
+    ::DestroyWindow(_hWnd);
+}
+
+void Application::SetupRenderer(RendererApi api)
+{
+    switch (api)
+    {
+        case RendererApi::OpenGL:
+        default:
+            _pRhi = new RhiOpenGL();
+    }
+
+    _pRhi->SetUp();
+}
+
+void Application::DestroyRenderer()
+{
+    if (_pRhi != nullptr)
+        _pRhi->Destroy();
+
+    delete _pRhi;
+}
+
 void Application::RunLoop()
 {
     while (true)
@@ -70,6 +102,8 @@ void Application::RunLoop()
 
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
+
+            _pRhi->Renderer();
         }
 
         if (shouldStop)
@@ -87,6 +121,11 @@ int Application::GetWindowHeight() const
 int Application::GetWindowWidth() const
 {
     return _height;
+}
+
+HWND Application::GetWindowHandle() const
+{
+    return _hWnd;
 }
 
 Input::Keyboard::Accessor Application::GetKeyboardAccessor()

@@ -4,14 +4,21 @@
 #include "Util/NonCopyable.h"
 #include "Input/Keyboard/Keyboard.h"
 #include "Input/Mouse/Mouse.h"
+#include "Define/RendererApi.h"
+#include "RendererApi/RenderHardwareInterface.h"
 
 class Application : public NonCopyable
 {
 public:
+    ~Application();
     void InitWindow(int windowWidth, int windowHeight, const wchar_t* name);
+    void DestroyWindow();
+    void SetupRenderer(RendererApi api);
+    void DestroyRenderer();
     void RunLoop();
     int GetWindowHeight() const;
     int GetWindowWidth() const;
+    HWND GetWindowHandle() const;
     Input::Keyboard::Accessor GetKeyboardAccessor();
     Input::Mouse::Accessor GetMouseAccessor();
 
@@ -40,13 +47,19 @@ private:
     LRESULT OnMsgWmMouseWheel(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 private:
+
+    /* Basic */
     int _height = 0;
     int _width = 0;
     HINSTANCE _hInst = ::GetModuleHandle(nullptr);
     HWND _hWnd = nullptr;
 
+    /* Input */
     Input::Keyboard _keyboard = Input::Keyboard{};
     Input::Mouse _mouse = Input::Mouse{};
+
+    /* Renderer */
+    RenderHardwareInterface* _pRhi = nullptr;
 
 private:
     static Application* _instance;
