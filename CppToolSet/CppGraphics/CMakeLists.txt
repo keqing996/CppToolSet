@@ -19,6 +19,7 @@ add_executable(${TargetName} ${src_files} ${res_files})
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
+        ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/ # eigen
         ${OPENGL_INCLUDE_DIR} # <gl/GL.h> -> Windows Kits\10\Include\10.0.xxx.0\um\
 )
 
