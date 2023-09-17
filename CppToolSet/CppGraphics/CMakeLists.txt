@@ -23,7 +23,7 @@ target_include_directories(${TargetName}
 )
 
 target_link_libraries(${TargetName}
-        # static link opengl library -> Windows Kits\10\Lib\10.0.xxx.0\um\x64\OpenGL32.Lib
+        # opengl import lib -> Windows Kits\10\Lib\10.0.xxx.0\um\x64\OpenGL32.Lib
         ${OPENGL_LIBRARIES}
 )
 
