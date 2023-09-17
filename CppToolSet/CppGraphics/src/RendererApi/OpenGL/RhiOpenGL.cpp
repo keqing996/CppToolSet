@@ -3,7 +3,8 @@
 
 bool RhiOpenGL::SetUp()
 {
-    HWND hWnd = Application::GetInstance()->GetWindowHandle();
+    auto pApplication = Application::GetInstance();
+    HWND hWnd = pApplication->GetWindowHandle();
 
     // init openGL pixel format
     PIXELFORMATDESCRIPTOR pfd =
@@ -62,7 +63,7 @@ bool RhiOpenGL::SetUp()
     }
 
     ::glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    ::glViewport(0, 0, 800, 600);
+    ::glViewport(0, 0, pApplication->GetWindowHeight(), pApplication->GetWindowWidth());
 
     _setUp = true;
 
@@ -81,38 +82,49 @@ void RhiOpenGL::Destroy()
     ::ReleaseDC(hWnd, _hDC);
 }
 
+constexpr LPCSTR pvsCode =
+        "#version 420 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "}\0";
+
+constexpr LPCSTR pfsCode =
+        "#version 420 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "}\n\0";
+
+constexpr GLfloat Vert[] = {
+        -0.5F, -0.5F, +0.0F, // left
+        +0.5F, -0.5F, +0.0F, // right
+        +0.0F, +0.5F, +0.0F  // top
+};
+
 void RhiOpenGL::Renderer()
 {
+    glClearColor(0.2f, 0.2f, 0.2f, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    constexpr LPCSTR pvsCode =
-            "#version 420 core\n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "void main()\n"
-            "{\n"
-            "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-            "}\0";
-
+    // vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &pvsCode, nullptr);
     glCompileShader(vertexShader);
     GLint vsSuccess = FALSE;
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vsSuccess);
 
-    constexpr LPCSTR pfsCode =
-            "#version 420 core\n"
-            "out vec4 FragColor;\n"
-            "void main()\n"
-            "{\n"
-            "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-            "}\n\0";
+    // pixel shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &pfsCode, nullptr);
     glCompileShader(fragmentShader);
     GLint fsSuccess = FALSE;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &fsSuccess);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fsSuccess);
 
-    auto _shader = glCreateProgram();
+    // shader program
+    unsigned int _shader = glCreateProgram();
     glAttachShader(_shader, vertexShader);
     glAttachShader(_shader, fragmentShader);
     glLinkProgram(_shader);
@@ -122,19 +134,15 @@ void RhiOpenGL::Renderer()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    constexpr GLfloat Vert[] = {
-            -0.5F, -0.5F, +0.0F, // 左
-            +0.5F, -0.5F, +0.0F, // 右
-            +0.0F, +0.5F, +0.0F  // 顶
-    };
+    // VAO
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
 
-    GLuint m_iVAO, m_iVBO;
-
-    glGenVertexArrays(1, &m_iVAO);
-    glGenBuffers(1, &m_iVBO);
-    glBindVertexArray(m_iVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_iVBO);
+    // VBO
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vert), Vert, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
@@ -144,7 +152,7 @@ void RhiOpenGL::Renderer()
     glBindVertexArray(0);
 
     glUseProgram(_shader);
-    glBindVertexArray(m_iVAO);
+    glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 
