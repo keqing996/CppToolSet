@@ -3,14 +3,14 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <mutex>
 #include <atomic>
+#include <memory>
+#include <queue>
 
 #include "cmdline/cmdline.h"
 #include "WinApiSocket.h"
 #include "StringUtil.hpp"
-
-WindowsApi::SocketClient* pSocketClient;
-std::atomic<bool> shouldStop = false;
 
 int SEND_BUFFER_SIZE = 1024;
 int RECEIVE_BUFFER_SIZE = 4096;
@@ -28,50 +28,64 @@ int main(int argc, char* argv[])
     std::wstring ipWStr = StringUtil::StringToWString(ipStr);
     int port = cmd.Get<int>("port");
 
-    pSocketClient = new WindowsApi::SocketClient{};
-
-    auto initResult = pSocketClient->InitSocket(WindowsApi::SocketMode::IPv4Tcp);
-    if (!initResult.first)
+    // Init WSA
+    auto initResult = WindowsApi::Socket::InitWinSocketsEnvironment();
+    if (!initResult.success)
     {
-        std::wcout << initResult.second << std::endl;
-        system("pause");
-        delete pSocketClient;
+        std::wcout << initResult.errorMessage << std::endl;
+        WindowsApi::Socket::CleanWinSocketsEnvironment();
+        std::cin.get();
         return 1;
     }
 
-    auto connectResult = pSocketClient->Connect(ipWStr, port);
-    if (!connectResult.first)
+    // Create socket
+    auto createSocketResult = WindowsApi::Socket::CreateTcpIpv4Socket();
+    if (!createSocketResult.success)
     {
-        std::wcout << connectResult.second << std::endl;
-        system("pause");
-        delete pSocketClient;
+        std::wcout << initResult.errorMessage << std::endl;
+        WindowsApi::Socket::CleanWinSocketsEnvironment();
+        std::cin.get();
         return 1;
     }
 
-    char* sendBuffer = new char[SEND_BUFFER_SIZE];
-    char* receiveBuffer = new char[RECEIVE_BUFFER_SIZE];
+    SOCKET socket = createSocketResult.socket;
 
-    std::thread receiveThread([receiveBuffer]() -> void
+    // Connect socket
+    auto connectResult = WindowsApi::Socket::SocketConnect(&socket, ipWStr, port);
+    if (!connectResult.success)
+    {
+        std::wcout << connectResult.errorMessage << std::endl;
+        WindowsApi::Socket::CleanWinSocketsEnvironment();
+        WindowsApi::Socket::CloseSocket(&socket);
+        std::cin.get();
+        return 1;
+    }
+
+    std::shared_ptr<char> pSendBuffer {new WindowsApi::Socket::Byte[SEND_BUFFER_SIZE]};
+    std::shared_ptr<char> pReceiveBuffer {new WindowsApi::Socket::Byte[RECEIVE_BUFFER_SIZE]};
+    std::atomic<bool> shouldStop = false;
+
+    // Receive thread
+    std::thread receiveThread([pReceiveBuffer, socket, &shouldStop]() -> void
     {
         while (true)
         {
             if (shouldStop.load())
                 break;
 
-            ::ZeroMemory(receiveBuffer, RECEIVE_BUFFER_SIZE);
+            ::ZeroMemory(pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
 
-            int receiveSize = -1;
-            auto receiveResult = pSocketClient->Receive(receiveBuffer, RECEIVE_BUFFER_SIZE, &receiveSize);
-            if (!receiveResult.first)
+            auto receiveResult = WindowsApi::Socket::SocketReceive(&socket, pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
+            if (!receiveResult.success)
             {
-                std::wcout << receiveResult.second << std::endl;
+                std::wcout << receiveResult.errorMessage << std::endl;
                 shouldStop.store(false);
                 break;
             }
 
-            if (receiveSize > 0)
+            if (receiveResult.receiveSize > 0)
             {
-                std::string_view receiveData(receiveBuffer);
+                std::string_view receiveData(pReceiveBuffer.get());
                 std::cout << receiveData << std::endl;
             }
 
@@ -79,31 +93,37 @@ int main(int argc, char* argv[])
         }
     });
 
+    // Send thread
 	while (true)
 	{
         if (shouldStop.load())
             break;
 
-        ::ZeroMemory(sendBuffer, SEND_BUFFER_SIZE);
+        ::ZeroMemory(pSendBuffer.get(), SEND_BUFFER_SIZE);
 
-        std::cin.getline(sendBuffer, SEND_BUFFER_SIZE - 2); // final zero will change to \n
+        std::cin.getline(pSendBuffer.get(), SEND_BUFFER_SIZE - 2); // final zero will change to \n
 
-        std::string_view sendStr {sendBuffer};
+        std::string_view sendStr {pSendBuffer.get()};
 
-        sendBuffer[sendStr.length()] = '\r';
-        sendBuffer[sendStr.length() + 1] = '\n';
+        (pSendBuffer.get())[sendStr.length()] = '\r';
+        (pSendBuffer.get())[sendStr.length() + 1] = '\n';
 
-        auto sendResult = pSocketClient->Send(sendBuffer, sendStr.length() + 2);
-        if (!sendResult.first)
+        auto sendResult = WindowsApi::Socket::SocketSend(&socket, pSendBuffer.get(), sendStr.length() + 2);
+        if (!sendResult.success)
         {
-            std::wcout << sendResult.second << std::endl;
+            std::wcout << sendResult.errorMessage << std::endl;
             shouldStop.store(false);
             break;
         }
 	}
 
     receiveThread.join();
+
     std::cout << "socket end" << std::endl;
-    system("pause");
+
+    WindowsApi::Socket::CloseSocket(&socket);
+    WindowsApi::Socket::CleanWinSocketsEnvironment();
+
+    std::cin.get();
 	return 0;
 }
