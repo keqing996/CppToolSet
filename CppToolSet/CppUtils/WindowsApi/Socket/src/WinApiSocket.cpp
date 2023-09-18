@@ -7,24 +7,9 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-namespace WindowsApi
+namespace WindowsApi::Socket
 {
-
-    Socket::Socket()
-    {
-        _socket = INVALID_SOCKET;
-    }
-
-    Socket::~Socket()
-    {
-        if (_socket != INVALID_SOCKET)
-            ::closesocket(_socket);
-
-        if (_initSuccess)
-            ::WSACleanup();
-    }
-
-    std::pair<bool, std::wstring> Socket::InitSocket(SocketMode mode)
+    ActionResult InitWinSocketsEnvironment()
     {
         WORD wVersion = MAKEWORD(2, 2);
         WSADATA wsadata;
@@ -39,103 +24,73 @@ namespace WindowsApi
             return { false, L"wsa start up: version 2.2 not exist." };
         }
 
+        return { true, L"" };
+    }
+
+    void CleanWinSocketsEnvironment()
+    {
+        ::WSACleanup();
+    }
+
+    SocketCreateResult CreateTcpIpv4Socket()
+    {
         int addressFamily = AF_INET;
         int socketType = SOCK_STREAM;
         int protocol = IPPROTO_TCP;
 
-        switch (mode)
+        SocketCreateResult result;
+
+        result.socket = ::socket(addressFamily, socketType, protocol);
+
+        if (result.socket == INVALID_SOCKET)
         {
-            case SocketMode::IPv4Tcp:
-                addressFamily = AF_INET;
-                socketType = SOCK_STREAM;
-                protocol = IPPROTO_TCP;
-                break;
-            case SocketMode::IPv6Tcp:
-                addressFamily = AF_INET6;
-                socketType = SOCK_DGRAM;
-                protocol = IPPROTO_TCP;
-                break;
-            case SocketMode::IPv4Udp:
-                addressFamily = AF_INET;
-                socketType = SOCK_STREAM;
-                protocol = IPPROTO_UDP;
-                break;
-            case SocketMode::IPv6Udp:
-                addressFamily = AF_INET6;
-                socketType = SOCK_DGRAM;
-                protocol = IPPROTO_UDP;
-                break;
+            result.success = false;
+            result.errorMessage = std::format(L"socket create failed, af = {}, type = {}. protocol = {}",
+                                              addressFamily, socketType, protocol);
+        }
+        else
+        {
+            result.success = true;
+            result.errorMessage = L"";
         }
 
-        _socket = ::socket(addressFamily, socketType, protocol);
-
-        if (_socket == INVALID_SOCKET)
-        {
-            ::WSACleanup();
-            return { false, std::format(L"socket create failed, af = {}, type = {}. protocol = {}",
-                                        addressFamily, socketType, protocol) };
-        }
-
-        _initSuccess = true;
-
-        return {true, L""};
+        return result;
     }
 
-    std::pair<bool, std::wstring> Socket::Send(BYTE* dataBuffer, int bufferSize) const
+    void CloseSocket(const SOCKET* pSocket)
     {
-        auto checkResult = ActionCheck();
-        if (!checkResult.first)
-            return checkResult;
+        if (*pSocket != INVALID_SOCKET)
+            ::closesocket(*pSocket);
+    }
 
-        auto sendResult = ::send(_socket, dataBuffer, bufferSize, 0);
+    ActionResult SocketSend(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
+    {
+        auto sendResult = ::send(*pSocket, pDataBuffer, bufferSize, 0);
         if (sendResult == SOCKET_ERROR)
         {
             int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket error: {}", errorCode)};
+            return {false, std::format(L"socket send error: {}", errorCode)};
         }
 
         return {true, L""};
     }
 
-    std::pair<bool, std::wstring> Socket::Receive(Socket::BYTE* dataBuffer, int bufferSize, int* receiveSize)
+    SocketReceiveResult SocketReceive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
     {
-        auto checkResult = ActionCheck();
-        if (!checkResult.first)
-            return checkResult;
-
-        int recvResult = ::recv(_socket, dataBuffer, bufferSize, 0);
-        if (recvResult == SOCKET_ERROR)
+        // receiveResult < 0 -> error
+        // receiveResult > 0 -> receive size
+        auto receiveResult = ::recv(*pSocket, pDataBuffer, bufferSize, 0);
+        if (receiveResult == SOCKET_ERROR)
         {
             int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket error: {}", errorCode)};
+            return {false, 0, std::format(L"socket receive error: {}", errorCode)};
         }
 
-        *receiveSize = recvResult;
-        return {true, L""};
+        return {true, receiveResult, L""};
     }
 
-    std::pair<bool, std::wstring> Socket::ActionCheck() const
+    ActionResult SocketConnect(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
-        if (!_initSuccess)
-            return {false, L"socket is not init."};
-
-        return {true, L""};
-    }
-
-    bool Socket::HasInit() const
-    {
-        return _initSuccess;
-    }
-
-    SocketClient::SocketClient() : Socket()
-    {
-    }
-
-    std::pair<bool, std::wstring> SocketClient::Connect(std::wstring ipStr, int port)
-    {
-        if (!_initSuccess)
-            return {false, L"socket not init."};
-
         in_addr dst;
         ::InetPton(AF_INET, ipStr.c_str(), &dst);
 
@@ -145,51 +100,21 @@ namespace WindowsApi
         serverAddr.sin_port = ::htons(port);
 
         auto connectResult = ::connect(
-                _socket,
+                *pSocket,
                 reinterpret_cast<SOCKADDR*>(&serverAddr),
                 sizeof(SOCKADDR));
 
         if (connectResult == SOCKET_ERROR)
         {
             int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket error: {}", errorCode)};
+            return {false, std::format(L"socket connect error: {}", errorCode)};
         }
 
-        _connectSuccess = true;
-
-        _ip = ipStr;
-        _port = port;
-
         return {true, L""};
     }
 
-    std::pair<bool, std::wstring> SocketClient::ActionCheck() const
+    ActionResult SocketBind(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
-        auto [baseSuccess, baseErrorStr] = Socket::ActionCheck();
-        if (!baseSuccess)
-            return {baseSuccess, baseErrorStr};
-
-        if (!_connectSuccess)
-            return {false, L"socket is not connected."};
-
-        return {true, L""};
-    }
-
-    std::wstring SocketClient::GetIp() const
-    {
-        return _ip;
-    }
-
-    int SocketClient::GetPort() const
-    {
-        return _port;
-    }
-
-    std::pair<bool, std::wstring> SocketServer::Bind(std::wstring ipStr, int port)
-    {
-        if (!_initSuccess)
-            return {false, L"socket not init."};
-
         in_addr dst;
         ::InetPton(AF_INET, ipStr.c_str(), &dst);
 
@@ -199,7 +124,7 @@ namespace WindowsApi
         serverAddr.sin_port = ::htons(port);
 
         auto bindResult = ::bind(
-                _socket,
+                *pSocket,
                 reinterpret_cast<SOCKADDR*>(&serverAddr),
                 sizeof(SOCKADDR));
 
@@ -209,78 +134,19 @@ namespace WindowsApi
             return {false, std::format(L"socket bind error: {}", errorCode)};
         }
 
-        _bindSuccess = true;
-
-        _ip = ipStr;
-        _port = port;
-
         return {true, L""};
     }
 
-    std::pair<bool, std::wstring> SocketServer::ActionCheck() const
+    ActionResult SocketListen(const SOCKET* pSocket)
     {
-        auto [baseSuccess, baseErrorStr] = Socket::ActionCheck();
-        if (!baseSuccess)
-            return {baseSuccess, baseErrorStr};
-
-        if (!_bindSuccess)
-            return {false, L"socket is not bound."};
-
-        return {true, L""};
-    }
-
-    std::pair<bool, std::wstring> SocketServer::Listen()
-    {
-        auto bindResult = ::listen(_socket, SOMAXCONN);
+        auto bindResult = ::listen(*pSocket, SOMAXCONN);
         if (bindResult == SOCKET_ERROR)
         {
             int errorCode = ::WSAGetLastError();
             return {false, std::format(L"socket listen error: {}", errorCode)};
         }
+
+        return {true, L""};
     }
-
-    std::wstring SocketServer::GetIp() const
-    {
-        return _ip;
-    }
-
-    int SocketServer::GetPort() const
-    {
-        return _port;
-    }
-
-    std::pair<bool, std::wstring> SocketServer::SetupEvent()
-    {
-        WSAEVENT serverEvent = ::WSACreateEvent();
-        if (serverEvent == WSA_INVALID_EVENT)
-        {
-            int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket event create error: {}", errorCode)};
-        }
-
-        int bindSelectEvent = ::WSAEventSelect(_socket, serverEvent, FD_ACCEPT);
-        if (bindSelectEvent == SOCKET_ERROR)
-        {
-            int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket bind select event error: {}", errorCode)};
-        }
-
-        
-
-    }
-
-    SocketServer::SocketServer() : Socket()
-    {
-        _serverEvent = WSA_INVALID_EVENT;
-    }
-
-    SocketServer::~SocketServer()
-    {
-        if (_serverEvent != WSA_INVALID_EVENT)
-            ::WSACloseEvent(_serverEvent);
-
-        Socket::~Socket();
-    }
-
 
 }

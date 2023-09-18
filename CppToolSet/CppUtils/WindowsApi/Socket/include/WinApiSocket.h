@@ -17,82 +17,51 @@
 #endif
 
 #include <string>
+#include <thread>
 #include <WinSock2.h>
 
-namespace WindowsApi
+namespace WindowsApi::Socket
 {
-    enum class SocketMode: int
+    using Byte = char;
+
+    struct ActionResult
     {
-        IPv4Tcp,
-        IPv6Tcp,
-        IPv4Udp,
-        IPv6Udp,
+        bool success;
+        std::wstring errorMessage;
     };
 
-    class Socket
+    struct SocketCreateResult
     {
-        using BYTE = char;
-    public:
-        Socket();
-        virtual ~Socket();
-
-    public:
-        bool HasInit() const;
-        std::pair<bool, std::wstring> InitSocket(SocketMode mode);
-        std::pair<bool, std::wstring> Send(BYTE* dataBuffer, int bufferSize) const;
-        std::pair<bool, std::wstring> Receive(BYTE* dataBuffer, int bufferSize, int* receiveSize);
-
-    protected:
-        virtual std::pair<bool, std::wstring> ActionCheck() const;
-
-    protected:
-        bool _initSuccess = false;
-
-        SOCKET _socket;
+        bool success;
+        SOCKET socket;
+        std::wstring errorMessage;
     };
 
-    class SocketClient : public Socket
+    struct SocketReceiveResult
     {
-    public:
-        SocketClient();
-        ~SocketClient() override;
-
-    public:
-        std::pair<bool, std::wstring> Connect(std::wstring ipStr, int port);
-        std::wstring GetIp() const;
-        int GetPort() const;
-
-    protected:
-        std::pair<bool, std::wstring> ActionCheck() const override;
-
-    protected:
-        std::wstring _ip;
-        int _port;
-        bool _connectSuccess = false;
+        bool success;
+        int receiveSize;
+        std::wstring errorMessage;
     };
 
-    class SocketServer : public Socket
-    {
-    public:
-        SocketServer();
-        ~SocketServer();
+    ActionResult InitWinSocketsEnvironment();
 
-    public:
-        std::pair<bool, std::wstring> Bind(std::wstring ipStr, int port);
-        std::pair<bool, std::wstring> Listen();
-        std::wstring GetIp() const;
-        int GetPort() const;
+    void CleanWinSocketsEnvironment();
 
-        // Event Model
-        std::pair<bool, std::wstring> SetupEvent();
+    SocketCreateResult CreateTcpIpv4Socket();
 
-    protected:
-        std::pair<bool, std::wstring> ActionCheck() const override;
+    void CloseSocket(const SOCKET* pSocket);
 
-    protected:
-        WSAEVENT _serverEvent;
-        std::wstring _ip;
-        int _port;
-        bool _bindSuccess = false;
-    };
+    ActionResult SocketSend(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
+
+    SocketReceiveResult SocketReceive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
+
+    ActionResult SocketConnect(const SOCKET* pSocket, std::wstring ipStr, int port);
+
+    ActionResult SocketBind(const SOCKET* pSocket, std::wstring ipStr, int port);
+
+    ActionResult SocketListen(const SOCKET* pSocket);
+
+    
+
 }
