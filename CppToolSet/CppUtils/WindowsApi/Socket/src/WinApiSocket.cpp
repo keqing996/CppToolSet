@@ -149,4 +149,29 @@ namespace WindowsApi::Socket
         return {true, L""};
     }
 
+    SocketAcceptResult SocketAccept(const SOCKET* pSocket)
+    {
+        sockaddr_in addrIn {};
+        int len = sizeof(sockaddr_in);
+        auto acceptResult = ::accept(*pSocket, (sockaddr*)&addrIn, &len);
+        if (acceptResult == SOCKET_ERROR)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, addrIn, std::format(L"socket accept error: {}", errorCode)};
+        }
+
+        return {true, addrIn, L""};
+    }
+
+    SocketCreateEventResult SocketCreateEvent()
+    {
+        auto wsaEvent = ::WSACreateEvent();
+        if (wsaEvent == WSA_INVALID_EVENT)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, WSA_INVALID_EVENT, std::format(L"socket accept error: {}", errorCode)};
+        }
+
+        return {true, wsaEvent, L""};
+    }
 }

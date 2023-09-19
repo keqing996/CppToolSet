@@ -44,6 +44,20 @@ namespace WindowsApi::Socket
         std::wstring errorMessage;
     };
 
+    struct SocketAcceptResult
+    {
+        bool success;
+        sockaddr_in acceptAddr;
+        std::wstring errorMessage;
+    };
+
+    struct SocketCreateEventResult
+    {
+        bool success;
+        void* event;
+        std::wstring errorMessage;
+    };
+
     ActionResult InitWinSocketsEnvironment();
 
     void CleanWinSocketsEnvironment();
@@ -62,6 +76,8 @@ namespace WindowsApi::Socket
 
     ActionResult SocketListen(const SOCKET* pSocket);
 
-    
+    SocketAcceptResult SocketAccept(const SOCKET* pSocket);
+
+
 
 }
