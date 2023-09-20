@@ -9,6 +9,42 @@
 
 namespace WindowsApi::Socket
 {
+    ActionResult::ActionResult(bool succ, const std::wstring &errMsg)
+        : success(succ)
+        , errorMessage(errMsg)
+    {
+    }
+
+    SocketCreateResult::SocketCreateResult(bool succ, SOCKET s, const std::wstring &errMsg)
+        : ActionResult(succ, errMsg)
+        , socket(s)
+    {
+    }
+
+    SocketReceiveResult::SocketReceiveResult(bool succ, int size, const std::wstring &errMsg)
+        : ActionResult(succ, errMsg)
+        , receiveSize(size)
+    {
+    }
+
+    SocketAcceptResult::SocketAcceptResult(bool succ, sockaddr_in addrIn, const std::wstring &errMsg)
+        : ActionResult(succ, errMsg)
+        , acceptAddr(addrIn)
+    {
+    }
+
+    SocketCreateEventResult::SocketCreateEventResult(bool succ, HANDLE e, const std::wstring &errMsg)
+        : ActionResult(succ, errMsg)
+        , event(e)
+    {
+    }
+
+    SocketEnumNetworkEventsResult::SocketEnumNetworkEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring &errMsg)
+        : ActionResult(succ, errMsg)
+        , triggeredEvents(events)
+    {
+    }
+
     ActionResult InitWinSocketsEnvironment()
     {
         WORD wVersion = MAKEWORD(2, 2);
@@ -38,23 +74,15 @@ namespace WindowsApi::Socket
         int socketType = SOCK_STREAM;
         int protocol = IPPROTO_TCP;
 
-        SocketCreateResult result;
+        SOCKET socket = ::socket(addressFamily, socketType, protocol);
 
-        result.socket = ::socket(addressFamily, socketType, protocol);
-
-        if (result.socket == INVALID_SOCKET)
+        if (socket == INVALID_SOCKET)
         {
-            result.success = false;
-            result.errorMessage = std::format(L"socket create failed, af = {}, type = {}. protocol = {}",
-                                              addressFamily, socketType, protocol);
-        }
-        else
-        {
-            result.success = true;
-            result.errorMessage = L"";
+            return {false, socket, std::format(L"socket create failed, af = {}, type = {}. protocol = {}",
+                                               addressFamily, socketType, protocol)};
         }
 
-        return result;
+        return {true, socket, L""};
     }
 
     void CloseSocket(const SOCKET* pSocket)
@@ -165,7 +193,7 @@ namespace WindowsApi::Socket
 
     SocketCreateEventResult SocketCreateEvent()
     {
-        auto wsaEvent = ::WSACreateEvent();
+        WSAEVENT wsaEvent = ::WSACreateEvent();
         if (wsaEvent == WSA_INVALID_EVENT)
         {
             int errorCode = ::WSAGetLastError();
@@ -173,5 +201,49 @@ namespace WindowsApi::Socket
         }
 
         return {true, wsaEvent, L""};
+    }
+
+    void SocketCloseEvent(WSAEVENT* wsaEvent)
+    {
+        ::WSACloseEvent(*wsaEvent);
+        *wsaEvent = WSA_INVALID_EVENT;
+    }
+
+    ActionResult SocketEventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long e)
+    {
+        int eventSelectResult = ::WSAEventSelect(*pSocket, wsaEvent, e);
+        if (eventSelectResult == SOCKET_ERROR)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, std::format(L"socket event select error: {}", errorCode)};
+        }
+
+        return {true, L""};
+    }
+
+    DWORD SocketWaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut, bool waitAll, bool alertable)
+    {
+        if (timeOut == 0)
+            timeOut = WSA_INFINITE;
+
+        return ::WSAWaitForMultipleEvents(numberOfEvents, pEventArray, waitAll, timeOut, alertable);
+    }
+
+    void SocketResetEvent(WSAEVENT wsaEvent)
+    {
+        ::WSAResetEvent(wsaEvent);
+    }
+
+    SocketEnumNetworkEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent)
+    {
+        WSANETWORKEVENTS  triggeredEvents;
+        int enumResult = ::WSAEnumNetworkEvents(*pSocket, wsaEvent, &triggeredEvents);
+        if (enumResult == SOCKET_ERROR)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, triggeredEvents, std::format(L"socket enum event error: {}", errorCode)};
+        }
+
+        return {true, triggeredEvents, L""};
     }
 }

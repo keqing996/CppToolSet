@@ -28,34 +28,43 @@ namespace WindowsApi::Socket
     {
         bool success;
         std::wstring errorMessage;
+
+        ActionResult(bool succ, const std::wstring& errMsg);
     };
 
-    struct SocketCreateResult
+    struct SocketCreateResult: public ActionResult
     {
-        bool success;
         SOCKET socket;
-        std::wstring errorMessage;
+
+        SocketCreateResult(bool succ, SOCKET s, const std::wstring& errMsg);
     };
 
-    struct SocketReceiveResult
+    struct SocketReceiveResult: public ActionResult
     {
-        bool success;
         int receiveSize;
-        std::wstring errorMessage;
+
+        SocketReceiveResult(bool succ, int size, const std::wstring& errMsg);
     };
 
-    struct SocketAcceptResult
+    struct SocketAcceptResult: public ActionResult
     {
-        bool success;
         sockaddr_in acceptAddr;
-        std::wstring errorMessage;
+
+        SocketAcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
     };
 
-    struct SocketCreateEventResult
+    struct SocketCreateEventResult: public ActionResult
     {
-        bool success;
-        void* event;
-        std::wstring errorMessage;
+        WSAEVENT event;
+
+        SocketCreateEventResult(bool succ, WSAEVENT e, const std::wstring& errMsg);
+    };
+
+    struct SocketEnumNetworkEventsResult: public ActionResult
+    {
+        WSANETWORKEVENTS  triggeredEvents;
+
+        SocketEnumNetworkEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
     };
 
     ActionResult InitWinSocketsEnvironment();
@@ -78,6 +87,16 @@ namespace WindowsApi::Socket
 
     SocketAcceptResult SocketAccept(const SOCKET* pSocket);
 
+    SocketCreateEventResult SocketCreateEvent();
 
+    void SocketCloseEvent(WSAEVENT* wsaEvent);
+
+    ActionResult SocketEventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long netEvent);
+
+    DWORD SocketWaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut = 0, bool waitAll = false, bool alertable = false);
+
+    void SocketResetEvent(WSAEVENT wsaEvent);
+
+    SocketEnumNetworkEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
 
 }
