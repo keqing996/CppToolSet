@@ -4,4 +4,3 @@ project(CppUtils)
 
 add_subdirectory(StringUtil)
 add_subdirectory(WindowsApi)
-add_subdirectory(UtilUnitTest)
