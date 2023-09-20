@@ -28,20 +28,43 @@ namespace WindowsApi::Socket
     {
         bool success;
         std::wstring errorMessage;
+
+        ActionResult(bool succ, const std::wstring& errMsg);
     };
 
-    struct SocketCreateResult
+    struct SocketCreateResult: public ActionResult
     {
-        bool success;
         SOCKET socket;
-        std::wstring errorMessage;
+
+        SocketCreateResult(bool succ, SOCKET s, const std::wstring& errMsg);
     };
 
-    struct SocketReceiveResult
+    struct SocketReceiveResult: public ActionResult
     {
-        bool success;
         int receiveSize;
-        std::wstring errorMessage;
+
+        SocketReceiveResult(bool succ, int size, const std::wstring& errMsg);
+    };
+
+    struct SocketAcceptResult: public ActionResult
+    {
+        sockaddr_in acceptAddr;
+
+        SocketAcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
+    };
+
+    struct SocketCreateEventResult: public ActionResult
+    {
+        WSAEVENT event;
+
+        SocketCreateEventResult(bool succ, WSAEVENT e, const std::wstring& errMsg);
+    };
+
+    struct SocketEnumNetworkEventsResult: public ActionResult
+    {
+        WSANETWORKEVENTS  triggeredEvents;
+
+        SocketEnumNetworkEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
     };
 
     ActionResult InitWinSocketsEnvironment();
@@ -62,87 +85,18 @@ namespace WindowsApi::Socket
 
     ActionResult SocketListen(const SOCKET* pSocket);
 
-/*
+    SocketAcceptResult SocketAccept(const SOCKET* pSocket);
 
-    enum class SocketMode: int
-    {
-        IPv4Tcp,
-        IPv6Tcp,
-        IPv4Udp,
-        IPv6Udp,
-    };
+    SocketCreateEventResult SocketCreateEvent();
 
-    class Socket
-    {
-        using BYTE = char;
-    public:
-        Socket();
-        virtual ~Socket();
+    void SocketCloseEvent(WSAEVENT* wsaEvent);
 
-    public:
-        bool HasInit() const;
-        std::pair<bool, std::wstring> InitSocket(SocketMode mode);
-        std::pair<bool, std::wstring> Send(BYTE* dataBuffer, int bufferSize) const;
-        std::pair<bool, std::wstring> Receive(BYTE* dataBuffer, int bufferSize, int* receiveSize);
+    ActionResult SocketEventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long netEvent);
 
-    protected:
-        virtual std::pair<bool, std::wstring> ActionCheck() const;
+    DWORD SocketWaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut = 0, bool waitAll = false, bool alertable = false);
 
-    protected:
-        bool _initSuccess = false;
+    void SocketResetEvent(WSAEVENT wsaEvent);
 
-        SOCKET _socket;
-    };
+    SocketEnumNetworkEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
 
-    class SocketClient : public Socket
-    {
-    public:
-        SocketClient();
-        ~SocketClient() override;
-
-    public:
-        std::pair<bool, std::wstring> Connect(std::wstring ipStr, int port);
-        std::wstring GetIp() const;
-        int GetPort() const;
-
-    protected:
-        std::pair<bool, std::wstring> ActionCheck() const override;
-
-    protected:
-        std::wstring _ip;
-        int _port;
-        bool _connectSuccess = false;
-    };
-
-    class SocketServer : public Socket
-    {
-    public:
-        SocketServer();
-        ~SocketServer();
-
-    public:
-        std::pair<bool, std::wstring> Bind(std::wstring ipStr, int port);
-        std::pair<bool, std::wstring> Listen();
-        std::wstring GetIp() const;
-        int GetPort() const;
-
-        void Start();
-
-    protected:
-        std::pair<bool, std::wstring> ActionCheck() const override;
-
-    protected:
-        std::wstring _ip;
-        int _port;
-        bool _bindSuccess = false;
-
-        SOCKET _clientSocketArray[64];
-        WSAEVENT _clientSocketEventArray[64];
-        unsigned int _clientSocketNum = 0;
-
-        std::thread _mainThread;
-        std::thread _processThread;
-    };
-
-    */
 }
