@@ -1,6 +1,6 @@
 
 #include "Application.h"
-#include "RendererApi/OpenGL/RhiOpenGL.h"
+#include "Renderer/RendererHardwareInterface/OpenGL/RhiOpenGL.h"
 
 Application::~Application()
 {
@@ -72,7 +72,7 @@ void Application::SetupRenderer(RendererApi api)
     {
         case RendererApi::OpenGL:
         default:
-            _pRhi = new RhiOpenGL();
+            _pRhi = new Renderer::RhiOpenGL();
     }
 
     _pRhi->SetUp();
