@@ -5,7 +5,7 @@
 #include "Input/Keyboard/Keyboard.h"
 #include "Input/Mouse/Mouse.h"
 #include "Define/RendererApi.h"
-#include "RendererApi/RenderHardwareInterface.h"
+#include "Renderer/RendererHardwareInterface//RenderHardwareInterface.h"
 
 class Application : public NonCopyable
 {
@@ -59,7 +59,7 @@ private:
     Input::Mouse _mouse = Input::Mouse{};
 
     /* Renderer */
-    RenderHardwareInterface* _pRhi = nullptr;
+    Renderer::RenderHardwareInterface* _pRhi = nullptr;
 
 private:
     static Application* _instance;
