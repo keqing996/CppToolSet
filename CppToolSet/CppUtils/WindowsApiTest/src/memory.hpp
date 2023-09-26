@@ -134,11 +134,11 @@ namespace MemoryApiTest
         void* currentRsp;
 
         // Needs clang. MSVC x64 does not support inline assembly
-        _asm
-        {
-            mov currentRbp, rbp
-            mov currentRsp, rsp
-        }
+        //_asm
+        //{
+        //    mov currentRbp, rbp
+        //    mov currentRsp, rsp
+        //}
 
         DWORD currentRbpValue = reinterpret_cast<DWORD>(currentRbp);
         DWORD currentRspValue = reinterpret_cast<DWORD>(currentRsp);

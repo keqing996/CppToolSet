@@ -5,15 +5,15 @@
 
 namespace WindowsApi::Console
 {
-    std::wstring ConsoleGetTitle();
+    std::wstring GetTitle();
 
-    bool ConsoleSetTitle(const std::wstring& title);
+    bool SetTitle(const std::wstring& title);
 
-    HANDLE GetStdOutputConsoleHandle();
+    HANDLE GetStdOutputHandle();
 
-    HANDLE GetStdInputConsoleHandle();
+    HANDLE GetStdInputHandle();
 
-    HANDLE GetStdErrorConsoleHandle();
+    HANDLE GetStdErrorHandle();
 
     bool ChangeSize(HANDLE consoleHandle, short width, short height);
 

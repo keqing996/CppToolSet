@@ -1,9 +1,11 @@
 #include "memory.hpp"
+#include "TestConsole.hpp"
+
 
 int main()
 {
-
-	MemoryApiTest::Test();
+    TestConsole();
+	// MemoryApiTest::Test();
 	
 	return 0;
 }
