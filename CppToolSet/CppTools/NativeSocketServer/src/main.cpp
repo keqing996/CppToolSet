@@ -70,6 +70,44 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    // Create event
+    auto eventCreatResult = WindowsApi::Socket::SocketCreateEvent();
+    if (!eventCreatResult.success)
+    {
+        std::wcout << eventCreatResult.errorMessage << std::endl;
+        WindowsApi::Socket::CleanWinSocketsEnvironment();
+        WindowsApi::Socket::CloseSocket(&socket);
+        std::cin.get();
+        return 1;
+    }
+
+    auto wsaEvent = eventCreatResult.event;
+
+    auto selectResult = WindowsApi::Socket::SocketEventSelect(&socket, wsaEvent, FD_ACCEPT | FD_CLOSE);
+    if (!selectResult.success)
+    {
+        std::wcout << selectResult.errorMessage << std::endl;
+        WindowsApi::Socket::CleanWinSocketsEnvironment();
+        WindowsApi::Socket::CloseSocket(&socket);
+        std::cin.get();
+        return 1;
+    }
+
+    SOCKET socketArray[WSA_MAXIMUM_WAIT_EVENTS];
+    WSAEVENT eventArray[WSA_MAXIMUM_WAIT_EVENTS];
+    DWORD dwTotal = 0;
+
+    socketArray[dwTotal] = socket;
+    eventArray[dwTotal] = wsaEvent;
+    dwTotal++;
+
+    for (;;)
+    {
+        auto index = WindowsApi::Socket::SocketWaitForMultipleEvents(dwTotal, eventArray);
+        WindowsApi::Socket::SocketEnumNetworkEvents(
+                &socketArray[index - WSA_WAIT_EVENT_0],
+                )
+    }
 
 
 
