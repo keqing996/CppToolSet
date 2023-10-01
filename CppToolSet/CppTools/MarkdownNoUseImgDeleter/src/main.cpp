@@ -1,9 +1,11 @@
 
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <regex>
 #include <unordered_set>
 #include <string>
+#include <format>
 
 int main()
 {
@@ -25,10 +27,22 @@ int main()
         else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".svg")
             _allImgSet.emplace(path.string());
 
-
-
-
         std::cout << ext << std::endl;
+    }
+
+    // all markdown file
+    for(const auto& mdFilePath: _allMdFileSet)
+    {
+        std::wifstream wideInputStream(mdFilePath, std::ios::in);
+
+        if (!wideInputStream.is_open())
+        {
+            std::cout << std::format("File Not Open: {}", mdFilePath) << std::endl;
+            continue;
+        }
+
+
+
     }
 
     return 0;
