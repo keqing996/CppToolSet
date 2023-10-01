@@ -7,6 +7,7 @@
 
 int main()
 {
+
     std::unordered_set<std::string> _allImgSet;
     std::unordered_set<std::string> _allMdFileSet;
 
@@ -16,7 +17,16 @@ int main()
         if (f.is_directory())
             continue;
 
-        auto ext = f.path().extension();
+        std::filesystem::path path = f.path();
+        std::filesystem::path ext = path.extension();
+
+        if (ext == ".md")
+            _allMdFileSet.emplace(path.string());
+        else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".svg")
+            _allImgSet.emplace(path.string());
+
+
+
 
         std::cout << ext << std::endl;
     }
