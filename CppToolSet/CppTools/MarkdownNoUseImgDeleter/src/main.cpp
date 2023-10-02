@@ -11,8 +11,8 @@ int main()
 {
     using wRegex = std::basic_regex<wchar_t>;
 
-    std::unordered_set<std::string> _allImgSet;
-    std::unordered_set<std::string> _allMdFileSet;
+    std::unordered_set<std::wstring> _allImgSet;
+    std::unordered_set<std::wstring> _allMdFileSet;
 
     auto currPath = std::filesystem::current_path();
     for (const auto& f: std::filesystem::recursive_directory_iterator(currPath))
@@ -24,15 +24,12 @@ int main()
         std::filesystem::path ext = path.extension();
 
         if (ext == ".md")
-            _allMdFileSet.emplace(path.string());
+            _allMdFileSet.emplace(path.wstring());
         else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".svg")
-            _allImgSet.emplace(path.string());
-
-        std::cout << ext << std::endl;
+            _allImgSet.emplace(path.wstring());
     }
 
     wRegex mdImgExpression{L"!\\[(.*)\\]\\((.*)\\)"};
-    wRegex mdImgPathExpression{L"\\((.*)"};
 
     // all markdown file
     for(const auto& mdFilePath: _allMdFileSet)
@@ -41,7 +38,7 @@ int main()
 
         if (!wideInputStream.is_open())
         {
-            std::cout << std::format("File Not Open: {}", mdFilePath) << std::endl;
+            std::wcout << std::format(L"File Not Open: {}", mdFilePath) << std::endl;
             continue;
         }
 
@@ -55,16 +52,12 @@ int main()
             if (!std::regex_match(oneLineContent, regexResult, mdImgExpression))
                 continue;
 
-            if (!std::regex_match(oneLineContent, regexResult, mdImgPathExpression))
-            {
-                std::cout << std::format("Line Have Img But Regex Match Path Fail, {}, Line {}", mdFilePath, lineNumber);
-                std::cout << std::endl;
-            }
-
-            std::wcout << regexResult[0] << std::endl;
+            std::wcout << regexResult[2] << std::endl;
         }
 
     }
+
+    system("pause");
 
     return 0;
 }
