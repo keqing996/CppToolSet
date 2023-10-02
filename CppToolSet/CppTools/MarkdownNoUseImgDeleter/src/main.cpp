@@ -9,6 +9,7 @@
 
 int main()
 {
+    using wRegex = std::basic_regex<wchar_t>;
 
     std::unordered_set<std::string> _allImgSet;
     std::unordered_set<std::string> _allMdFileSet;
@@ -30,6 +31,9 @@ int main()
         std::cout << ext << std::endl;
     }
 
+    wRegex mdImgExpression{L"!\\[(.*)\\]\\((.*)\\)"};
+    wRegex mdImgPathExpression{L"\\((.*)"};
+
     // all markdown file
     for(const auto& mdFilePath: _allMdFileSet)
     {
@@ -41,7 +45,24 @@ int main()
             continue;
         }
 
+        std::wstring oneLineContent;
+        std::wsmatch regexResult;
+        int lineNumber = 0;
+        while (std::getline(wideInputStream, oneLineContent))
+        {
+            lineNumber++;
 
+            if (!std::regex_match(oneLineContent, regexResult, mdImgExpression))
+                continue;
+
+            if (!std::regex_match(oneLineContent, regexResult, mdImgPathExpression))
+            {
+                std::cout << std::format("Line Have Img But Regex Match Path Fail, {}, Line {}", mdFilePath, lineNumber);
+                std::cout << std::endl;
+            }
+
+            std::wcout << regexResult[0] << std::endl;
+        }
 
     }
 
