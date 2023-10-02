@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <string>
 #include <format>
+#include "StringUtil.hpp"
 
 int main()
 {
@@ -54,7 +55,8 @@ int main()
             if (!std::regex_match(oneLineContent, regexResult, mdImgExpression))
                 continue;
 
-            std::wstring imgPathStr = currPath.wstring() + L".\\" + regexResult[2].str();
+            std::wstring imgPathStr = currPath.wstring() + L"\\" + regexResult[2].str();
+            StringUtil::ReplaceInPlace<wchar_t>(imgPathStr, L"%20", L" ");
             std::filesystem::path imgPath {imgPathStr};
 
             if (_allImgSet.contains(imgPath))
@@ -81,14 +83,14 @@ int main()
 
     std::wcout << L"Going Delete Img:\n";
     for (const auto& path : toDeletedPathSet)
-        std::wcout << std::format(L"\t{}", path.wstring());
+        std::wcout << std::format(L"\t{}\n", path.wstring());
 
     std::wcout << std::endl;
     std::wcout << std::endl;
 
     std::wcout << L"Not Found Img:\n";
     for (const auto& path : findFailImgPathSet)
-        std::wcout << std::format(L"\t{}", path.wstring());
+        std::wcout << std::format(L"\t{}\n", path.wstring());
 
     std::wcout << std::endl;
 
