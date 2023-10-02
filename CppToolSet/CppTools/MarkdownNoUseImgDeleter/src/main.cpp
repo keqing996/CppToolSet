@@ -11,8 +11,8 @@ int main()
 {
     using wRegex = std::basic_regex<wchar_t>;
 
-    std::unordered_set<std::wstring> _allImgSet;
-    std::unordered_set<std::wstring> _allMdFileSet;
+    std::unordered_set<std::filesystem::path> _allImgSet;
+    std::unordered_set<std::filesystem::path> _allMdFileSet;
 
     auto currPath = std::filesystem::current_path();
     for (const auto& f: std::filesystem::recursive_directory_iterator(currPath))
@@ -24,11 +24,13 @@ int main()
         std::filesystem::path ext = path.extension();
 
         if (ext == ".md")
-            _allMdFileSet.emplace(path.wstring());
+            _allMdFileSet.emplace(path);
         else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".svg")
-            _allImgSet.emplace(path.wstring());
+            _allImgSet.emplace(path);
     }
 
+    std::unordered_set<std::filesystem::path> findFailImgPathSet;
+    std::unordered_set<std::filesystem::path> findSuccessImgPathSet;
     wRegex mdImgExpression{L"!\\[(.*)\\]\\((.*)\\)"};
 
     // all markdown file
@@ -38,7 +40,7 @@ int main()
 
         if (!wideInputStream.is_open())
         {
-            std::wcout << std::format(L"File Not Open: {}", mdFilePath) << std::endl;
+            std::wcout << std::format(L"File Not Open: {}", mdFilePath.wstring()) << std::endl;
             continue;
         }
 
@@ -52,11 +54,59 @@ int main()
             if (!std::regex_match(oneLineContent, regexResult, mdImgExpression))
                 continue;
 
-            std::wcout << regexResult[2] << std::endl;
-        }
+            std::wstring imgPathStr = currPath.wstring() + L".\\" + regexResult[2].str();
+            std::filesystem::path imgPath {imgPathStr};
 
+            if (_allImgSet.contains(imgPath))
+                findSuccessImgPathSet.insert(imgPath);
+            else
+                findFailImgPathSet.insert(imgPath);
+        }
     }
 
+    std::unordered_set<std::filesystem::path> toDeletedPathSet;
+
+    for (const auto& path : _allImgSet)
+    {
+        if (!findSuccessImgPathSet.contains(path))
+            toDeletedPathSet.insert(path);
+    }
+
+    if (toDeletedPathSet.empty() && findFailImgPathSet.empty())
+    {
+        std::wcout << "No File Need To Be Deleted" << std::endl;
+        system("pause");
+        return 0;
+    }
+
+    std::wcout << L"Going Delete Img:\n";
+    for (const auto& path : toDeletedPathSet)
+        std::wcout << std::format(L"\t{}", path.wstring());
+
+    std::wcout << std::endl;
+    std::wcout << std::endl;
+
+    std::wcout << L"Not Found Img:\n";
+    for (const auto& path : findFailImgPathSet)
+        std::wcout << std::format(L"\t{}", path.wstring());
+
+    std::wcout << std::endl;
+
+    std::wcout << L"Delete? (Y/N) :\n";
+
+    wchar_t answer;
+    std::wcin >> answer;
+
+    if (answer != L'Y')
+    {
+        system("pause");
+        return 0;
+    }
+
+    for (const auto& path : toDeletedPathSet)
+        std::filesystem::remove(path);
+
+    std::wcout << "Delete Finish !" << std::endl;
     system("pause");
 
     return 0;
