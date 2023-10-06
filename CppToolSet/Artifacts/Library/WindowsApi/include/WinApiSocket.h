@@ -50,6 +50,21 @@ namespace WindowsApi::Socket
         WSANETWORKEVENTS  triggeredEvents;
 
         SocketEnumNetworkEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
+
+        template<int FD, int FD_BIT>
+        bool GetFdBitResult() const
+        {
+            return (triggeredEvents.lNetworkEvents & FD)
+                   && (triggeredEvents.iErrorCode[FD_BIT] == 0);
+        }
+
+        bool IsAccept() const;
+
+        bool IsWrite() const;
+
+        bool IsRead() const;
+
+        bool IsClose() const;
     };
 
     ActionResult InitWinSocketsEnvironment();

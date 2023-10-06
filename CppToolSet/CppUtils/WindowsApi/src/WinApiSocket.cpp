@@ -45,6 +45,26 @@ namespace WindowsApi::Socket
     {
     }
 
+    bool SocketEnumNetworkEventsResult::IsAccept() const
+    {
+        return GetFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>();
+    }
+
+    bool SocketEnumNetworkEventsResult::IsWrite() const
+    {
+        return GetFdBitResult<FD_WRITE, FD_WRITE_BIT>();
+    }
+
+    bool SocketEnumNetworkEventsResult::IsRead() const
+    {
+        return GetFdBitResult<FD_READ, FD_READ_BIT>();
+    }
+
+    bool SocketEnumNetworkEventsResult::IsClose() const
+    {
+        return GetFdBitResult<FD_CLOSE, FD_CLOSE_BIT>();
+    }
+
     ActionResult InitWinSocketsEnvironment()
     {
         WORD wVersion = MAKEWORD(2, 2);
