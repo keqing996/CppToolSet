@@ -103,10 +103,22 @@ int main(int argc, char* argv[])
 
     for (;;)
     {
-        auto index = WindowsApi::Socket::SocketWaitForMultipleEvents(dwTotal, eventArray);
-        WindowsApi::Socket::SocketEnumNetworkEvents(
-                &socketArray[index - WSA_WAIT_EVENT_0],
-                )
+        auto index = WindowsApi::Socket::SocketWaitForMultipleEvents(
+                dwTotal, eventArray);
+
+        auto fixedIndex = index - WSA_WAIT_EVENT_0;
+
+        auto enumEventResult = WindowsApi::Socket::SocketEnumNetworkEvents(
+                &socketArray[fixedIndex], eventArray[fixedIndex]);
+
+        if (!enumEventResult.success)
+        {
+            std::wcout << selectResult.errorMessage << std::endl;
+            break;
+        }
+
+        auto event = enumEventResult.triggeredEvents;
+        event.lNetworkEvents
     }
 
 
