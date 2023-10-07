@@ -15,52 +15,52 @@ namespace WindowsApi::Socket
     {
     }
 
-    SocketCreateResult::SocketCreateResult(bool succ, SOCKET s, const std::wstring &errMsg)
+    CreateSocketResult::CreateSocketResult(bool succ, SOCKET s, const std::wstring &errMsg)
         : ActionResult(succ, errMsg)
         , socket(s)
     {
     }
 
-    SocketReceiveResult::SocketReceiveResult(bool succ, int size, const std::wstring &errMsg)
+    ReceiveResult::ReceiveResult(bool succ, int size, const std::wstring &errMsg)
         : ActionResult(succ, errMsg)
         , receiveSize(size)
     {
     }
 
-    SocketAcceptResult::SocketAcceptResult(bool succ, sockaddr_in addrIn, const std::wstring &errMsg)
+    AcceptResult::AcceptResult(bool succ, sockaddr_in addrIn, const std::wstring &errMsg)
         : ActionResult(succ, errMsg)
         , acceptAddr(addrIn)
     {
     }
 
-    SocketCreateEventResult::SocketCreateEventResult(bool succ, HANDLE e, const std::wstring &errMsg)
+    CreateEventResult::CreateEventResult(bool succ, HANDLE e, const std::wstring &errMsg)
         : ActionResult(succ, errMsg)
         , event(e)
     {
     }
 
-    SocketEnumNetworkEventsResult::SocketEnumNetworkEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring &errMsg)
+    EnumEventsResult::EnumEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring &errMsg)
         : ActionResult(succ, errMsg)
         , triggeredEvents(events)
     {
     }
 
-    bool SocketEnumNetworkEventsResult::IsAccept() const
+    bool EnumEventsResult::IsAccept() const
     {
         return GetFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>();
     }
 
-    bool SocketEnumNetworkEventsResult::IsWrite() const
+    bool EnumEventsResult::IsWrite() const
     {
         return GetFdBitResult<FD_WRITE, FD_WRITE_BIT>();
     }
 
-    bool SocketEnumNetworkEventsResult::IsRead() const
+    bool EnumEventsResult::IsRead() const
     {
         return GetFdBitResult<FD_READ, FD_READ_BIT>();
     }
 
-    bool SocketEnumNetworkEventsResult::IsClose() const
+    bool EnumEventsResult::IsClose() const
     {
         return GetFdBitResult<FD_CLOSE, FD_CLOSE_BIT>();
     }
@@ -88,7 +88,7 @@ namespace WindowsApi::Socket
         ::WSACleanup();
     }
 
-    SocketCreateResult CreateTcpIpv4Socket()
+    CreateSocketResult CreateTcpIpv4Socket()
     {
         int addressFamily = AF_INET;
         int socketType = SOCK_STREAM;
@@ -111,7 +111,7 @@ namespace WindowsApi::Socket
             ::closesocket(*pSocket);
     }
 
-    ActionResult SocketSend(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
+    ActionResult Send(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
     {
         auto sendResult = ::send(*pSocket, pDataBuffer, bufferSize, 0);
         if (sendResult == SOCKET_ERROR)
@@ -123,7 +123,7 @@ namespace WindowsApi::Socket
         return {true, L""};
     }
 
-    SocketReceiveResult SocketReceive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
+    ReceiveResult Receive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
     {
         // receiveResult < 0 -> error
         // receiveResult > 0 -> receive size
@@ -137,7 +137,7 @@ namespace WindowsApi::Socket
         return {true, receiveResult, L""};
     }
 
-    ActionResult SocketConnect(const SOCKET* pSocket, std::wstring ipStr, int port)
+    ActionResult Connect(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
         in_addr dst;
         ::InetPton(AF_INET, ipStr.c_str(), &dst);
@@ -161,7 +161,7 @@ namespace WindowsApi::Socket
         return {true, L""};
     }
 
-    ActionResult SocketBind(const SOCKET* pSocket, std::wstring ipStr, int port)
+    ActionResult Bind(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
         in_addr dst;
         ::InetPton(AF_INET, ipStr.c_str(), &dst);
@@ -185,7 +185,7 @@ namespace WindowsApi::Socket
         return {true, L""};
     }
 
-    ActionResult SocketListen(const SOCKET* pSocket)
+    ActionResult Listen(const SOCKET* pSocket)
     {
         auto bindResult = ::listen(*pSocket, SOMAXCONN);
         if (bindResult == SOCKET_ERROR)
@@ -197,7 +197,7 @@ namespace WindowsApi::Socket
         return {true, L""};
     }
 
-    SocketAcceptResult SocketAccept(const SOCKET* pSocket)
+    AcceptResult Accept(const SOCKET* pSocket)
     {
         sockaddr_in addrIn {};
         int len = sizeof(sockaddr_in);
@@ -211,7 +211,7 @@ namespace WindowsApi::Socket
         return {true, addrIn, L""};
     }
 
-    SocketCreateEventResult SocketCreateEvent()
+    CreateEventResult SocketCreateEvent()
     {
         WSAEVENT wsaEvent = ::WSACreateEvent();
         if (wsaEvent == WSA_INVALID_EVENT)
@@ -254,7 +254,7 @@ namespace WindowsApi::Socket
         ::WSAResetEvent(wsaEvent);
     }
 
-    SocketEnumNetworkEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent)
+    EnumEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent)
     {
         WSANETWORKEVENTS  triggeredEvents;
         int enumResult = ::WSAEnumNetworkEvents(*pSocket, wsaEvent, &triggeredEvents);

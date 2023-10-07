@@ -17,39 +17,39 @@ namespace WindowsApi::Socket
         ActionResult(bool succ, const std::wstring& errMsg);
     };
 
-    struct SocketCreateResult: public ActionResult
+    struct CreateSocketResult: public ActionResult
     {
         SOCKET socket;
 
-        SocketCreateResult(bool succ, SOCKET s, const std::wstring& errMsg);
+        CreateSocketResult(bool succ, SOCKET s, const std::wstring& errMsg);
     };
 
-    struct SocketReceiveResult: public ActionResult
+    struct ReceiveResult: public ActionResult
     {
         int receiveSize;
 
-        SocketReceiveResult(bool succ, int size, const std::wstring& errMsg);
+        ReceiveResult(bool succ, int size, const std::wstring& errMsg);
     };
 
-    struct SocketAcceptResult: public ActionResult
+    struct AcceptResult: public ActionResult
     {
         sockaddr_in acceptAddr;
 
-        SocketAcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
+        AcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
     };
 
-    struct SocketCreateEventResult: public ActionResult
+    struct CreateEventResult: public ActionResult
     {
         WSAEVENT event;
 
-        SocketCreateEventResult(bool succ, WSAEVENT e, const std::wstring& errMsg);
+        CreateEventResult(bool succ, WSAEVENT e, const std::wstring& errMsg);
     };
 
-    struct SocketEnumNetworkEventsResult: public ActionResult
+    struct EnumEventsResult: public ActionResult
     {
         WSANETWORKEVENTS  triggeredEvents;
 
-        SocketEnumNetworkEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
+        EnumEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
 
         template<int FD, int FD_BIT>
         bool GetFdBitResult() const
@@ -71,32 +71,32 @@ namespace WindowsApi::Socket
 
     void CleanWinSocketsEnvironment();
 
-    SocketCreateResult CreateTcpIpv4Socket();
+    CreateSocketResult CreateTcpIpv4Socket();
 
     void CloseSocket(const SOCKET* pSocket);
 
-    ActionResult SocketSend(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
+    ActionResult Send(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
 
-    SocketReceiveResult SocketReceive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
+    ReceiveResult Receive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
 
-    ActionResult SocketConnect(const SOCKET* pSocket, std::wstring ipStr, int port);
+    ActionResult Connect(const SOCKET* pSocket, std::wstring ipStr, int port);
 
-    ActionResult SocketBind(const SOCKET* pSocket, std::wstring ipStr, int port);
+    ActionResult Bind(const SOCKET* pSocket, std::wstring ipStr, int port);
 
-    ActionResult SocketListen(const SOCKET* pSocket);
+    ActionResult Listen(const SOCKET* pSocket);
 
-    SocketAcceptResult SocketAccept(const SOCKET* pSocket);
+    AcceptResult Accept(const SOCKET* pSocket);
 
-    SocketCreateEventResult SocketCreateEvent();
+    CreateEventResult SocketCreateEvent();
 
-    void SocketCloseEvent(WSAEVENT* wsaEvent);
+    void CloseEvent(WSAEVENT * wsaEvent);
 
-    ActionResult SocketEventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long netEvent);
+    ActionResult EventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long netEvent);
 
-    DWORD SocketWaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut = 0, bool waitAll = false, bool alertable = false);
+    DWORD WaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut = 0, bool waitAll = false, bool alertable = false);
 
-    void SocketResetEvent(WSAEVENT wsaEvent);
+    void EventReset(WSAEVENT wsaEvent);
 
-    SocketEnumNetworkEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
+    EnumEventsResult EnumEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
 
 }
