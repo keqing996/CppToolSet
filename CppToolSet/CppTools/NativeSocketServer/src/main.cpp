@@ -7,6 +7,7 @@
 #include <atomic>
 #include <memory>
 #include <queue>
+#include <format>
 
 #include "cmdline/cmdline.h"
 #include "WinApiSocket.h"
@@ -117,8 +118,31 @@ int main(int argc, char* argv[])
             break;
         }
 
-        auto event = enumEventResult.triggeredEvents;
-        event.lNetworkEvents
+        if (enumEventResult.IsAccept())
+        {
+            auto acceptResult = WindowsApi::Socket::SocketAccept(&socketArray[fixedIndex]);
+            if (!acceptResult.success)
+            {
+                std::wcout << acceptResult.errorMessage << std::endl;
+            }
+            else
+            {
+                auto acceptAddr = acceptResult.acceptAddr;
+                std::wcout << std::format(L"Accept {}: {}", ::inet_ntoa(acceptAddr.sin_addr), ::ntohs(acceptAddr.sin_port));
+            }
+        }
+        else if (enumEventResult.IsRead())
+        {
+
+        }
+        else if (enumEventResult.IsClose())
+        {
+
+        }
+        else if (enumEventResult.IsWrite())
+        {
+
+        }
     }
 
 
