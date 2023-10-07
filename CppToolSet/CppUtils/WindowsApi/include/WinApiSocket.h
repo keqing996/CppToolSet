@@ -9,69 +9,110 @@ namespace WindowsApi::Socket
 {
     using Byte = char;
 
-    struct ActionResult
+    template<typename... Args>
+    struct ResultWithErrMsg;
+
+    template<>
+    struct ResultWithErrMsg<>
     {
         bool success;
         std::wstring errorMessage;
 
-        ActionResult(bool succ, const std::wstring& errMsg);
+        ResultWithErrMsg(bool succ, const std::wstring& errMsg)
+                : success(succ)
+                , errorMessage(errMsg)
+        {
+        }
     };
 
-    struct CreateSocketResult: public ActionResult
+    template<typename OnePara>
+    struct ResultWithErrMsg<OnePara>
     {
-        SOCKET socket;
+        OnePara result;
+        bool success;
+        std::wstring errorMessage;
 
-        CreateSocketResult(bool succ, SOCKET s, const std::wstring& errMsg);
+        ResultWithErrMsg(bool succ, OnePara para, const std::wstring& errMsg)
+                : success(succ)
+                , result(para)
+                , errorMessage(errMsg)
+        {
+        }
     };
 
-    struct CreateSockAddrResult: public ActionResult
+    template<typename Para1, typename Para2>
+    struct ResultWithErrMsg<Para1, Para2>
     {
-        SOCKADDR_IN addr;
+        Para1 result1;
+        Para2 result2;
+        bool success;
+        std::wstring errorMessage;
 
-        CreateSockAddrResult(bool succ, SOCKADDR_IN addr, const std::wstring& errMsg);
+        ResultWithErrMsg(bool succ, Para1 para1, Para2 para2, const std::wstring& errMsg)
+                : success(succ)
+                , result1(para1)
+                , result2(para2)
+                , errorMessage(errMsg)
+        {
+        }
     };
 
-    struct ReceiveResult: public ActionResult
+    struct ActionResult: public ResultWithErrMsg<>
     {
-        int receiveSize;
-
-        ReceiveResult(bool succ, int size, const std::wstring& errMsg);
     };
 
-    struct AcceptResult: public ActionResult
+    struct CreateSocketResult: public ResultWithErrMsg<SOCKET>
     {
-        SOCKADDR_IN acceptAddr;
-
-        AcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
     };
 
-    struct CreateEventResult: public ActionResult
+    struct CreateSocketAddrResult: public ResultWithErrMsg<SOCKADDR_IN>
     {
-        WSAEVENT event;
-
-        CreateEventResult(bool succ, WSAEVENT e, const std::wstring& errMsg);
     };
 
-    struct EnumEventsResult: public ActionResult
+    struct ReceiveResult: public ResultWithErrMsg<int>
     {
-        WSANETWORKEVENTS  triggeredEvents;
+        int GetReceiveSize() const
+        {
+            return result;
+        }
+    };
 
-        EnumEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
+    struct AcceptResult: public ResultWithErrMsg<SOCKADDR_IN>
+    {
+    };
 
+    struct CreateEventResult: public ResultWithErrMsg<WSAEVENT>
+    {
+    };
+
+    struct EnumEventsResult: public ResultWithErrMsg<WSANETWORKEVENTS>
+    {
         template<int FD, int FD_BIT>
         bool GetFdBitResult() const
         {
-            return (triggeredEvents.lNetworkEvents & FD)
-                   && (triggeredEvents.iErrorCode[FD_BIT] == 0);
+            return (result.lNetworkEvents & FD)
+                   && (result.iErrorCode[FD_BIT] == 0);
         }
 
-        bool IsAccept() const;
+        bool IsAccept() const
+        {
+            return GetFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>();
+        }
 
-        bool IsWrite() const;
+        bool IsWrite() const
+        {
+            return GetFdBitResult<FD_WRITE, FD_WRITE_BIT>();
+        }
 
-        bool IsRead() const;
+        bool IsRead() const
+        {
+            return GetFdBitResult<FD_READ, FD_READ_BIT>();
+        }
 
-        bool IsClose() const;
+        bool IsClose() const
+        {
+            return GetFdBitResult<FD_CLOSE, FD_CLOSE_BIT>();
+        }
     };
 
     SOCKADDR_IN GenAddrFromIpv4(const std::wstring& ipStr, int port);

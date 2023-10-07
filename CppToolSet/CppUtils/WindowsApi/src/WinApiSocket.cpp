@@ -9,67 +9,6 @@
 
 namespace WindowsApi::Socket
 {
-    ActionResult::ActionResult(bool succ, const std::wstring &errMsg)
-        : success(succ)
-        , errorMessage(errMsg)
-    {
-    }
-
-    CreateSocketResult::CreateSocketResult(bool succ, SOCKET s, const std::wstring &errMsg)
-        : ActionResult(succ, errMsg)
-        , socket(s)
-    {
-    }
-
-    CreateSockAddrResult::CreateSockAddrResult(bool succ, SOCKADDR_IN addr, const std::wstring& errMsg)
-            : ActionResult(succ, errMsg)
-            , addr(addr)
-    {
-    }
-
-    ReceiveResult::ReceiveResult(bool succ, int size, const std::wstring &errMsg)
-        : ActionResult(succ, errMsg)
-        , receiveSize(size)
-    {
-    }
-
-    AcceptResult::AcceptResult(bool succ, sockaddr_in addrIn, const std::wstring &errMsg)
-        : ActionResult(succ, errMsg)
-        , acceptAddr(addrIn)
-    {
-    }
-
-    CreateEventResult::CreateEventResult(bool succ, HANDLE e, const std::wstring &errMsg)
-        : ActionResult(succ, errMsg)
-        , event(e)
-    {
-    }
-
-    EnumEventsResult::EnumEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring &errMsg)
-        : ActionResult(succ, errMsg)
-        , triggeredEvents(events)
-    {
-    }
-
-    bool EnumEventsResult::IsAccept() const
-    {
-        return GetFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>();
-    }
-
-    bool EnumEventsResult::IsWrite() const
-    {
-        return GetFdBitResult<FD_WRITE, FD_WRITE_BIT>();
-    }
-
-    bool EnumEventsResult::IsRead() const
-    {
-        return GetFdBitResult<FD_READ, FD_READ_BIT>();
-    }
-
-    bool EnumEventsResult::IsClose() const
-    {
-        return GetFdBitResult<FD_CLOSE, FD_CLOSE_BIT>();
-    }
 
     SOCKADDR_IN GenAddrFromIpv4(const std::wstring& ipStr, int port)
     {
