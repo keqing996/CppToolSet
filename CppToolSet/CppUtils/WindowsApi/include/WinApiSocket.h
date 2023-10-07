@@ -24,6 +24,13 @@ namespace WindowsApi::Socket
         CreateSocketResult(bool succ, SOCKET s, const std::wstring& errMsg);
     };
 
+    struct CreateSockAddrResult: public ActionResult
+    {
+        SOCKADDR_IN addr;
+
+        CreateSockAddrResult(bool succ, SOCKADDR_IN addr, const std::wstring& errMsg);
+    };
+
     struct ReceiveResult: public ActionResult
     {
         int receiveSize;
@@ -33,7 +40,7 @@ namespace WindowsApi::Socket
 
     struct AcceptResult: public ActionResult
     {
-        sockaddr_in acceptAddr;
+        SOCKADDR_IN acceptAddr;
 
         AcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
     };
@@ -66,6 +73,10 @@ namespace WindowsApi::Socket
 
         bool IsClose() const;
     };
+
+    SOCKADDR_IN GenAddrFromIpv4(const std::wstring& ipStr, int port);
+
+    std::pair<std::wstring, int> GetIpv4FromAddr(SOCKADDR_IN addr);
 
     ActionResult InitWinSocketsEnvironment();
 

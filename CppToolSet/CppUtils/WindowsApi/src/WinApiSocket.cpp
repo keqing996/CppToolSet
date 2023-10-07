@@ -21,6 +21,12 @@ namespace WindowsApi::Socket
     {
     }
 
+    CreateSockAddrResult::CreateSockAddrResult(bool succ, SOCKADDR_IN addr, const std::wstring& errMsg)
+            : ActionResult(succ, errMsg)
+            , addr(addr)
+    {
+    }
+
     ReceiveResult::ReceiveResult(bool succ, int size, const std::wstring &errMsg)
         : ActionResult(succ, errMsg)
         , receiveSize(size)
@@ -63,6 +69,27 @@ namespace WindowsApi::Socket
     bool EnumEventsResult::IsClose() const
     {
         return GetFdBitResult<FD_CLOSE, FD_CLOSE_BIT>();
+    }
+
+    SOCKADDR_IN GenAddrFromIpv4(const std::wstring& ipStr, int port)
+    {
+        in_addr dst{};
+        ::InetPton(AF_INET, ipStr.c_str(), &dst);
+
+        SOCKADDR_IN result;
+        result.sin_family = AF_INET;
+        result.sin_addr.S_un.S_addr = dst.S_un.S_addr;
+        result.sin_port = ::htons(port);
+
+        return result;
+    }
+
+    std::pair<std::wstring, int> GetIpv4FromAddr(SOCKADDR_IN addr)
+    {
+        wchar_t pIpStr[16] {0};
+        ::InetNtop(AF_INET, &addr.sin_addr.S_un.S_addr, pIpStr, sizeof(pIpStr));
+        auto port = ::ntohs(addr.sin_port);
+        return {{pIpStr}, port};
     }
 
     ActionResult InitWinSocketsEnvironment()
@@ -139,13 +166,7 @@ namespace WindowsApi::Socket
 
     ActionResult Connect(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
-        in_addr dst;
-        ::InetPton(AF_INET, ipStr.c_str(), &dst);
-
-        SOCKADDR_IN serverAddr;
-        serverAddr.sin_family = AF_INET;
-        serverAddr.sin_addr.S_un.S_addr = dst.S_un.S_addr;
-        serverAddr.sin_port = ::htons(port);
+        SOCKADDR_IN serverAddr = GenAddrFromIpv4(ipStr, port);
 
         auto connectResult = ::connect(
                 *pSocket,
@@ -163,13 +184,7 @@ namespace WindowsApi::Socket
 
     ActionResult Bind(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
-        in_addr dst;
-        ::InetPton(AF_INET, ipStr.c_str(), &dst);
-
-        SOCKADDR_IN serverAddr;
-        serverAddr.sin_family = AF_INET;
-        serverAddr.sin_addr.S_un.S_addr = dst.S_un.S_addr;
-        serverAddr.sin_port = ::htons(port);
+        SOCKADDR_IN serverAddr = GenAddrFromIpv4(ipStr, port);
 
         auto bindResult = ::bind(
                 *pSocket,
