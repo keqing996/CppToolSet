@@ -49,10 +49,10 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    SOCKET socket = createSocketResult.socket;
+    SOCKET socket = createSocketResult.result;
 
     // Connect socket
-    auto connectResult = WindowsApi::Socket::SocketConnect(&socket, ipWStr, port);
+    auto connectResult = WindowsApi::Socket::Connect(&socket, ipWStr, port);
     if (!connectResult.success)
     {
         std::wcout << connectResult.errorMessage << std::endl;
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
             ::ZeroMemory(pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
 
-            auto receiveResult = WindowsApi::Socket::SocketReceive(&socket, pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
+            auto receiveResult = WindowsApi::Socket::Receive(&socket, pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
             if (!receiveResult.success)
             {
                 std::lock_guard lockGuard(threadMt);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
                 break;
             }
 
-            if (receiveResult.receiveSize > 0)
+            if (receiveResult.result > 0)
             {
                 std::string_view receiveData(pReceiveBuffer.get());
                 std::lock_guard lockGuard(threadMt);
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
         (pSendBuffer.get())[sendStr.length()] = '\r';
         (pSendBuffer.get())[sendStr.length() + 1] = '\n';
 
-        auto sendResult = WindowsApi::Socket::SocketSend(&socket, pSendBuffer.get(), sendStr.length() + 2);
+        auto sendResult = WindowsApi::Socket::Send(&socket, pSendBuffer.get(), sendStr.length() + 2);
         if (!sendResult.success)
         {
             std::lock_guard lockGuard {threadMt};
