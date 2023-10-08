@@ -47,10 +47,10 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    SOCKET socket = createSocketResult.socket;
+    SOCKET socket = createSocketResult.result;
 
     // Bind socket
-    auto bindResult = WindowsApi::Socket::SocketBind(&socket, ipWStr, port);
+    auto bindResult = WindowsApi::Socket::Bind(&socket, ipWStr, port);
     if (!bindResult.success)
     {
         std::wcout << bindResult.errorMessage << std::endl;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     }
 
     // Listen socket
-    auto listenResult = WindowsApi::Socket::SocketListen(&socket);
+    auto listenResult = WindowsApi::Socket::Listen(&socket);
     if (!listenResult.success)
     {
         std::wcout << listenResult.errorMessage << std::endl;
@@ -82,9 +82,9 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    auto wsaEvent = eventCreatResult.event;
+    auto wsaEvent = eventCreatResult.result;
 
-    auto selectResult = WindowsApi::Socket::SocketEventSelect(&socket, wsaEvent, FD_ACCEPT | FD_CLOSE);
+    auto selectResult = WindowsApi::Socket::EventSelect(&socket, wsaEvent, FD_ACCEPT | FD_CLOSE);
     if (!selectResult.success)
     {
         std::wcout << selectResult.errorMessage << std::endl;
@@ -104,12 +104,12 @@ int main(int argc, char* argv[])
 
     for (;;)
     {
-        auto index = WindowsApi::Socket::SocketWaitForMultipleEvents(
+        auto index = WindowsApi::Socket::WaitForMultipleEvents(
                 dwTotal, eventArray);
 
         auto fixedIndex = index - WSA_WAIT_EVENT_0;
 
-        auto enumEventResult = WindowsApi::Socket::SocketEnumNetworkEvents(
+        auto enumEventResult = WindowsApi::Socket::EnumEvents(
                 &socketArray[fixedIndex], eventArray[fixedIndex]);
 
         if (!enumEventResult.success)
@@ -118,28 +118,33 @@ int main(int argc, char* argv[])
             break;
         }
 
-        if (enumEventResult.IsAccept())
+        if (WindowsApi::Socket::EnumEventsIsAccept(enumEventResult))
         {
-            auto acceptResult = WindowsApi::Socket::SocketAccept(&socketArray[fixedIndex]);
+            auto acceptResult = WindowsApi::Socket::Accept(&socketArray[fixedIndex]);
             if (!acceptResult.success)
             {
                 std::wcout << acceptResult.errorMessage << std::endl;
             }
             else
             {
-                auto acceptAddr = acceptResult.acceptAddr;
-                std::wcout << std::format(L"Accept {}: {}", ::inet_ntoa(acceptAddr.sin_addr), ::ntohs(acceptAddr.sin_port));
+                auto acceptAddr = acceptResult.result;
+                auto parseAddrResult = WindowsApi::Socket::GetIpv4FromAddr(acceptAddr);
+                if (parseAddrResult.success)
+                {
+                    std::wcout << std::format(L"Accept {}: {}", parseAddrResult.result1, parseAddrResult.result2);
+                }
+
             }
         }
-        else if (enumEventResult.IsRead())
+        else if (WindowsApi::Socket::EnumEventsIsAccept(enumEventResult))
         {
 
         }
-        else if (enumEventResult.IsClose())
+        else if (WindowsApi::Socket::EnumEventsIsAccept(enumEventResult))
         {
 
         }
-        else if (enumEventResult.IsWrite())
+        else if (WindowsApi::Socket::EnumEventsIsAccept(enumEventResult))
         {
 
         }
