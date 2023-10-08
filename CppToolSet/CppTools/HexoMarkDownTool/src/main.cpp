@@ -20,7 +20,7 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
     auto resPath = mdPath.parent_path() / "Resource";
     if (!std::filesystem::exists(resPath))
     {
-        std::cout << "\tNo Resource Directory, Finished." << std::endl;
+        std::cout << "\tNo Resource Directory, Finished." << std::endl << std::endl;
         return;
     }
 
@@ -91,18 +91,40 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
 
 void ProcessDirectory(const std::filesystem::path& path)
 {
+    if (!std::filesystem::exists(path))
+        return;
+
     if (!std::filesystem::is_directory(path))
         return;
 
-    for (const auto& f: std::filesystem::recursive_directory_iterator(path))
+    std::vector<std::filesystem::path> nextDirectories;
+    std::optional<std::filesystem::path> thisDirectoryMdFile;
+    for (const auto& f: std::filesystem::directory_iterator(path))
     {
         if (f.is_directory())
-            ProcessDirectory(f.path());
+        {
+            nextDirectories.push_back(f.path());
+            continue;
+        }
 
         std::filesystem::path ext = f.path().extension();
         if (ext == ".md")
-            ProcessMarkdownFile(f.path());
+        {
+            if (thisDirectoryMdFile.has_value())
+            {
+                std::wcout << std::format(L"Error: Duplicate Md File In One Directory: {}", f.path().wstring());
+                continue;
+            }
+            else
+                thisDirectoryMdFile = f.path();
+        }
     }
+
+    for (const auto& p : nextDirectories)
+        ProcessDirectory(p);
+
+    if (thisDirectoryMdFile.has_value())
+        ProcessMarkdownFile(thisDirectoryMdFile.value());
 }
 
 int main()
