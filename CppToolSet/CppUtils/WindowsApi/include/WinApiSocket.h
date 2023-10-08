@@ -7,6 +7,9 @@
 
 namespace WindowsApi::Socket
 {
+
+#pragma region [Define]
+
     using Byte = char;
 
     template<typename... Args>
@@ -57,67 +60,20 @@ namespace WindowsApi::Socket
         }
     };
 
-    struct ActionResult: public ResultWithErrMsg<>
-    {
-    };
+    using ActionResult = ResultWithErrMsg<>;
+    using CreateSocketResult = ResultWithErrMsg<SOCKET>;
+    using CreateSocketAddrResult = ResultWithErrMsg<SOCKADDR_IN>;
+    using ReceiveResult = ResultWithErrMsg<int>;
+    using AcceptResult = ResultWithErrMsg<SOCKADDR_IN>;
+    using CreateEventResult = ResultWithErrMsg<WSAEVENT>;
+    using EnumEventsResult = ResultWithErrMsg<WSANETWORKEVENTS>;
+    using IpInfoResult = ResultWithErrMsg<std::wstring, unsigned short>;
 
-    struct CreateSocketResult: public ResultWithErrMsg<SOCKET>
-    {
-    };
+#pragma endregion
 
-    struct CreateSocketAddrResult: public ResultWithErrMsg<SOCKADDR_IN>
-    {
-    };
+    CreateSocketAddrResult CreateAddrFromIpv4(const std::wstring& ipStr, int port);
 
-    struct ReceiveResult: public ResultWithErrMsg<int>
-    {
-        int GetReceiveSize() const
-        {
-            return result;
-        }
-    };
-
-    struct AcceptResult: public ResultWithErrMsg<SOCKADDR_IN>
-    {
-    };
-
-    struct CreateEventResult: public ResultWithErrMsg<WSAEVENT>
-    {
-    };
-
-    struct EnumEventsResult: public ResultWithErrMsg<WSANETWORKEVENTS>
-    {
-        template<int FD, int FD_BIT>
-        bool GetFdBitResult() const
-        {
-            return (result.lNetworkEvents & FD)
-                   && (result.iErrorCode[FD_BIT] == 0);
-        }
-
-        bool IsAccept() const
-        {
-            return GetFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>();
-        }
-
-        bool IsWrite() const
-        {
-            return GetFdBitResult<FD_WRITE, FD_WRITE_BIT>();
-        }
-
-        bool IsRead() const
-        {
-            return GetFdBitResult<FD_READ, FD_READ_BIT>();
-        }
-
-        bool IsClose() const
-        {
-            return GetFdBitResult<FD_CLOSE, FD_CLOSE_BIT>();
-        }
-    };
-
-    SOCKADDR_IN GenAddrFromIpv4(const std::wstring& ipStr, int port);
-
-    std::pair<std::wstring, int> GetIpv4FromAddr(SOCKADDR_IN addr);
+    IpInfoResult GetIpv4FromAddr(SOCKADDR_IN addr);
 
     ActionResult InitWinSocketsEnvironment();
 
@@ -149,6 +105,25 @@ namespace WindowsApi::Socket
 
     void EventReset(WSAEVENT wsaEvent);
 
+#pragma region [Enum Events]
+
     EnumEventsResult EnumEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
+
+    template<int FD, int FD_BIT>
+    bool GetEnumEventsFdBitResult(const EnumEventsResult& result)
+    {
+        return (result.result.lNetworkEvents & FD)
+               && (result.result.iErrorCode[FD_BIT] == 0);
+    }
+
+    bool EnumEventsIsAccept(const EnumEventsResult& result);
+
+    bool EnumEventsIsWrite(const EnumEventsResult& result);
+
+    bool EnumEventsIsRead(const EnumEventsResult& result);
+
+    bool EnumEventsIsClose(const EnumEventsResult& result);
+
+#pragma endregion
 
 }

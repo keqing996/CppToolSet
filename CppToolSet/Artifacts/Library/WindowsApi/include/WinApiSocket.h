@@ -7,65 +7,73 @@
 
 namespace WindowsApi::Socket
 {
+
+#pragma region [Define]
+
     using Byte = char;
 
-    struct ActionResult
+    template<typename... Args>
+    struct ResultWithErrMsg;
+
+    template<>
+    struct ResultWithErrMsg<>
     {
         bool success;
         std::wstring errorMessage;
 
-        ActionResult(bool succ, const std::wstring& errMsg);
-    };
-
-    struct CreateSocketResult: public ActionResult
-    {
-        SOCKET socket;
-
-        CreateSocketResult(bool succ, SOCKET s, const std::wstring& errMsg);
-    };
-
-    struct ReceiveResult: public ActionResult
-    {
-        int receiveSize;
-
-        ReceiveResult(bool succ, int size, const std::wstring& errMsg);
-    };
-
-    struct AcceptResult: public ActionResult
-    {
-        sockaddr_in acceptAddr;
-
-        AcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
-    };
-
-    struct CreateEventResult: public ActionResult
-    {
-        WSAEVENT event;
-
-        CreateEventResult(bool succ, WSAEVENT e, const std::wstring& errMsg);
-    };
-
-    struct EnumEventsResult: public ActionResult
-    {
-        WSANETWORKEVENTS  triggeredEvents;
-
-        EnumEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
-
-        template<int FD, int FD_BIT>
-        bool GetFdBitResult() const
+        ResultWithErrMsg(bool succ, const std::wstring& errMsg)
+                : success(succ)
+                , errorMessage(errMsg)
         {
-            return (triggeredEvents.lNetworkEvents & FD)
-                   && (triggeredEvents.iErrorCode[FD_BIT] == 0);
         }
-
-        bool IsAccept() const;
-
-        bool IsWrite() const;
-
-        bool IsRead() const;
-
-        bool IsClose() const;
     };
+
+    template<typename OnePara>
+    struct ResultWithErrMsg<OnePara>
+    {
+        OnePara result;
+        bool success;
+        std::wstring errorMessage;
+
+        ResultWithErrMsg(bool succ, OnePara para, const std::wstring& errMsg)
+                : success(succ)
+                , result(para)
+                , errorMessage(errMsg)
+        {
+        }
+    };
+
+    template<typename Para1, typename Para2>
+    struct ResultWithErrMsg<Para1, Para2>
+    {
+        Para1 result1;
+        Para2 result2;
+        bool success;
+        std::wstring errorMessage;
+
+        ResultWithErrMsg(bool succ, Para1 para1, Para2 para2, const std::wstring& errMsg)
+                : success(succ)
+                , result1(para1)
+                , result2(para2)
+                , errorMessage(errMsg)
+        {
+        }
+    };
+
+    using ActionResult = ResultWithErrMsg<>;
+    using CreateSocketResult = ResultWithErrMsg<SOCKET>;
+    using CreateSocketAddrResult = ResultWithErrMsg<SOCKADDR_IN>;
+    using ReceiveResult = ResultWithErrMsg<int>;
+    using AcceptResult = ResultWithErrMsg<SOCKADDR_IN>;
+    using CreateEventResult = ResultWithErrMsg<WSAEVENT>;
+    using EnumEventsResult = ResultWithErrMsg<WSANETWORKEVENTS>;
+    using IpInfoResult = ResultWithErrMsg<std::wstring, unsigned short>;
+
+#pragma endregion
+
+    CreateSocketAddrResult CreateAddrFromIpv4(const std::wstring& ipStr, int port);
+
+    IpInfoResult GetIpv4FromAddr(SOCKADDR_IN addr);
 
     ActionResult InitWinSocketsEnvironment();
 
@@ -97,6 +105,25 @@ namespace WindowsApi::Socket
 
     void EventReset(WSAEVENT wsaEvent);
 
+#pragma region [Enum Events]
+
     EnumEventsResult EnumEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
+
+    template<int FD, int FD_BIT>
+    bool GetEnumEventsFdBitResult(const EnumEventsResult& result)
+    {
+        return (result.result.lNetworkEvents & FD)
+               && (result.result.iErrorCode[FD_BIT] == 0);
+    }
+
+    bool EnumEventsIsAccept(const EnumEventsResult& result);
+
+    bool EnumEventsIsWrite(const EnumEventsResult& result);
+
+    bool EnumEventsIsRead(const EnumEventsResult& result);
+
+    bool EnumEventsIsClose(const EnumEventsResult& result);
+
+#pragma endregion
 
 }

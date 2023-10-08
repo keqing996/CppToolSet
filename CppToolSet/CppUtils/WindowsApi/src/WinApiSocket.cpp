@@ -9,26 +9,36 @@
 
 namespace WindowsApi::Socket
 {
-
-    SOCKADDR_IN GenAddrFromIpv4(const std::wstring& ipStr, int port)
+    CreateSocketAddrResult CreateAddrFromIpv4(const std::wstring& ipStr, int port)
     {
         in_addr dst{};
-        ::InetPton(AF_INET, ipStr.c_str(), &dst);
+        int result = ::InetPton(AF_INET, ipStr.c_str(), &dst);
+        if (result != 1)
+        {
+            int errorCode = ::WSAGetLastError();
+            return {false, {}, std::format(L"ip error: {}", errorCode)};
+        }
 
-        SOCKADDR_IN result;
-        result.sin_family = AF_INET;
-        result.sin_addr.S_un.S_addr = dst.S_un.S_addr;
-        result.sin_port = ::htons(port);
+        SOCKADDR_IN sockAddrIn;
+        sockAddrIn.sin_family = AF_INET;
+        sockAddrIn.sin_addr.S_un.S_addr = dst.S_un.S_addr;
+        sockAddrIn.sin_port = ::htons(port);
 
-        return result;
+        return {true, sockAddrIn, L""};
     }
 
-    std::pair<std::wstring, int> GetIpv4FromAddr(SOCKADDR_IN addr)
+    IpInfoResult GetIpv4FromAddr(SOCKADDR_IN addr)
     {
         wchar_t pIpStr[16] {0};
-        ::InetNtop(AF_INET, &addr.sin_addr.S_un.S_addr, pIpStr, sizeof(pIpStr));
+        auto pErrMsg = ::InetNtop(AF_INET, &addr.sin_addr.S_un.S_addr, pIpStr, sizeof(pIpStr));
+
+        if (pErrMsg != nullptr)
+        {
+            return { false, L"", 0, {pErrMsg} };
+        }
+
         auto port = ::ntohs(addr.sin_port);
-        return {{pIpStr}, port};
+        return { true, {pIpStr}, port, L""};
     }
 
     ActionResult InitWinSocketsEnvironment()
@@ -105,7 +115,11 @@ namespace WindowsApi::Socket
 
     ActionResult Connect(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
-        SOCKADDR_IN serverAddr = GenAddrFromIpv4(ipStr, port);
+        auto createAddrResult = CreateAddrFromIpv4(ipStr, port);
+        if (!createAddrResult.success)
+            return {false, createAddrResult.errorMessage};
+
+        SOCKADDR_IN serverAddr = createAddrResult.result;
 
         auto connectResult = ::connect(
                 *pSocket,
@@ -123,7 +137,11 @@ namespace WindowsApi::Socket
 
     ActionResult Bind(const SOCKET* pSocket, std::wstring ipStr, int port)
     {
-        SOCKADDR_IN serverAddr = GenAddrFromIpv4(ipStr, port);
+        auto createAddrResult = CreateAddrFromIpv4(ipStr, port);
+        if (!createAddrResult.success)
+            return {false, createAddrResult.errorMessage};
+
+        SOCKADDR_IN serverAddr = createAddrResult.result;
 
         auto bindResult = ::bind(
                 *pSocket,
@@ -175,6 +193,26 @@ namespace WindowsApi::Socket
         }
 
         return {true, wsaEvent, L""};
+    }
+
+    bool EnumEventsIsAccept(const EnumEventsResult &result)
+    {
+        return GetEnumEventsFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>(result);
+    }
+
+    bool EnumEventsIsWrite(const EnumEventsResult &result)
+    {
+        return GetEnumEventsFdBitResult<FD_WRITE, FD_WRITE_BIT>(result);
+    }
+
+    bool EnumEventsIsRead(const EnumEventsResult &result)
+    {
+        return GetEnumEventsFdBitResult<FD_READ, FD_READ_BIT>(result);
+    }
+
+    bool EnumEventsIsClose(const EnumEventsResult &result)
+    {
+        return GetEnumEventsFdBitResult<FD_CLOSE, FD_CLOSE_BIT>(result);
     }
 
     void SocketCloseEvent(WSAEVENT* wsaEvent)
