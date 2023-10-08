@@ -61,9 +61,12 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
             continue;
         }
 
-        std::wcout << std::format(L"\t-: {}", oneLineContent) << std::endl;
-        StringUtil::ReplaceInPlace<wchar_t>(oneLineContent, L"Resource", mdFileNameW);
-        std::wcout << std::format(L"\t+: {}", oneLineContent) << std::endl;
+        std::wcout << std::format(L"\t<--: {}", oneLineContent) << std::endl;
+
+        std::wstring title = regexResult[1];
+        std::wstring imgPath = StringUtil::Replace<wchar_t>(regexResult[2], L"Resource/", L"");
+        oneLineContent = std::format(L"{{% asset_img {} {} %}}", imgPath, title);
+        std::wcout << std::format(L"\t-->: {}", oneLineContent) << std::endl;
         gFileContentBuffer.push_back(oneLineContent);
     }
 
