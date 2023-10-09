@@ -135,4 +135,86 @@ namespace WindowsApi::Console
         style = style & (enable ? WS_MINIMIZEBOX : ~WS_MINIMIZEBOX);
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
+
+    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
+    {
+        HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        WORD result = 0;
+
+        switch (foreground)
+        {
+            case ConsoleColor::None:
+            case ConsoleColor::White:
+                result |= FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN;
+                break;
+            case ConsoleColor::Black:
+                result |= 0;
+                break;
+            case ConsoleColor::Green:
+                result |= FOREGROUND_GREEN;
+                break;
+            case ConsoleColor::Blue:
+                result |= FOREGROUND_BLUE;
+                break;
+            case ConsoleColor::Red:
+                result |= FOREGROUND_RED;
+                break;
+            case ConsoleColor::Gray:
+                result |= FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
+                break;
+            case ConsoleColor::Purple:
+                result |= FOREGROUND_BLUE | FOREGROUND_RED;
+                break;
+            case ConsoleColor::Cyan:
+                result |= FOREGROUND_BLUE | FOREGROUND_GREEN;
+                break;
+            case ConsoleColor::Yellow:
+                result |= FOREGROUND_RED | FOREGROUND_GREEN;
+                break;
+            default:
+                break;
+        }
+
+        if (foregroundIntensity)
+            result |= FOREGROUND_INTENSITY;
+
+        switch (background)
+        {
+            case ConsoleColor::None:
+            case ConsoleColor::Black:
+                result |= 0;
+                break;
+            case ConsoleColor::White:
+                result |= BACKGROUND_BLUE | BACKGROUND_RED | BACKGROUND_GREEN;
+                break;
+            case ConsoleColor::Green:
+                result |= BACKGROUND_GREEN;
+                break;
+            case ConsoleColor::Blue:
+                result |= BACKGROUND_BLUE;
+                break;
+            case ConsoleColor::Red:
+                result |= BACKGROUND_RED;
+                break;
+            case ConsoleColor::Gray:
+                result |= BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
+                break;
+            case ConsoleColor::Purple:
+                result |= BACKGROUND_BLUE | BACKGROUND_RED;
+                break;
+            case ConsoleColor::Cyan:
+                result |= BACKGROUND_BLUE | BACKGROUND_GREEN;
+                break;
+            case ConsoleColor::Yellow:
+                result |= BACKGROUND_RED | BACKGROUND_GREEN;
+                break;
+            default:
+                break;
+        }
+
+        if (backgroundIntensity)
+            result |= BACKGROUND_INTENSITY;
+
+        ::SetConsoleTextAttribute(handle, result);
+    }
 }

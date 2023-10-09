@@ -5,6 +5,20 @@
 
 namespace WindowsApi::Console
 {
+    enum class ConsoleColor
+    {
+        None,
+        Green,
+        Red,
+        Blue,
+        White,
+        Black,
+        Yellow,
+        Purple,
+        Gray,
+        Cyan
+    };
+
     HANDLE GetStdOutputHandle();
 
     HANDLE GetStdInputHandle();
@@ -40,4 +54,7 @@ namespace WindowsApi::Console
     void SetWindowMaxEnable(HANDLE consoleHandle, bool enable);
 
     void SetWindowMinEnable(HANDLE consoleHandle, bool enable);
+
+    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
+
 }
