@@ -9,18 +9,6 @@ namespace WindowsApi::Console
         return ::GetConsoleWindow();
     }
 
-    std::wstring GetTitle()
-    {
-        wchar_t buf[0xFF];
-        ::GetConsoleTitle(buf,0xFF);
-        return { buf };
-    }
-
-    bool SetTitle(const std::wstring& title)
-    {
-        return ::SetConsoleTitle(title.c_str());
-    }
-
     HANDLE GetStdOutputHandle()
     {
         return ::GetStdHandle(STD_OUTPUT_HANDLE);
@@ -36,11 +24,98 @@ namespace WindowsApi::Console
         return ::GetStdHandle(STD_ERROR_HANDLE);
     }
 
-    bool ChangeSize(HANDLE consoleHandle, short width, short height)
+    std::wstring GetTitle()
     {
-        SMALL_RECT wrt = { 0, 0, (short)(width - 1), (short)(height - 1) };
-        return ::SetConsoleWindowInfo(consoleHandle, TRUE, &wrt);
+        wchar_t buf[0xFF];
+        ::GetConsoleTitle(buf,0xFF);
+        return { buf };
     }
+
+    bool SetTitle(const std::wstring& title)
+    {
+        return ::SetConsoleTitle(title.c_str());
+    }
+
+    CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle)
+    {
+        CONSOLE_SCREEN_BUFFER_INFOEX info;
+        info.cbSize = sizeof(info);
+
+        ::GetConsoleScreenBufferInfoEx(consoleHandle, &info);
+
+        // windows bug, https://stackoverflow.com/questions/35901572/setconsolescreenbufferinfoex-bug
+        info.srWindow.Right++;
+        info.srWindow.Bottom++;
+
+        return info;
+    }
+
+    bool SetConsoleBufferInfo(HANDLE consoleHandle, CONSOLE_SCREEN_BUFFER_INFOEX* pInfo)
+    {
+        return ::SetConsoleScreenBufferInfoEx(consoleHandle, pInfo);
+    }
+
+    Coord<short> GetBufferSize(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.dwSize.X, bufferInfo.dwSize.Y };
+    }
+
+    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        bufferInfo.dwSize = { newSize.x, newSize.y };
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+    }
+
+    Coord<short> GetCursorPosition(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.dwCursorPosition.X, bufferInfo.dwCursorPosition.Y };
+    }
+
+    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        bufferInfo.dwCursorPosition = { newPos.x, newPos.y };
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+    }
+
+    Rect<short> GetWindowRect(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.srWindow.Left, bufferInfo.srWindow.Top, bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
+    }
+
+    bool SetWindowRect(HANDLE consoleHandle, Rect<short> rect)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        bufferInfo.srWindow = {rect.left, rect.top, rect.right, rect.bottom };
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+    }
+
+    Coord<short> GetWindowSize(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
+    }
+
+    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        bufferInfo.srWindow.Right = size.x;
+        bufferInfo.srWindow.Bottom = size.y;
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+    }
+
+
+
+
+
+
+
+
+
 
     void SetWindowResizeEnable(HANDLE consoleHandle, bool enable)
     {
