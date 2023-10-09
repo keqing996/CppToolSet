@@ -9,18 +9,6 @@ namespace WindowsApi::Console
         return ::GetConsoleWindow();
     }
 
-    std::wstring GetTitle()
-    {
-        wchar_t buf[0xFF];
-        ::GetConsoleTitle(buf,0xFF);
-        return { buf };
-    }
-
-    bool SetTitle(const std::wstring& title)
-    {
-        return ::SetConsoleTitle(title.c_str());
-    }
-
     HANDLE GetStdOutputHandle()
     {
         return ::GetStdHandle(STD_OUTPUT_HANDLE);
@@ -36,10 +24,92 @@ namespace WindowsApi::Console
         return ::GetStdHandle(STD_ERROR_HANDLE);
     }
 
-    bool ChangeSize(HANDLE consoleHandle, short width, short height)
+    std::wstring GetTitle()
     {
-        SMALL_RECT wrt = { 0, 0, (short)(width - 1), (short)(height - 1) };
-        return ::SetConsoleWindowInfo(consoleHandle, TRUE, &wrt);
+        wchar_t buf[0xFF];
+        ::GetConsoleTitle(buf,0xFF);
+        return { buf };
+    }
+
+    bool SetTitle(const std::wstring& title)
+    {
+        return ::SetConsoleTitle(title.c_str());
+    }
+
+    CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle)
+    {
+        CONSOLE_SCREEN_BUFFER_INFOEX info;
+        info.cbSize = sizeof(info);
+
+        ::GetConsoleScreenBufferInfoEx(consoleHandle, &info);
+
+        // windows bug, https://stackoverflow.com/questions/35901572/setconsolescreenbufferinfoex-bug
+        info.srWindow.Right++;
+        info.srWindow.Bottom++;
+
+        return info;
+    }
+
+    bool SetConsoleBufferInfo(HANDLE consoleHandle, CONSOLE_SCREEN_BUFFER_INFOEX* pInfo)
+    {
+        return ::SetConsoleScreenBufferInfoEx(consoleHandle, pInfo);
+    }
+
+    Coord<short> GetBufferSize(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.dwSize.X, bufferInfo.dwSize.Y };
+    }
+
+    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        bufferInfo.dwSize = { newSize.x, newSize.y };
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+    }
+
+    Coord<short> GetCursorPosition(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.dwCursorPosition.X, bufferInfo.dwCursorPosition.Y };
+    }
+
+    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        bufferInfo.dwCursorPosition = { newPos.x, newPos.y };
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+    }
+
+    Rect<short> GetWindowRect(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.srWindow.Left, bufferInfo.srWindow.Top, bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
+    }
+
+    bool SetWindowRect(HANDLE consoleHandle, Rect<short> rect)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        rect.right--;
+        rect.bottom--;
+        bufferInfo.srWindow = {rect.left, rect.top, rect.right, rect.bottom };
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+    }
+
+    Coord<short> GetWindowSize(HANDLE consoleHandle)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        return { bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
+    }
+
+    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size)
+    {
+        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        size.x--;
+        size.y--;
+        bufferInfo.srWindow.Right = size.x;
+        bufferInfo.srWindow.Bottom = size.y;
+        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
     }
 
     void SetWindowResizeEnable(HANDLE consoleHandle, bool enable)
@@ -64,5 +134,87 @@ namespace WindowsApi::Console
         auto style= ::GetWindowLongPtr(hWnd, GWL_STYLE);
         style = style & (enable ? WS_MINIMIZEBOX : ~WS_MINIMIZEBOX);
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
+    }
+
+    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
+    {
+        HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        WORD result = 0;
+
+        switch (foreground)
+        {
+            case ConsoleColor::None:
+            case ConsoleColor::White:
+                result |= FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN;
+                break;
+            case ConsoleColor::Black:
+                result |= 0;
+                break;
+            case ConsoleColor::Green:
+                result |= FOREGROUND_GREEN;
+                break;
+            case ConsoleColor::Blue:
+                result |= FOREGROUND_BLUE;
+                break;
+            case ConsoleColor::Red:
+                result |= FOREGROUND_RED;
+                break;
+            case ConsoleColor::Gray:
+                result |= FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
+                break;
+            case ConsoleColor::Purple:
+                result |= FOREGROUND_BLUE | FOREGROUND_RED;
+                break;
+            case ConsoleColor::Cyan:
+                result |= FOREGROUND_BLUE | FOREGROUND_GREEN;
+                break;
+            case ConsoleColor::Yellow:
+                result |= FOREGROUND_RED | FOREGROUND_GREEN;
+                break;
+            default:
+                break;
+        }
+
+        if (foregroundIntensity)
+            result |= FOREGROUND_INTENSITY;
+
+        switch (background)
+        {
+            case ConsoleColor::None:
+            case ConsoleColor::Black:
+                result |= 0;
+                break;
+            case ConsoleColor::White:
+                result |= BACKGROUND_BLUE | BACKGROUND_RED | BACKGROUND_GREEN;
+                break;
+            case ConsoleColor::Green:
+                result |= BACKGROUND_GREEN;
+                break;
+            case ConsoleColor::Blue:
+                result |= BACKGROUND_BLUE;
+                break;
+            case ConsoleColor::Red:
+                result |= BACKGROUND_RED;
+                break;
+            case ConsoleColor::Gray:
+                result |= BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
+                break;
+            case ConsoleColor::Purple:
+                result |= BACKGROUND_BLUE | BACKGROUND_RED;
+                break;
+            case ConsoleColor::Cyan:
+                result |= BACKGROUND_BLUE | BACKGROUND_GREEN;
+                break;
+            case ConsoleColor::Yellow:
+                result |= BACKGROUND_RED | BACKGROUND_GREEN;
+                break;
+            default:
+                break;
+        }
+
+        if (backgroundIntensity)
+            result |= BACKGROUND_INTENSITY;
+
+        ::SetConsoleTextAttribute(handle, result);
     }
 }

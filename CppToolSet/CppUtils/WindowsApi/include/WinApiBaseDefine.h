@@ -17,3 +17,22 @@
 #endif
 
 #include <Windows.h>
+
+namespace WindowsApi
+{
+    template<typename T>
+    struct Coord
+    {
+        T x;
+        T y;
+    };
+
+    template<typename T>
+    struct Rect
+    {
+        T left;
+        T top;
+        T right;
+        T bottom;
+    };
+}
