@@ -90,6 +90,8 @@ namespace WindowsApi::Console
     bool SetWindowRect(HANDLE consoleHandle, Rect<short> rect)
     {
         auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        rect.right--;
+        rect.bottom--;
         bufferInfo.srWindow = {rect.left, rect.top, rect.right, rect.bottom };
         return SetScreenBufferInfo(consoleHandle, &bufferInfo);
     }
@@ -103,19 +105,12 @@ namespace WindowsApi::Console
     bool SetWindowSize(HANDLE consoleHandle, Coord<short> size)
     {
         auto bufferInfo = GetScreenBufferInfo(consoleHandle);
+        size.x--;
+        size.y--;
         bufferInfo.srWindow.Right = size.x;
         bufferInfo.srWindow.Bottom = size.y;
         return SetScreenBufferInfo(consoleHandle, &bufferInfo);
     }
-
-
-
-
-
-
-
-
-
 
     void SetWindowResizeEnable(HANDLE consoleHandle, bool enable)
     {

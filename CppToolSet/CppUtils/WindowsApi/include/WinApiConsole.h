@@ -35,12 +35,6 @@ namespace WindowsApi::Console
 
     bool SetWindowSize(HANDLE consoleHandle, Coord<short> size);
 
-
-
-
-
-    bool ChangeSize(HANDLE consoleHandle, short width, short height);
-
     void SetWindowResizeEnable(HANDLE consoleHandle, bool enable);
 
     void SetWindowMaxEnable(HANDLE consoleHandle, bool enable);
