@@ -7,81 +7,123 @@
 
 namespace WindowsApi::Socket
 {
+
+#pragma region [Define]
+
     using Byte = char;
 
-    struct ActionResult
+    template<typename... Args>
+    struct ResultWithErrMsg;
+
+    template<>
+    struct ResultWithErrMsg<>
     {
         bool success;
         std::wstring errorMessage;
 
-        ActionResult(bool succ, const std::wstring& errMsg);
+        ResultWithErrMsg(bool succ, const std::wstring& errMsg)
+                : success(succ)
+                , errorMessage(errMsg)
+        {
+        }
     };
 
-    struct SocketCreateResult: public ActionResult
+    template<typename OnePara>
+    struct ResultWithErrMsg<OnePara>
     {
-        SOCKET socket;
+        OnePara result;
+        bool success;
+        std::wstring errorMessage;
 
-        SocketCreateResult(bool succ, SOCKET s, const std::wstring& errMsg);
+        ResultWithErrMsg(bool succ, OnePara para, const std::wstring& errMsg)
+                : success(succ)
+                , result(para)
+                , errorMessage(errMsg)
+        {
+        }
     };
 
-    struct SocketReceiveResult: public ActionResult
+    template<typename Para1, typename Para2>
+    struct ResultWithErrMsg<Para1, Para2>
     {
-        int receiveSize;
+        Para1 result1;
+        Para2 result2;
+        bool success;
+        std::wstring errorMessage;
 
-        SocketReceiveResult(bool succ, int size, const std::wstring& errMsg);
+        ResultWithErrMsg(bool succ, Para1 para1, Para2 para2, const std::wstring& errMsg)
+                : success(succ)
+                , result1(para1)
+                , result2(para2)
+                , errorMessage(errMsg)
+        {
+        }
     };
 
-    struct SocketAcceptResult: public ActionResult
-    {
-        sockaddr_in acceptAddr;
+    using ActionResult = ResultWithErrMsg<>;
+    using CreateSocketResult = ResultWithErrMsg<SOCKET>;
+    using CreateSocketAddrResult = ResultWithErrMsg<SOCKADDR_IN>;
+    using ReceiveResult = ResultWithErrMsg<int>;
+    using AcceptResult = ResultWithErrMsg<SOCKADDR_IN>;
+    using CreateEventResult = ResultWithErrMsg<WSAEVENT>;
+    using EnumEventsResult = ResultWithErrMsg<WSANETWORKEVENTS>;
+    using IpInfoResult = ResultWithErrMsg<std::wstring, unsigned short>;
 
-        SocketAcceptResult(bool succ, sockaddr_in addrIn, const std::wstring& errMsg);
-    };
+#pragma endregion
 
-    struct SocketCreateEventResult: public ActionResult
-    {
-        WSAEVENT event;
+    CreateSocketAddrResult CreateAddrFromIpv4(const std::wstring& ipStr, int port);
 
-        SocketCreateEventResult(bool succ, WSAEVENT e, const std::wstring& errMsg);
-    };
-
-    struct SocketEnumNetworkEventsResult: public ActionResult
-    {
-        WSANETWORKEVENTS  triggeredEvents;
-
-        SocketEnumNetworkEventsResult(bool succ, WSANETWORKEVENTS events, const std::wstring& errMsg);
-    };
+    IpInfoResult GetIpv4FromAddr(SOCKADDR_IN addr);
 
     ActionResult InitWinSocketsEnvironment();
 
     void CleanWinSocketsEnvironment();
 
-    SocketCreateResult CreateTcpIpv4Socket();
+    CreateSocketResult CreateTcpIpv4Socket();
 
     void CloseSocket(const SOCKET* pSocket);
 
-    ActionResult SocketSend(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
+    ActionResult Send(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
 
-    SocketReceiveResult SocketReceive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
+    ReceiveResult Receive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize);
 
-    ActionResult SocketConnect(const SOCKET* pSocket, std::wstring ipStr, int port);
+    ActionResult Connect(const SOCKET* pSocket, std::wstring ipStr, int port);
 
-    ActionResult SocketBind(const SOCKET* pSocket, std::wstring ipStr, int port);
+    ActionResult Bind(const SOCKET* pSocket, std::wstring ipStr, int port);
 
-    ActionResult SocketListen(const SOCKET* pSocket);
+    ActionResult Listen(const SOCKET* pSocket);
 
-    SocketAcceptResult SocketAccept(const SOCKET* pSocket);
+    AcceptResult Accept(const SOCKET* pSocket);
 
-    SocketCreateEventResult SocketCreateEvent();
+    CreateEventResult SocketCreateEvent();
 
-    void SocketCloseEvent(WSAEVENT* wsaEvent);
+    void CloseEvent(WSAEVENT * wsaEvent);
 
-    ActionResult SocketEventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long netEvent);
+    ActionResult EventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long netEvent);
 
-    DWORD SocketWaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut = 0, bool waitAll = false, bool alertable = false);
+    DWORD WaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut = 0, bool waitAll = false, bool alertable = false);
 
-    void SocketResetEvent(WSAEVENT wsaEvent);
+    void EventReset(WSAEVENT wsaEvent);
 
-    SocketEnumNetworkEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
+#pragma region [Enum Events]
+
+    EnumEventsResult EnumEvents(const SOCKET* pSocket, WSAEVENT wsaEvent);
+
+    template<int FD, int FD_BIT>
+    bool GetEnumEventsFdBitResult(const EnumEventsResult& result)
+    {
+        return (result.result.lNetworkEvents & FD)
+               && (result.result.iErrorCode[FD_BIT] == 0);
+    }
+
+    bool EnumEventsIsAccept(const EnumEventsResult& result);
+
+    bool EnumEventsIsWrite(const EnumEventsResult& result);
+
+    bool EnumEventsIsRead(const EnumEventsResult& result);
+
+    bool EnumEventsIsClose(const EnumEventsResult& result);
+
+#pragma endregion
 
 }
