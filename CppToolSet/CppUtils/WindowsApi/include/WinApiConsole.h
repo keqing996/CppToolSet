@@ -55,6 +55,7 @@ namespace WindowsApi::Console
 
     void SetWindowMinEnable(HANDLE consoleHandle, bool enable);
 
-    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
+    void SetColor(HANDLE consoleHandle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
 
+    void ClearScreen();
 }
