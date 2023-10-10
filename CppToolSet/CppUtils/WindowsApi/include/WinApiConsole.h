@@ -15,7 +15,6 @@ namespace WindowsApi::Console
         Black,
         Yellow,
         Purple,
-        Gray,
         Cyan
     };
 

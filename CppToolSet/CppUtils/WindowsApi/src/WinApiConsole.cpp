@@ -158,9 +158,6 @@ namespace WindowsApi::Console
             case ConsoleColor::Red:
                 result |= FOREGROUND_RED;
                 break;
-            case ConsoleColor::Gray:
-                result |= FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
-                break;
             case ConsoleColor::Purple:
                 result |= FOREGROUND_BLUE | FOREGROUND_RED;
                 break;
@@ -194,9 +191,6 @@ namespace WindowsApi::Console
                 break;
             case ConsoleColor::Red:
                 result |= BACKGROUND_RED;
-                break;
-            case ConsoleColor::Gray:
-                result |= BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
                 break;
             case ConsoleColor::Purple:
                 result |= BACKGROUND_BLUE | BACKGROUND_RED;
