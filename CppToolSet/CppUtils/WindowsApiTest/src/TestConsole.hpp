@@ -11,12 +11,10 @@ using namespace WindowsApi::Console;
 void TestConsole()
 {
     auto handle = GetStdOutputHandle();
-    SetWindowMaxEnable(handle, false);
-    SetWindowMinEnable(handle, false);
-    SetWindowResizeEnable(handle, false);
-    SetTitle(L"2333");
 
-    SetWindowSize(handle, {800, 400});
+    SetWindowMaxEnable(false);
+    SetWindowMinEnable(false);
+    SetWindowResizeEnable(false);
 
     std::cout << "Hello None" << std::endl;
 

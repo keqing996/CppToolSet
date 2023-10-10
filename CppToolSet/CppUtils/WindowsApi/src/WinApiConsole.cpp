@@ -24,18 +24,6 @@ namespace WindowsApi::Console
         return ::GetStdHandle(STD_ERROR_HANDLE);
     }
 
-    std::wstring GetTitle()
-    {
-        wchar_t buf[0xFF];
-        ::GetConsoleTitle(buf,0xFF);
-        return { buf };
-    }
-
-    bool SetTitle(const std::wstring& title)
-    {
-        return ::SetConsoleTitle(title.c_str());
-    }
-
     CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle)
     {
         CONSOLE_SCREEN_BUFFER_INFOEX info;
@@ -48,48 +36,6 @@ namespace WindowsApi::Console
         info.srWindow.Bottom++;
 
         return info;
-    }
-
-    Coord<short> GetBufferSize(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.dwSize.X, bufferInfo.dwSize.Y };
-    }
-
-    Coord<short> GetCursorPosition(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.dwCursorPosition.X, bufferInfo.dwCursorPosition.Y };
-    }
-
-    Rect<short> GetWindowRect(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.srWindow.Left, bufferInfo.srWindow.Top, bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
-    }
-
-    Coord<short> GetWindowSize(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
-    }
-
-    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize)
-    {
-        return ::SetConsoleScreenBufferSize(consoleHandle, { newSize.x, newSize.y });
-    }
-
-    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos)
-    {
-        return ::SetConsoleCursorPosition(consoleHandle, { newPos.x, newPos.y });
-    }
-
-    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size, bool absolute)
-    {
-        size.x--;
-        size.y--;
-        SMALL_RECT winSize = {size.x, size.y};
-        return ::SetConsoleWindowInfo(consoleHandle, absolute, &winSize);
     }
 
     void SetWindowResizeEnable(bool enable)

@@ -24,25 +24,7 @@ namespace WindowsApi::Console
 
     HANDLE GetStdErrorHandle();
 
-    std::wstring GetTitle();
-
-    bool SetTitle(const std::wstring& title);
-
     CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle);
-
-    Coord<short> GetBufferSize(HANDLE consoleHandle);
-
-    Coord<short> GetCursorPosition(HANDLE consoleHandle);
-
-    Rect<short> GetWindowRect(HANDLE consoleHandle);
-
-    Coord<short> GetWindowSize(HANDLE consoleHandle);
-
-    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize);
-
-    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos);
-
-    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size, bool absolute = false);
 
     void SetWindowResizeEnable(bool enable);
 
