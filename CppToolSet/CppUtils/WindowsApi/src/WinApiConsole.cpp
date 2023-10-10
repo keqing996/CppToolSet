@@ -50,7 +50,7 @@ namespace WindowsApi::Console
         return info;
     }
 
-    bool SetConsoleBufferInfo(HANDLE consoleHandle, CONSOLE_SCREEN_BUFFER_INFOEX* pInfo)
+    bool SetScreenBufferInfo(HANDLE consoleHandle, CONSOLE_SCREEN_BUFFER_INFOEX* pInfo)
     {
         return ::SetConsoleScreenBufferInfoEx(consoleHandle, pInfo);
     }
