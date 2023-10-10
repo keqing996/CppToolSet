@@ -24,18 +24,6 @@ namespace WindowsApi::Console
         return ::GetStdHandle(STD_ERROR_HANDLE);
     }
 
-    std::wstring GetTitle()
-    {
-        wchar_t buf[0xFF];
-        ::GetConsoleTitle(buf,0xFF);
-        return { buf };
-    }
-
-    bool SetTitle(const std::wstring& title)
-    {
-        return ::SetConsoleTitle(title.c_str());
-    }
-
     CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle)
     {
         CONSOLE_SCREEN_BUFFER_INFOEX info;
@@ -50,69 +38,7 @@ namespace WindowsApi::Console
         return info;
     }
 
-    bool SetConsoleBufferInfo(HANDLE consoleHandle, CONSOLE_SCREEN_BUFFER_INFOEX* pInfo)
-    {
-        return ::SetConsoleScreenBufferInfoEx(consoleHandle, pInfo);
-    }
-
-    Coord<short> GetBufferSize(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.dwSize.X, bufferInfo.dwSize.Y };
-    }
-
-    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        bufferInfo.dwSize = { newSize.x, newSize.y };
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
-    }
-
-    Coord<short> GetCursorPosition(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.dwCursorPosition.X, bufferInfo.dwCursorPosition.Y };
-    }
-
-    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        bufferInfo.dwCursorPosition = { newPos.x, newPos.y };
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
-    }
-
-    Rect<short> GetWindowRect(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.srWindow.Left, bufferInfo.srWindow.Top, bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
-    }
-
-    bool SetWindowRect(HANDLE consoleHandle, Rect<short> rect)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        rect.right--;
-        rect.bottom--;
-        bufferInfo.srWindow = {rect.left, rect.top, rect.right, rect.bottom };
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
-    }
-
-    Coord<short> GetWindowSize(HANDLE consoleHandle)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        return { bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
-    }
-
-    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        size.x--;
-        size.y--;
-        bufferInfo.srWindow.Right = size.x;
-        bufferInfo.srWindow.Bottom = size.y;
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
-    }
-
-    void SetWindowResizeEnable(HANDLE consoleHandle, bool enable)
+    void SetWindowResizeEnable(bool enable)
     {
         auto hWnd = GetWindowHandle();
         auto style= ::GetWindowLongPtr(hWnd, GWL_STYLE);
@@ -120,7 +46,7 @@ namespace WindowsApi::Console
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
 
-    void SetWindowMaxEnable(HANDLE consoleHandle, bool enable)
+    void SetWindowMaxEnable(bool enable)
     {
         auto hWnd = GetWindowHandle();
         auto style= ::GetWindowLongPtr(hWnd, GWL_STYLE);
@@ -128,7 +54,7 @@ namespace WindowsApi::Console
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
 
-    void SetWindowMinEnable(HANDLE consoleHandle, bool enable)
+    void SetWindowMinEnable(bool enable)
     {
         auto hWnd = GetWindowHandle();
         auto style= ::GetWindowLongPtr(hWnd, GWL_STYLE);
@@ -136,9 +62,8 @@ namespace WindowsApi::Console
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
 
-    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
+    void SetColor(HANDLE handle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
     {
-        HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
         WORD result = 0;
 
         switch (foreground)
@@ -158,9 +83,6 @@ namespace WindowsApi::Console
                 break;
             case ConsoleColor::Red:
                 result |= FOREGROUND_RED;
-                break;
-            case ConsoleColor::Gray:
-                result |= FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
                 break;
             case ConsoleColor::Purple:
                 result |= FOREGROUND_BLUE | FOREGROUND_RED;
@@ -196,9 +118,6 @@ namespace WindowsApi::Console
             case ConsoleColor::Red:
                 result |= BACKGROUND_RED;
                 break;
-            case ConsoleColor::Gray:
-                result |= BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
-                break;
             case ConsoleColor::Purple:
                 result |= BACKGROUND_BLUE | BACKGROUND_RED;
                 break;
@@ -216,5 +135,43 @@ namespace WindowsApi::Console
             result |= BACKGROUND_INTENSITY;
 
         ::SetConsoleTextAttribute(handle, result);
+    }
+
+    // https://learn.microsoft.com/zh-cn/windows/console/clearing-the-screen
+    void ClearScreen(HANDLE hConsole)
+    {
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        SMALL_RECT scrollRect;
+        COORD scrollTarget;
+        CHAR_INFO fill;
+
+        // Get the number of character cells in the current buffer.
+        if (!GetConsoleScreenBufferInfo(hConsole, &csbi))
+        {
+            return;
+        }
+
+        // Scroll the rectangle of the entire buffer.
+        scrollRect.Left = 0;
+        scrollRect.Top = 0;
+        scrollRect.Right = csbi.dwSize.X;
+        scrollRect.Bottom = csbi.dwSize.Y;
+
+        // Scroll it upwards off the top of the buffer with a magnitude of the entire height.
+        scrollTarget.X = 0;
+        scrollTarget.Y = (SHORT)(0 - csbi.dwSize.Y);
+
+        // Fill with empty spaces with the buffer's default text attribute.
+        fill.Char.UnicodeChar = TEXT(' ');
+        fill.Attributes = csbi.wAttributes;
+
+        // Do the scroll
+        ScrollConsoleScreenBuffer(hConsole, &scrollRect, NULL, scrollTarget, &fill);
+
+        // Move the cursor to the top left corner too.
+        csbi.dwCursorPosition.X = 0;
+        csbi.dwCursorPosition.Y = 0;
+
+        SetConsoleCursorPosition(hConsole, csbi.dwCursorPosition);
     }
 }

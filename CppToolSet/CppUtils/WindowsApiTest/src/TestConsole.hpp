@@ -6,41 +6,69 @@
 #include <chrono>
 #include "WinApiConsole.h"
 
+using namespace WindowsApi::Console;
+
 void TestConsole()
 {
-    auto handle = WindowsApi::Console::GetStdOutputHandle();
-    WindowsApi::Console::SetWindowMaxEnable(handle, false);
-    WindowsApi::Console::SetWindowMinEnable(handle, false);
-    WindowsApi::Console::SetWindowResizeEnable(handle, false);
-    WindowsApi::Console::SetTitle(L"2333");
+    auto handle = GetStdOutputHandle();
 
-    std::mutex mt;
+    SetWindowMaxEnable(false);
+    SetWindowMinEnable(false);
+    SetWindowResizeEnable(false);
 
-    auto thread = std::thread([&mt](){
-        for (int i = 0; i < 1000; i++)
-        {
-            std::lock_guard lock(mt);
-            std::cout << "sssssssssssssssssssssssssssssssssssssssssssssssssssss" << std::endl;
-            std::this_thread::sleep_for(std::chrono::milliseconds {1000});
-        }
-    });
+    std::cout << "Hello None" << std::endl;
 
-    std::string str;
-    while (true)
-    {
-        std::getline(std::cin, str);
+    // foreground color
 
-        if (str == "exit")
-            break;
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Black);
+    std::cout << "Hello Foreground White" << std::endl;
 
-        mt.lock();
-        std::cout << str << std::endl;
-        str = "";
-        mt.unlock();
-    }
+    SetColor(handle, ConsoleColor::Black, ConsoleColor::Black);
+    std::cout << "Hello Foreground Black" << std::endl;
 
-    thread.join();
+    SetColor(handle, ConsoleColor::Green, ConsoleColor::Black);
+    std::cout << "Hello Foreground Green" << std::endl;
 
-    std::cout << "test" << std::endl;
+    SetColor(handle, ConsoleColor::Blue, ConsoleColor::Black);
+    std::cout << "Hello Foreground Blue" << std::endl;
+
+    SetColor(handle, ConsoleColor::Red, ConsoleColor::Black);
+    std::cout << "Hello Foreground Red" << std::endl;
+
+    SetColor(handle, ConsoleColor::Cyan, ConsoleColor::Black);
+    std::cout << "Hello Foreground Cyan" << std::endl;
+
+    SetColor(handle, ConsoleColor::Yellow, ConsoleColor::Black);
+    std::cout << "Hello Foreground Yellow" << std::endl;
+
+    SetColor(handle, ConsoleColor::Purple, ConsoleColor::Black);
+    std::cout << "Hello Foreground Purple" << std::endl;
+
+    // background color
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::White);
+    std::cout << "Hello Background White" << std::endl;
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Black);
+    std::cout << "Hello Background Black" << std::endl;
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Green);
+    std::cout << "Hello Background Green" << std::endl;
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Blue);
+    std::cout << "Hello Background Blue" << std::endl;
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Red);
+    std::cout << "Hello Background Red" << std::endl;
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Cyan);
+    std::cout << "Hello Background Cyan" << std::endl;
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Yellow);
+    std::cout << "Hello Background Yellow" << std::endl;
+
+    SetColor(handle, ConsoleColor::White, ConsoleColor::Purple);
+    std::cout << "Hello Background Purple" << std::endl;
+
     std::cin.get();
 }
