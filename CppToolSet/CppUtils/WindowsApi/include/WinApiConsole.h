@@ -30,29 +30,25 @@ namespace WindowsApi::Console
 
     CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle);
 
-    bool SetScreenBufferInfo(HANDLE consoleHandle, CONSOLE_SCREEN_BUFFER_INFOEX* pInfo);
-
     Coord<short> GetBufferSize(HANDLE consoleHandle);
-
-    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize);
 
     Coord<short> GetCursorPosition(HANDLE consoleHandle);
 
-    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos);
-
     Rect<short> GetWindowRect(HANDLE consoleHandle);
-
-    bool SetWindowRect(HANDLE consoleHandle, Rect<short> size);
 
     Coord<short> GetWindowSize(HANDLE consoleHandle);
 
-    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size);
+    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize);
 
-    void SetWindowResizeEnable(HANDLE consoleHandle, bool enable);
+    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos);
 
-    void SetWindowMaxEnable(HANDLE consoleHandle, bool enable);
+    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size, bool absolute = false);
 
-    void SetWindowMinEnable(HANDLE consoleHandle, bool enable);
+    void SetWindowResizeEnable(bool enable);
+
+    void SetWindowMaxEnable(bool enable);
+
+    void SetWindowMinEnable(bool enable);
 
     void SetColor(HANDLE consoleHandle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
 

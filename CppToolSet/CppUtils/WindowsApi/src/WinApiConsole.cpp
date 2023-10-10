@@ -50,22 +50,10 @@ namespace WindowsApi::Console
         return info;
     }
 
-    bool SetScreenBufferInfo(HANDLE consoleHandle, CONSOLE_SCREEN_BUFFER_INFOEX* pInfo)
-    {
-        return ::SetConsoleScreenBufferInfoEx(consoleHandle, pInfo);
-    }
-
     Coord<short> GetBufferSize(HANDLE consoleHandle)
     {
         auto bufferInfo = GetScreenBufferInfo(consoleHandle);
         return { bufferInfo.dwSize.X, bufferInfo.dwSize.Y };
-    }
-
-    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        bufferInfo.dwSize = { newSize.x, newSize.y };
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
     }
 
     Coord<short> GetCursorPosition(HANDLE consoleHandle)
@@ -74,26 +62,10 @@ namespace WindowsApi::Console
         return { bufferInfo.dwCursorPosition.X, bufferInfo.dwCursorPosition.Y };
     }
 
-    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        bufferInfo.dwCursorPosition = { newPos.x, newPos.y };
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
-    }
-
     Rect<short> GetWindowRect(HANDLE consoleHandle)
     {
         auto bufferInfo = GetScreenBufferInfo(consoleHandle);
         return { bufferInfo.srWindow.Left, bufferInfo.srWindow.Top, bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
-    }
-
-    bool SetWindowRect(HANDLE consoleHandle, Rect<short> rect)
-    {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        rect.right--;
-        rect.bottom--;
-        bufferInfo.srWindow = {rect.left, rect.top, rect.right, rect.bottom };
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
     }
 
     Coord<short> GetWindowSize(HANDLE consoleHandle)
@@ -102,17 +74,25 @@ namespace WindowsApi::Console
         return { bufferInfo.srWindow.Right, bufferInfo.srWindow.Bottom };
     }
 
-    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size)
+    bool SetBufferSize(HANDLE consoleHandle, Coord<short> newSize)
     {
-        auto bufferInfo = GetScreenBufferInfo(consoleHandle);
-        size.x--;
-        size.y--;
-        bufferInfo.srWindow.Right = size.x;
-        bufferInfo.srWindow.Bottom = size.y;
-        return SetScreenBufferInfo(consoleHandle, &bufferInfo);
+        return ::SetConsoleScreenBufferSize(consoleHandle, { newSize.x, newSize.y });
     }
 
-    void SetWindowResizeEnable(HANDLE consoleHandle, bool enable)
+    bool SetCursorPosition(HANDLE consoleHandle, Coord<short> newPos)
+    {
+        return ::SetConsoleCursorPosition(consoleHandle, { newPos.x, newPos.y });
+    }
+
+    bool SetWindowSize(HANDLE consoleHandle, Coord<short> size, bool absolute)
+    {
+        size.x--;
+        size.y--;
+        SMALL_RECT winSize = {size.x, size.y};
+        return ::SetConsoleWindowInfo(consoleHandle, absolute, &winSize);
+    }
+
+    void SetWindowResizeEnable(bool enable)
     {
         auto hWnd = GetWindowHandle();
         auto style= ::GetWindowLongPtr(hWnd, GWL_STYLE);
@@ -120,7 +100,7 @@ namespace WindowsApi::Console
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
 
-    void SetWindowMaxEnable(HANDLE consoleHandle, bool enable)
+    void SetWindowMaxEnable(bool enable)
     {
         auto hWnd = GetWindowHandle();
         auto style= ::GetWindowLongPtr(hWnd, GWL_STYLE);
@@ -128,7 +108,7 @@ namespace WindowsApi::Console
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
 
-    void SetWindowMinEnable(HANDLE consoleHandle, bool enable)
+    void SetWindowMinEnable(bool enable)
     {
         auto hWnd = GetWindowHandle();
         auto style= ::GetWindowLongPtr(hWnd, GWL_STYLE);
