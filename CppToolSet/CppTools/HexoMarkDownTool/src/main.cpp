@@ -7,10 +7,31 @@
 #include <string>
 #include <format>
 #include "StringUtil.hpp"
+#include "WinApiConsole.h"
 
 using wRegex = std::basic_regex<wchar_t>;
 
+HANDLE hConsoleHandle;
 std::vector<std::wstring> gFileContentBuffer;
+
+void SetConsoleColor(WindowsApi::Console::ConsoleColor c)
+{
+    WindowsApi::Console::SetColor(hConsoleHandle, c, WindowsApi::Console::ConsoleColor::Black);
+}
+
+void LogError(const std::string& message)
+{
+    SetConsoleColor(WindowsApi::Console::ConsoleColor::Red);
+    std::cout << message << std::endl;
+    SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+}
+
+void LogError(const std::wstring& message)
+{
+    SetConsoleColor(WindowsApi::Console::ConsoleColor::Red);
+    std::wcout << message << std::endl;
+    SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+}
 
 void ProcessMarkdownFile(const std::filesystem::path& mdPath)
 {
@@ -32,7 +53,7 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
     auto targetResPath = mdPath.parent_path() / mdFileName;
     if (std::filesystem::exists(targetResPath))
     {
-        std::cout << std::format("\tError: {} Already Exists!", targetResPath.string()) << std::endl;
+        LogError(std::format("\tError: {} Already Exists!", targetResPath.string()));
         return;
     }
 
@@ -45,7 +66,7 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
 
     if (!wideInputStream.is_open())
     {
-        std::cout << std::format("\tError: {} Read Open Failed!", mdPath.string()) << std::endl;
+        LogError(std::format("\tError: {} Read Open Failed!", mdPath.string()));
         return;
     }
 
@@ -61,12 +82,18 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
             continue;
         }
 
+        SetConsoleColor(WindowsApi::Console::ConsoleColor::Cyan);
         std::wcout << std::format(L"\t<--: {}", oneLineContent) << std::endl;
 
         std::wstring title = regexResult[1];
         std::wstring imgPath = StringUtil::Replace<wchar_t>(regexResult[2], L"Resource/", L"");
         oneLineContent = std::format(L"{{% asset_img {} {} %}}", imgPath, title);
+
+        SetConsoleColor(WindowsApi::Console::ConsoleColor::Green);
         std::wcout << std::format(L"\t-->: {}", oneLineContent) << std::endl;
+
+        SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+
         gFileContentBuffer.push_back(oneLineContent);
     }
 
@@ -78,7 +105,7 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
 
     if (!wideOutputStream.is_open())
     {
-        std::cout << std::format("\tError: {} Write Open Failed!", mdPath.string()) << std::endl;
+        LogError(std::format("\tError: {} Write Open Failed!", mdPath.string()));
         return;
     }
 
@@ -115,7 +142,7 @@ void ProcessDirectory(const std::filesystem::path& path)
         {
             if (thisDirectoryMdFile.has_value())
             {
-                std::wcout << std::format(L"Error: Duplicate Md File In One Directory: {}", f.path().wstring());
+                LogError(std::format(L"Error: Duplicate Md File In One Directory: {}", f.path().wstring()));
                 continue;
             }
             else
@@ -132,6 +159,8 @@ void ProcessDirectory(const std::filesystem::path& path)
 
 int main()
 {
+    hConsoleHandle = WindowsApi::Console::GetStdOutputHandle();
+
     auto currPath = std::filesystem::current_path();
     ProcessDirectory(currPath);
 
