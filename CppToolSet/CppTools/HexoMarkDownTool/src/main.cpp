@@ -70,6 +70,8 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
         return;
     }
 
+    wideInputStream.imbue(std::locale {"zh_CN.UTF-8"});
+
     std::wstring oneLineContent;
     std::wsmatch regexResult;
 
@@ -108,6 +110,8 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
         LogError(std::format("\tError: {} Write Open Failed!", mdPath.string()));
         return;
     }
+
+    wideOutputStream.imbue(std::locale {"zh_CN.UTF-8"});
 
     for (const auto& line : gFileContentBuffer)
         wideOutputStream << line << std::endl;
@@ -160,6 +164,8 @@ void ProcessDirectory(const std::filesystem::path& path)
 int main()
 {
     hConsoleHandle = WindowsApi::Console::GetStdOutputHandle();
+
+    std::wcout.imbue(std::locale {"zh_CN"});
 
     auto currPath = std::filesystem::current_path();
     ProcessDirectory(currPath);
