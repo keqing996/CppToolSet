@@ -1,0 +1,50 @@
+cmake_minimum_required(VERSION 3.26)
+
+project (QuickOpenFolder)
+
+set(TargetName quick_open_folder)
+set(CMAKE_CXX_STANDARD 20)
+set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/imgui-1.89/)
+
+add_compile_definitions(_UNICODE UNICODE) # windows wchar
+add_compile_definitions(NOMINMAX) # cancel windows min max macro
+
+file (GLOB_RECURSE src_files src/*.cpp)
+
+add_executable(${TargetName}
+        ${src_files}
+        ${IM_GUI_DIR}/backends/imgui_impl_dx11.cpp
+        ${IM_GUI_DIR}/backends/imgui_impl_win32.cpp
+        ${IM_GUI_DIR}/imgui.cpp
+        ${IM_GUI_DIR}/imgui_draw.cpp
+        ${IM_GUI_DIR}/imgui_tables.cpp
+        ${IM_GUI_DIR}/imgui_widgets.cpp
+)
+
+set_target_properties(${TargetName} PROPERTIES
+        LINK_FLAGS "/SUBSYSTEM:WINDOWS"
+)
+
+target_include_directories(${TargetName}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
+        ${IM_GUI_DIR}
+        ${IM_GUI_DIR}/backends
+)
+
+find_library(D3D11_LIBRARY d3d11.lib
+        PATHS
+        "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64/")
+
+target_link_libraries(${TargetName} PRIVATE d3d11.lib)
+
+# release copy artifacts
+if (CMAKE_BUILD_TYPE STREQUAL Release)
+    add_custom_command(
+            TARGET ${TargetName} POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            -E copy
+            $<TARGET_FILE:${TargetName}>
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Tool/${TargetName}.exe"
+    )
+endif ()
