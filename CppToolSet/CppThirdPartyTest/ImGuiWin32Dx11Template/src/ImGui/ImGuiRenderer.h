@@ -23,8 +23,8 @@ public:
     void ImGuiCleanUp();
 
 private:
-    ID3D11Device* g_pd3dDevice = nullptr;
-    ID3D11DeviceContext* g_pd3dDeviceContext = nullptr;
-    IDXGISwapChain* g_pSwapChain = nullptr;
-    ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
+    ID3D11Device* _pD3dDevice = nullptr;
+    ID3D11DeviceContext* _pD3dDeviceContext = nullptr;
+    IDXGISwapChain* _pSwapChain = nullptr;
+    ID3D11RenderTargetView* _pMainRenderTargetView = nullptr;
 };

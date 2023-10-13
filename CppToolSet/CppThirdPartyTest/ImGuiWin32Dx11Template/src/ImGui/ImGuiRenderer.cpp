@@ -35,7 +35,7 @@ bool ImGuiRenderer::D3D11CreateDevice(HWND hWnd)
             D3D_FEATURE_LEVEL_10_0,
             };
 
-    if (D3D11CreateDeviceAndSwapChain(
+    if (::D3D11CreateDeviceAndSwapChain(
             nullptr,
             D3D_DRIVER_TYPE_HARDWARE,
             nullptr,
@@ -44,10 +44,10 @@ bool ImGuiRenderer::D3D11CreateDevice(HWND hWnd)
             2,
             D3D11_SDK_VERSION,
             &sd,
-            &g_pSwapChain,
-            &g_pd3dDevice,
+            &_pSwapChain,
+            &_pD3dDevice,
             &featureLevel,
-            &g_pd3dDeviceContext) != S_OK)
+            &_pD3dDeviceContext) != S_OK)
         return false;
 
     D3D11CreateRenderTarget();
@@ -59,46 +59,46 @@ void ImGuiRenderer::D3D11CleanUpDevice()
 {
     D3D11ClearRenderTarget();
 
-    if (g_pSwapChain)
+    if (_pSwapChain)
     {
-        g_pSwapChain->Release();
-        g_pSwapChain = nullptr;
+        _pSwapChain->Release();
+        _pSwapChain = nullptr;
     }
 
-    if (g_pd3dDeviceContext)
+    if (_pD3dDeviceContext)
     {
-        g_pd3dDeviceContext->Release();
-        g_pd3dDeviceContext = nullptr;
+        _pD3dDeviceContext->Release();
+        _pD3dDeviceContext = nullptr;
     }
 
-    if (g_pd3dDevice)
+    if (_pD3dDevice)
     {
-        g_pd3dDevice->Release();
-        g_pd3dDevice = nullptr;
+        _pD3dDevice->Release();
+        _pD3dDevice = nullptr;
     }
 }
 
 void ImGuiRenderer::D3D11CreateRenderTarget()
 {
     ID3D11Texture2D* pBackBuffer;
-    g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-    g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView);
+    _pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+    _pD3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &_pMainRenderTargetView);
     pBackBuffer->Release();
 }
 
 void ImGuiRenderer::D3D11ClearRenderTarget()
 {
-    if (g_mainRenderTargetView)
+    if (_pMainRenderTargetView)
     {
-        g_mainRenderTargetView->Release();
-        g_mainRenderTargetView = nullptr;
+        _pMainRenderTargetView->Release();
+        _pMainRenderTargetView = nullptr;
     }
 }
 
 void ImGuiRenderer::D3D11OnResize(unsigned int width, unsigned int height)
 {
     D3D11ClearRenderTarget();
-    g_pSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
+    _pSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
     D3D11CreateRenderTarget();
 }
 
@@ -116,7 +116,7 @@ void ImGuiRenderer::ImGuiCreateContext(HANDLE hWnd)
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hWnd);
-    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+    ImGui_ImplDX11_Init(_pD3dDevice, _pD3dDeviceContext);
 
     // Load Font
     ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", 16.0f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
@@ -140,12 +140,12 @@ void ImGuiRenderer::ImGuiRenderLoop()
             clear_color.z * clear_color.w,
             clear_color.w };
 
-    g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
-    g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
+    _pD3dDeviceContext->OMSetRenderTargets(1, &_pMainRenderTargetView, nullptr);
+    _pD3dDeviceContext->ClearRenderTargetView(_pMainRenderTargetView, clear_color_with_alpha);
 
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-    g_pSwapChain->Present(1, 0); // Present with vsync
+    _pSwapChain->Present(1, 0); // Present with vsync
 }
 
 LRESULT ImGuiRenderer::ImGuiHandleWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

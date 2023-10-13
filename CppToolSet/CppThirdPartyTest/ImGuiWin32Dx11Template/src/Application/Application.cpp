@@ -9,7 +9,7 @@ bool Application::InitWindow(unsigned int windowWidth, unsigned int windowHeight
     _pWndClassEx = new WNDCLASSEX {};
 
     _pWndClassEx->cbSize = sizeof(*_pWndClassEx);
-    _pWndClassEx->style = CS_OWNDC;
+    _pWndClassEx->style = CS_CLASSDC;
     _pWndClassEx->lpfnWndProc = HandleMsg;
     _pWndClassEx->cbClsExtra = 0;
     _pWndClassEx->cbWndExtra = 0;
@@ -67,6 +67,8 @@ bool Application::InitWindow(unsigned int windowWidth, unsigned int windowHeight
 
     // Im Gui Context
     _pImGuiRenderer->ImGuiCreateContext(_hWnd);
+
+    return true;
 }
 
 void Application::Destroy()
