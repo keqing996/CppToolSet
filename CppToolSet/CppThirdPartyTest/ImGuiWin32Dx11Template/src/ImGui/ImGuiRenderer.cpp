@@ -1,6 +1,6 @@
 
 #include "ImGuiRenderer.h"
-#include "ImGui.h"
+#include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
@@ -29,25 +29,23 @@ bool ImGuiRenderer::D3D11CreateDevice(HWND hWnd)
     UINT createDeviceFlags = 0;
     //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
     D3D_FEATURE_LEVEL featureLevel;
-    const D3D_FEATURE_LEVEL featureLevelArray[2] =
-            {
-            D3D_FEATURE_LEVEL_11_0,
-            D3D_FEATURE_LEVEL_10_0,
-            };
+    const D3D_FEATURE_LEVEL featureLevelArray[] ={D3D_FEATURE_LEVEL_11_0,};
 
-    if (::D3D11CreateDeviceAndSwapChain(
+    HRESULT d3dInitResult = ::D3D11CreateDeviceAndSwapChain(
             nullptr,
             D3D_DRIVER_TYPE_HARDWARE,
             nullptr,
             createDeviceFlags,
             featureLevelArray,
-            2,
+            1,
             D3D11_SDK_VERSION,
             &sd,
             &_pSwapChain,
             &_pD3dDevice,
             &featureLevel,
-            &_pD3dDeviceContext) != S_OK)
+            &_pD3dDeviceContext);
+
+    if (d3dInitResult != S_OK)
         return false;
 
     D3D11CreateRenderTarget();
@@ -152,6 +150,8 @@ LRESULT ImGuiRenderer::ImGuiHandleWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPA
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
         return true;
+
+    return false;
 }
 
 void ImGuiRenderer::ImGuiCleanUp()
