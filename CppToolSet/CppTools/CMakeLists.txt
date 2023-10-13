@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.26)
 
 project(CppTools)
 
-add_subdirectory(WxWidgetQuickOpenFolder)
 add_subdirectory(VsNewProjWin32Deleter)
 add_subdirectory(NativeSocketClient)
 add_subdirectory(NativeSocketServer)
 add_subdirectory(PeFileDumper)
 add_subdirectory(MarkdownNoUseImgDeleter)
 add_subdirectory(HexoMarkDownTool)
+add_subdirectory(QuickOpenFolder)
