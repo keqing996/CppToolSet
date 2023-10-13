@@ -127,7 +127,11 @@ void ImGuiRenderer::ImGuiRenderLoop()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    // TODO
+    for (auto p : _loopDelegate)
+    {
+        if (p != nullptr)
+            p->Update();
+    }
 
     ImGui::Render();
 
@@ -159,4 +163,9 @@ void ImGuiRenderer::ImGuiCleanUp()
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+}
+
+void ImGuiRenderer::AddRenderDelegate(const ImGuiRenderDelegate* pRender)
+{
+    _loopDelegate.push_back(pRender);
 }

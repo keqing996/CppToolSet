@@ -3,8 +3,10 @@
 
 #include <Windows.h>
 #include <d3d11.h>
+#include <vector>
 
 #include "Util/NonCopyable.h"
+#include "ImGuiRenderDelegate.h"
 
 class ImGuiRenderer : public NonCopyable
 {
@@ -22,9 +24,15 @@ public:
     LRESULT ImGuiHandleWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     void ImGuiCleanUp();
 
+    // business
+    void AddRenderDelegate(const ImGuiRenderDelegate* pRender);
+
 private:
     ID3D11Device* _pD3dDevice = nullptr;
     ID3D11DeviceContext* _pD3dDeviceContext = nullptr;
     IDXGISwapChain* _pSwapChain = nullptr;
     ID3D11RenderTargetView* _pMainRenderTargetView = nullptr;
+
+private:
+    std::vector<const ImGuiRenderDelegate*> _loopDelegate;
 };

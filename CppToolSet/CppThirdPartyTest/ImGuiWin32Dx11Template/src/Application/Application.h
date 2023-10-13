@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "Util/NonCopyable.h"
 #include "ImGui/ImGuiRenderer.h"
+#include "UiLogic/UiLogic.h"
 
 class Application : public NonCopyable
 {
@@ -31,6 +32,7 @@ private:
     HINSTANCE _hInst = ::GetModuleHandle(nullptr);
     HWND _hWnd = nullptr;
     ImGuiRenderer* _pImGuiRenderer = nullptr;
+    UiLogic* _pUiLogic = nullptr;
 
 private:
     static Application* _instance;

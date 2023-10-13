@@ -68,11 +68,22 @@ bool Application::InitWindow(unsigned int windowWidth, unsigned int windowHeight
     // Im Gui Context
     _pImGuiRenderer->ImGuiCreateContext(_hWnd);
 
+    // Ui Log
+    _pUiLogic = new UiLogic();
+    _pImGuiRenderer->AddRenderDelegate(_pUiLogic);
+
     return true;
 }
 
 void Application::Destroy()
 {
+    if (_pUiLogic != nullptr)
+    {
+        delete _pUiLogic;
+
+        _pUiLogic = nullptr;
+    }
+
     if (_pImGuiRenderer != nullptr)
     {
         _pImGuiRenderer->ImGuiCleanUp();
