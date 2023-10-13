@@ -10,7 +10,7 @@ class ImGuiRenderer : public NonCopyable
 {
 public:
     // d3d11
-    bool D3D11CreateDevice(HWND hWnd);
+    bool D3D11CreateDevice(HWND hWnd, unsigned int width, unsigned int height);
     void D3D11CleanUpDevice();
     void D3D11CreateRenderTarget();
     void D3D11ClearRenderTarget();

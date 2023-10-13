@@ -23,14 +23,6 @@ bool Application::InitWindow(unsigned int windowWidth, unsigned int windowHeight
 
     ::RegisterClassExW(_pWndClassEx);
 
-    _pImGuiRenderer = new ImGuiRenderer();
-    if (!_pImGuiRenderer->D3D11CreateDevice(_hWnd))
-    {
-        _pImGuiRenderer->D3D11CleanUpDevice();
-        ::UnregisterClassW(_pWndClassEx->lpszClassName, _pWndClassEx->hInstance);
-        return false;
-    }
-
     RECT rect;
     rect.left = 100;
     rect.right = _width + rect.left;
@@ -58,6 +50,14 @@ bool Application::InitWindow(unsigned int windowWidth, unsigned int windowHeight
             _hInst,
             lParam
     );
+
+    _pImGuiRenderer = new ImGuiRenderer();
+    if (!_pImGuiRenderer->D3D11CreateDevice(_hWnd, _width, _height))
+    {
+        _pImGuiRenderer->D3D11CleanUpDevice();
+        ::UnregisterClassW(_pWndClassEx->lpszClassName, _pWndClassEx->hInstance);
+        return false;
+    }
 
     ::ShowWindow(_hWnd, SW_SHOWDEFAULT);
     ::UpdateWindow(_hWnd);
