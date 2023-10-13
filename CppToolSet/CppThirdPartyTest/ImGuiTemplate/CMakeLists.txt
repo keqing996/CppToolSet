@@ -16,7 +16,6 @@ add_executable(${TargetName}
         ${IM_GUI_DIR}/backends/imgui_impl_win32.cpp
         ${IM_GUI_DIR}/imgui.cpp
         ${IM_GUI_DIR}/imgui_draw.cpp
-        ${IM_GUI_DIR}/imgui_demo.cpp
         ${IM_GUI_DIR}/imgui_tables.cpp
         ${IM_GUI_DIR}/imgui_widgets.cpp
 )
