@@ -62,9 +62,6 @@ bool Application::InitWindow(unsigned int windowWidth, unsigned int windowHeight
     ::ShowWindow(_hWnd, SW_SHOWDEFAULT);
     ::UpdateWindow(_hWnd);
 
-    // Dpi
-    ::SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-
     // Im Gui Context
     _pImGuiRenderer->ImGuiCreateContext(_hWnd);
 

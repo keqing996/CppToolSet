@@ -11,10 +11,12 @@ add_compile_definitions(NOMINMAX) # cancel windows min max macro
 
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
+file (GLOB_RECURSE manifest_files manifest/*.manifest)
 
 add_executable(${TargetName}
         ${src_files}
         ${res_files}
+        ${manifest_files}
         ${IM_GUI_DIR}/backends/imgui_impl_dx11.cpp
         ${IM_GUI_DIR}/backends/imgui_impl_win32.cpp
         ${IM_GUI_DIR}/imgui.cpp

@@ -104,7 +104,8 @@ void ImGuiRenderer::ImGuiCreateContext(HANDLE hWnd)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -116,8 +117,13 @@ void ImGuiRenderer::ImGuiCreateContext(HANDLE hWnd)
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX11_Init(_pD3dDevice, _pD3dDeviceContext);
 
+    // Get Dpi Scale
+    float dpiScale = ImGui_ImplWin32_GetDpiScaleForHwnd(hWnd);
+    ImGui::GetStyle().ScaleAllSizes(dpiScale);
+
     // Load Font
-    ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", 16.0f, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    float fontSize = 16 * dpiScale;
+    ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
     IM_ASSERT(font != nullptr);
 }
 
@@ -126,6 +132,8 @@ void ImGuiRenderer::ImGuiRenderLoop()
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+
+
 
     for (auto p : _loopDelegate)
     {
