@@ -6,7 +6,13 @@
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCmdShow)
 {
     Application::CreateInstance();
-    Application::GetInstance()->InitWindow(900, 600, L"QuickOpenFolder");
+
+    if (!Application::GetInstance()->InitWindow(900, 600, L"Quick Open Folder"))
+        return 1;
+
     Application::GetInstance()->RunLoop();
+
+    Application::GetInstance()->Destroy();
+
     return 0;
 }

@@ -9,20 +9,20 @@ set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/imgui-1.89/)
 add_compile_definitions(_UNICODE UNICODE) # windows wchar
 add_compile_definitions(NOMINMAX) # cancel windows min max macro
 
+file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
+file (GLOB_RECURSE manifest_files manifest/*.manifest)
 
 add_executable(${TargetName}
         ${src_files}
+        ${res_files}
+        ${manifest_files}
         ${IM_GUI_DIR}/backends/imgui_impl_dx11.cpp
         ${IM_GUI_DIR}/backends/imgui_impl_win32.cpp
         ${IM_GUI_DIR}/imgui.cpp
         ${IM_GUI_DIR}/imgui_draw.cpp
         ${IM_GUI_DIR}/imgui_tables.cpp
         ${IM_GUI_DIR}/imgui_widgets.cpp
-)
-
-set_target_properties(${TargetName} PROPERTIES
-        LINK_FLAGS "/SUBSYSTEM:WINDOWS"
 )
 
 target_include_directories(${TargetName}
@@ -32,19 +32,13 @@ target_include_directories(${TargetName}
         ${IM_GUI_DIR}/backends
 )
 
+set_target_properties(${TargetName} PROPERTIES
+        LINK_FLAGS "/SUBSYSTEM:WINDOWS"
+)
+
 find_library(D3D11_LIBRARY d3d11.lib
         PATHS
-        "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64/")
+        "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64/"
+)
 
 target_link_libraries(${TargetName} PRIVATE d3d11.lib)
-
-# release copy artifacts
-if (CMAKE_BUILD_TYPE STREQUAL Release)
-    add_custom_command(
-            TARGET ${TargetName} POST_BUILD
-            COMMAND ${CMAKE_COMMAND}
-            -E copy
-            $<TARGET_FILE:${TargetName}>
-            "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Tool/${TargetName}.exe"
-    )
-endif ()
