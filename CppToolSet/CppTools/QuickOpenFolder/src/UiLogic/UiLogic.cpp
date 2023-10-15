@@ -5,9 +5,12 @@
 #include "imgui.h"
 #include "UiLogic.h"
 #include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
 
-using DocumentW = rapidjson::GenericDocument<rapidjson::UTF16<>>;
-using ValueW = rapidjson::GenericValue<rapidjson::UTF16<>>;
+using RapidJsonDocW = rapidjson::GenericDocument<rapidjson::UTF16<>>;
+using RapidJsonValueW = rapidjson::GenericValue<rapidjson::UTF16<>>;
+using RapidJsonStringBufferW = rapidjson::GenericStringBuffer<rapidjson::UTF16<>>;
+using RapidJsonPrettyWriterW = rapidjson::PrettyWriter<RapidJsonStringBufferW, rapidjson::UTF16<>, rapidjson::UTF16<>>;
 
 UiLogic::UiLogic()
 {
@@ -57,7 +60,7 @@ void UiLogic::InitConfig()
     inputFile.close();
 
     // read form json
-    DocumentW doc;
+    RapidJsonDocW doc;
     rapidjson::ParseResult parseOk = doc.Parse(fileContent.str().c_str());
     if (parseOk)
     {
@@ -89,10 +92,48 @@ void UiLogic::InitConfig()
 
 void UiLogic::WriteConfig()
 {
+    if (_vsCodePathString.length() == 0 && _allFolder.empty())
+        return;
+
     auto configPath = GetConfigPath();
     std::wofstream fs(configPath, std::ios::out);
     if (!fs.is_open())
         return;
 
+    RapidJsonDocW doc;
 
+    if (_vsCodePathString.length() > 0)
+    {
+        RapidJsonValueW value(_vsCodePathString.c_str(), _vsCodePathString.length());
+        doc.AddMember(L"VsCodePath", value, doc.GetAllocator());
+    }
+
+    if (!_allFolder.empty())
+    {
+        RapidJsonValueW arr(rapidjson::kArrayType);
+
+        for (const auto& f : _allFolder)
+        {
+            RapidJsonValueW folderObj(rapidjson::kObjectType);
+
+            RapidJsonValueW name(f.name.c_str(), f.name.length());
+            RapidJsonValueW path(f.path.c_str(), f.path.length());
+
+            folderObj.AddMember(L"Name", name, doc.GetAllocator());
+            folderObj.AddMember(L"Path", path, doc.GetAllocator());
+
+            arr.PushBack(folderObj, doc.GetAllocator());
+        }
+
+        doc.AddMember(L"FolderArray", arr, doc.GetAllocator());
+    }
+
+    RapidJsonStringBufferW sb;
+    RapidJsonPrettyWriterW writer {sb};
+
+    doc.Accept(writer);
+
+    fs << doc.GetString();
+
+    fs.close();
 }
