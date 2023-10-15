@@ -136,11 +136,6 @@ const Renderer::Renderer* Application::GetRenderer() const
     return _pRender;
 }
 
-RendererApi Application::GetRenderApi() const
-{
-    return _pRender->GetApi();
-}
-
 #pragma endregion
 
 #pragma region [Static Instance]

@@ -7,8 +7,7 @@ namespace Renderer
 {
     VertexBuffer* VertexBuffer::Create(float* vertices, unsigned int length)
     {
-        auto renderApi = Application::GetInstance()->GetRenderApi();
-        switch (renderApi)
+        switch (Renderer::GetApi())
         {
             case RendererApi::OpenGL:
                 return new RhiOpenGLVertexBuffer(vertices, length);

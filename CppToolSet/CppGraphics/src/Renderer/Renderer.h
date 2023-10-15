@@ -13,12 +13,12 @@ namespace Renderer
         ~Renderer();
 
     public:
-        RendererApi GetApi() const;
+        inline static RendererApi GetApi();
         void Render();
         void Destroy();
 
     private:
-        RendererApi _api;
+        static RendererApi _api;
         RhiImp* _pRhi;
     };
 }

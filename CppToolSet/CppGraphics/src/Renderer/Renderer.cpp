@@ -25,11 +25,6 @@ namespace Renderer
         }
     }
 
-    RendererApi Renderer::GetApi() const
-    {
-        return _api;
-    }
-
     void Renderer::Render()
     {
         _pRhi->Render();
@@ -38,5 +33,10 @@ namespace Renderer
     void Renderer::Destroy()
     {
         _pRhi->Destroy();
+    }
+
+    RendererApi Renderer::GetApi()
+    {
+        return _api;
     }
 }

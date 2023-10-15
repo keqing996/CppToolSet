@@ -24,7 +24,6 @@ public: // Gettter
     Input::Keyboard::Accessor GetKeyboardAccessor();
     Input::Mouse::Accessor GetMouseAccessor();
     const Renderer::Renderer* GetRenderer() const;
-    RendererApi GetRenderApi() const;
 
 private:
     Application() = default;
