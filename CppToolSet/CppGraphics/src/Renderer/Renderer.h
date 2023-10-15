@@ -18,6 +18,7 @@ namespace Renderer
         void Destroy();
 
     private:
+        RendererApi _api;
         RhiImp* _pRhi;
     };
 }

@@ -3,11 +3,6 @@
 
 namespace Renderer
 {
-    RendererApi RhiOpenGL::GetApi() const
-    {
-        return RendererApi::OpenGL;
-    }
-
     bool RhiOpenGL::SetUp()
     {
         auto pApplication = Application::GetInstance();

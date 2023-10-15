@@ -6,6 +6,8 @@ namespace Renderer
 
     Renderer::Renderer(RendererApi api)
     {
+        _api = api;
+
         switch (api)
         {
             case RendererApi::OpenGL:
@@ -25,7 +27,7 @@ namespace Renderer
 
     RendererApi Renderer::GetApi() const
     {
-        return _pRhi->GetApi();
+        return _api;
     }
 
     void Renderer::Render()

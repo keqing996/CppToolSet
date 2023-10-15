@@ -10,7 +10,6 @@ namespace Renderer
     class RhiOpenGL : public RhiImp
     {
     public:
-        RendererApi GetApi() const override;
         bool SetUp() override;
         void Destroy() override;
         void Render() override;
