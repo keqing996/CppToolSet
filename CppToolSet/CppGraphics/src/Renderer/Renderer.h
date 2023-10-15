@@ -2,23 +2,27 @@
 
 #include "Util/NonCopyable.h"
 #include "Define/RendererApi.h"
-#include "RendererHardwareInterface/RhiImp.h"
 
 namespace Renderer
 {
     class Renderer: public NonCopyable
     {
     public:
-        explicit Renderer(RendererApi api);
-        ~Renderer();
+        virtual ~Renderer() = default;
+
+    public: // static
+        static RendererApi GetApi();
+        static Renderer* Create(RendererApi api);
+
+    public: // virtual
+        virtual bool SetUp() = 0;
+        virtual void Destroy() = 0;
+        virtual void SwapBuffer() = 0;
 
     public:
-        inline static RendererApi GetApi();
         void Render();
-        void Destroy();
 
     private:
-        static RendererApi _api;
-        RhiImp* _pRhi;
+        inline static RendererApi _api;
     };
 }

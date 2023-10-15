@@ -3,16 +3,19 @@
 #include <Windows.h>
 
 #include "RendererHardwareInterface/OpenGL/GLAD/Glad.h"
-#include "RendererHardwareInterface/RhiImp.h"
+#include "Renderer/Renderer.h"
 
 namespace Renderer
 {
-    class RhiOpenGL : public RhiImp
+    class RhiOpenGL : public Renderer
     {
+    public:
+        ~RhiOpenGL() override = default;
+
     public:
         bool SetUp() override;
         void Destroy() override;
-        void Render() override;
+        void SwapBuffer() override;
 
     private:
         HDC _hDC;
