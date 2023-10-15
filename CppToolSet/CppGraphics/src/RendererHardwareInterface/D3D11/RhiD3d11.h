@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer/RendererHardwareInterface//RenderHardwareInterface.h"
+#include "RendererHardwareInterface/RenderHardwareInterface.h"
 
 namespace Renderer
 {

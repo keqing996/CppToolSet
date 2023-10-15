@@ -1,6 +1,6 @@
 
 #include "Application.h"
-#include "Renderer/RendererHardwareInterface/OpenGL/RhiOpenGL.h"
+#include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
 
 Application::~Application()
 {

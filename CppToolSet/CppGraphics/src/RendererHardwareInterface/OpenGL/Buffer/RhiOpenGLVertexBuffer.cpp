@@ -1,5 +1,5 @@
 #include "RhiOpenGLVertexBuffer.h"
-#include "Renderer/RendererHardwareInterface/OpenGL/GLAD/Glad.h"
+#include "RendererHardwareInterface/OpenGL/GLAD/Glad.h"
 
 namespace Renderer
 {

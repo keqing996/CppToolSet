@@ -1,5 +1,5 @@
 #include "RenderHardwareInterface.h"
-#include "Renderer/RendererHardwareInterface/OpenGL/RhiOpenGL.h"
+#include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
 
 namespace Renderer
 {

@@ -2,8 +2,8 @@
 
 #include <Windows.h>
 
-#include "Renderer/RendererHardwareInterface/OpenGL/GLAD/Glad.h"
-#include "Renderer/RendererHardwareInterface//RenderHardwareInterface.h"
+#include "RendererHardwareInterface/OpenGL/GLAD/Glad.h"
+#include "RendererHardwareInterface/RenderHardwareInterface.h"
 
 namespace Renderer
 {
