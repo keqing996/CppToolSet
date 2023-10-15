@@ -5,7 +5,7 @@
 #include "Input/Keyboard/Keyboard.h"
 #include "Input/Mouse/Mouse.h"
 #include "Define/RendererApi.h"
-#include "Renderer/RendererHardwareInterface//RenderHardwareInterface.h"
+#include "Renderer/Renderer.h"
 
 class Application : public NonCopyable
 {
@@ -23,7 +23,8 @@ public: // Gettter
     HWND GetWindowHandle() const;
     Input::Keyboard::Accessor GetKeyboardAccessor();
     Input::Mouse::Accessor GetMouseAccessor();
-    const Renderer::RenderHardwareInterface* GetRhiRender() const;
+    const Renderer::Renderer* GetRenderer() const;
+    RendererApi GetRenderApi() const;
 
 private:
     Application() = default;
@@ -61,12 +62,12 @@ private:
     Input::Keyboard _keyboard = Input::Keyboard{};
     Input::Mouse _mouse = Input::Mouse{};
 
-    /* Renderer */
-    Renderer::RenderHardwareInterface* _pRhi = nullptr;
+    /* Render */
+    Renderer::Renderer* _pRender = nullptr;
 
 private:
     static Application* _instance;
-    static constexpr LPCWSTR WND_CLASS_NAME = L"Graphic Renderer";
+    static constexpr LPCWSTR WND_CLASS_NAME = L"Graphic Render";
 
 public:
     static void CreateInstance();

@@ -68,22 +68,15 @@ void Application::DestroyWindow()
 
 void Application::SetupRenderer(RendererApi api)
 {
-    switch (api)
-    {
-        case RendererApi::OpenGL:
-        default:
-            _pRhi = new Renderer::RhiOpenGL();
-    }
-
-    _pRhi->SetUp();
+    _pRender = new Renderer::Renderer(api);
 }
 
 void Application::DestroyRenderer()
 {
-    if (_pRhi != nullptr)
-        _pRhi->Destroy();
+    if (_pRender != nullptr)
+        _pRender->Destroy();
 
-    delete _pRhi;
+    delete _pRender;
 }
 
 void Application::RunLoop()
@@ -103,7 +96,7 @@ void Application::RunLoop()
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
 
-            _pRhi->Renderer();
+            _pRender->Render();
         }
 
         if (shouldStop)
@@ -138,9 +131,14 @@ Input::Mouse::Accessor Application::GetMouseAccessor()
     return _mouse.GetAccessor();
 }
 
-const Renderer::RenderHardwareInterface* Application::GetRhiRender() const
+const Renderer::Renderer* Application::GetRenderer() const
 {
-    return _pRhi;
+    return _pRender;
+}
+
+RendererApi Application::GetRenderApi() const
+{
+    return _pRender->GetApi();
 }
 
 #pragma endregion

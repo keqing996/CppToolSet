@@ -111,7 +111,7 @@ namespace Renderer
             +0.0F, +0.5F, +0.0F  // top
     };
 
-    void RhiOpenGL::Renderer()
+    void RhiOpenGL::Render()
     {
         glClearColor(0.2f, 0.2f, 0.2f, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

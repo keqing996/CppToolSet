@@ -1,9 +1,9 @@
-#include "RenderHardwareInterface.h"
+#include "RhiImp.h"
 #include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
 
 namespace Renderer
 {
-    bool RenderHardwareInterface::IsSettleUp() const
+    bool RhiImp::IsSettleUp() const
     {
         return _setUp;
     }

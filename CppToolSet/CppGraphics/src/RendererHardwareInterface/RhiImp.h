@@ -5,17 +5,17 @@
 
 namespace Renderer
 {
-    class RenderHardwareInterface : public NonCopyable
+    class RhiImp : public NonCopyable
     {
     public:
-        RenderHardwareInterface() = default;
-        virtual ~RenderHardwareInterface() = default;
+        RhiImp() = default;
+        virtual ~RhiImp() = default;
 
     public:
         virtual RendererApi GetApi() const = 0;
         virtual bool SetUp() = 0;
         virtual void Destroy() = 0;
-        virtual void Renderer() = 0;
+        virtual void Render() = 0;
 
     public:
         bool IsSettleUp() const;

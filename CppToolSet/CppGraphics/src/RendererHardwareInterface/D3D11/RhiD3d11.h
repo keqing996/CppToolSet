@@ -1,15 +1,15 @@
 #pragma once
 
-#include "RendererHardwareInterface/RenderHardwareInterface.h"
+#include "RendererHardwareInterface/RhiImp.h"
 
 namespace Renderer
 {
-    class RhiD3d11 : public RenderHardwareInterface
+    class RhiD3d11 : public RhiImp
     {
     public:
         bool SetUp() override;
         void Destroy() override;
-        void Renderer() override;
+        void Render() override;
     };
 }
 
