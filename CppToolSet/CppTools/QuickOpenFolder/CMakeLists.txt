@@ -28,6 +28,7 @@ add_executable(${TargetName}
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/ # json
         ${IM_GUI_DIR}
         ${IM_GUI_DIR}/backends
 )

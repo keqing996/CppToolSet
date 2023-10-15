@@ -1,8 +1,18 @@
 
+#include <filesystem>
+#include <fstream>
+
 #include "imgui.h"
 #include "UiLogic.h"
+#include "rapidjson/document.h"
 
-bool test = false;
+using DocumentW = rapidjson::GenericDocument<rapidjson::UTF16<>>;
+using ValueW = rapidjson::GenericValue<rapidjson::UTF16<>>;
+
+UiLogic::UiLogic()
+{
+    InitConfig();
+}
 
 void UiLogic::Update() const
 {
@@ -20,4 +30,31 @@ void UiLogic::Update() const
 
 
     ImGui::End();
+}
+
+void UiLogic::InitConfig()
+{
+    auto currentPath = std::filesystem::current_path();
+    auto configPath = currentPath /= L"quick_open_folder.json";
+
+    if (!std::filesystem::exists(configPath))
+    {
+        // create file
+        std::wofstream fs(configPath, std::ios::out);
+        fs.close();
+    }
+
+    // read file content
+    std::wifstream inputFile(configPath);
+    std::wstringstream fileContent;
+    fileContent << inputFile.rdbuf();
+    inputFile.close();
+
+    //
+    DocumentW doc;
+    rapidjson::ParseResult parseOk = doc.Parse(fileContent.str().c_str());
+    if (parseOk)
+    {
+
+    }
 }
