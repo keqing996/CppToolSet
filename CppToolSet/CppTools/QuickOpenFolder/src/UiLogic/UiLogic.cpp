@@ -32,10 +32,16 @@ void UiLogic::Update() const
     ImGui::End();
 }
 
-void UiLogic::InitConfig()
+std::wstring UiLogic::GetConfigPath() const
 {
     auto currentPath = std::filesystem::current_path();
     auto configPath = currentPath /= L"quick_open_folder.json";
+    return configPath;
+}
+
+void UiLogic::InitConfig()
+{
+    auto configPath = GetConfigPath();
 
     if (!std::filesystem::exists(configPath))
     {
@@ -50,11 +56,43 @@ void UiLogic::InitConfig()
     fileContent << inputFile.rdbuf();
     inputFile.close();
 
-    //
+    // read form json
     DocumentW doc;
     rapidjson::ParseResult parseOk = doc.Parse(fileContent.str().c_str());
     if (parseOk)
     {
+        if (doc.HasMember(L"VsCodePath") && doc[L"VsCodePath"].IsString())
+            _vsCodePathString = doc[L"VsCodePath"].GetString();
+        else
+            _vsCodePathString = L"";
 
+        if (doc.HasMember(L"FolderArray") && doc[L"FolderArray"].IsArray())
+        {
+            for (const auto& singleFolder: doc[L"FolderArray"].GetArray())
+            {
+                if (singleFolder.HasMember(L"Name") && singleFolder[L"Name"].IsString()
+                    && singleFolder.HasMember(L"Path") && singleFolder[L"Path"].IsString())
+                {
+                    _allFolder.emplace_back(
+                            singleFolder[L"Name"].GetString(),
+                            singleFolder[L"Path"].GetString()
+                    );
+                }
+            }
+        }
     }
+    else
+    {
+        _vsCodePathString = L"";
+    }
+}
+
+void UiLogic::WriteConfig()
+{
+    auto configPath = GetConfigPath();
+    std::wofstream fs(configPath, std::ios::out);
+    if (!fs.is_open())
+        return;
+
+
 }
