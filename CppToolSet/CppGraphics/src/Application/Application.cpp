@@ -138,6 +138,11 @@ Input::Mouse::Accessor Application::GetMouseAccessor()
     return _mouse.GetAccessor();
 }
 
+const Renderer::RenderHardwareInterface* Application::GetRhiRender() const
+{
+    return _pRhi;
+}
+
 #pragma endregion
 
 #pragma region [Static Instance]

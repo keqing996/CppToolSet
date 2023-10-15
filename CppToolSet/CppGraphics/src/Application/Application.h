@@ -16,11 +16,14 @@ public:
     void SetupRenderer(RendererApi api);
     void DestroyRenderer();
     void RunLoop();
+
+public: // Gettter
     int GetWindowHeight() const;
     int GetWindowWidth() const;
     HWND GetWindowHandle() const;
     Input::Keyboard::Accessor GetKeyboardAccessor();
     Input::Mouse::Accessor GetMouseAccessor();
+    const Renderer::RenderHardwareInterface* GetRhiRender() const;
 
 private:
     Application() = default;
