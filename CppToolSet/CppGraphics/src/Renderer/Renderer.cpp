@@ -1,4 +1,7 @@
 #include "Renderer.h"
+#include "Shader/ShaderProgram.h"
+#include "Shader/VertexShader.h"
+#include "Shader/PixelShader.h"
 #include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
 
 namespace Renderer
@@ -49,30 +52,19 @@ namespace Renderer
         glClearColor(0.2f, 0.2f, 0.2f, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        // vertex shader
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &pvsCode, nullptr);
-        glCompileShader(vertexShader);
-        GLint vsSuccess = FALSE;
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vsSuccess);
+        VertexShader* pVertexShader = VertexShader::Create(pvsCode);
+        pVertexShader->Compile();
 
-        // pixel shader
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &pfsCode, nullptr);
-        glCompileShader(fragmentShader);
-        GLint fsSuccess = FALSE;
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fsSuccess);
+        PixelShader* pPixelShader = PixelShader::Create(pfsCode);
+        pPixelShader->Compile();
 
-        // shader program
-        unsigned int _shader = glCreateProgram();
-        glAttachShader(_shader, vertexShader);
-        glAttachShader(_shader, fragmentShader);
-        glLinkProgram(_shader);
-        GLint ProgramSuccess = FALSE;
-        glGetProgramiv(_shader, GL_LINK_STATUS, &ProgramSuccess);
+        ShaderProgram* pShader = ShaderProgram::Create();
+        pShader->AddVertexShader(pVertexShader);
+        pShader->AddPixelShader(pPixelShader);
+        pShader->Link();
 
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        delete pVertexShader;
+        delete pPixelShader;
 
         // VAO
         GLuint vao;
@@ -97,6 +89,8 @@ namespace Renderer
         glBindVertexArray(0);
 
         glFlush();
+
+        delete pShader;
 
         SwapBuffer();
     }

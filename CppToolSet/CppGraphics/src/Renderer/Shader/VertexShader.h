@@ -8,9 +8,9 @@ namespace Renderer
         virtual ~VertexShader() = default;
 
     public:
-
+        virtual bool Compile() = 0;
 
     public:
-        static VertexShader* Create();
+        static VertexShader* Create(const char* shaderContent);
     };
 }

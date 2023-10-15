@@ -1,17 +1,17 @@
-#include "VertexShader.h"
+#include "PixelShader.h"
 #include "Define/RendererApi.h"
 #include "Renderer/Renderer.h"
-#include "RendererHardwareInterface/OpenGL/Shader/VertexShaderOpenGL.h"
+#include "RendererHardwareInterface/OpenGL/Shader/PixelShaderOpenGL.h"
 
 namespace Renderer
 {
 
-    VertexShader* VertexShader::Create(const char* shaderContent)
+    PixelShader* PixelShader::Create(const char* shaderContent)
     {
         switch (Renderer::GetApi())
         {
             case RendererApi::OpenGL:
-                return new VertexShaderOpenGL(shaderContent);
+                return new PixelShaderOpenGL(shaderContent);
             case RendererApi::Vulkan:
                 break;
             case RendererApi::D3D11:
