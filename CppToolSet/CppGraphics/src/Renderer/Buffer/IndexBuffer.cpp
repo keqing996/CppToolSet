@@ -5,7 +5,7 @@
 
 namespace Renderer
 {
-    IndexBuffer* IndexBuffer::Create(unsigned int* indices, unsigned int length)
+    IndexBuffer* IndexBuffer::Create(const unsigned int* indices, unsigned int length)
     {
         switch (Renderer::GetApi())
         {

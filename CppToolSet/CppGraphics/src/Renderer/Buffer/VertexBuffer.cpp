@@ -5,7 +5,7 @@
 
 namespace Renderer
 {
-    VertexBuffer* VertexBuffer::Create(float* vertices, unsigned int length)
+    VertexBuffer* VertexBuffer::Create(const float* vertices, unsigned int length)
     {
         switch (Renderer::GetApi())
         {

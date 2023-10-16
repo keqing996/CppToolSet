@@ -7,10 +7,7 @@ namespace Renderer
     public:
         virtual ~VertexBuffer() = default;
 
-        virtual void Bind() const = 0;
-        virtual void UnBind() const = 0;
-
     public:
-        static VertexBuffer* Create(float* vertices, unsigned int length);
+        static VertexBuffer* Create(const float* vertices, unsigned int length);
     };
 }
