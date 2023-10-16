@@ -13,8 +13,9 @@ namespace Renderer
         void AddVertexShader(VertexShader* pVertexShader) override;
         void AddPixelShader(PixelShader* pPixelShader) override;
         bool Link() override;
+        void Use() override;
 
     private:
-        unsigned int _shaderProgrmaId = 0;
+        unsigned int _shaderProgramId = 0;
     };
 }

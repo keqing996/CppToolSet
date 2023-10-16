@@ -49,6 +49,8 @@ namespace Renderer
                 +0.0F, +0.5F, +0.0F  // top
         };
 
+        constexpr GLuint Indeics[] = { 0, 1, 2 };
+
         glClearColor(0.2f, 0.2f, 0.2f, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -66,29 +68,49 @@ namespace Renderer
         delete pVertexShader;
         delete pPixelShader;
 
-        // VAO
-        GLuint vao;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        // VBO
+        // Vertex Buffer Object
         GLuint vbo;
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Vert), Vert, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *) 0);
-        glEnableVertexAttribArray(0);
+        // Vertex Array
+        GLuint vao;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // Vertex Attrib
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *) 0);
+
+        // Index Buffer
+        GLuint ibo;
+        glGenBuffers(1, &ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+
+        // Index Buffer Data
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indeics), Indeics, GL_STATIC_DRAW);
+
+
+        // glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        // ------------- draw
+        pShader->Use();
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+
+
+/*
         glBindVertexArray(0);
 
-        glUseProgram(_shader);
+
+
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
 
         glFlush();
+        */
 
         delete pShader;
 

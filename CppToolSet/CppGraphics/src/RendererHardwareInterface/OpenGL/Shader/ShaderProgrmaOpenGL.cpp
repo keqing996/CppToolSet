@@ -8,7 +8,7 @@ namespace Renderer
 
     ShaderProgramOpenGL::ShaderProgramOpenGL()
     {
-        _shaderProgrmaId = ::glCreateProgram();
+        _shaderProgramId = ::glCreateProgram();
     }
 
     void ShaderProgramOpenGL::AddVertexShader(VertexShader* pVertexShader)
@@ -17,7 +17,7 @@ namespace Renderer
         if (pVSOpenGL == nullptr)
             return;
 
-        ::glAttachShader(_shaderProgrmaId, pVSOpenGL->GetShaderId());
+        ::glAttachShader(_shaderProgramId, pVSOpenGL->GetShaderId());
     }
 
     void ShaderProgramOpenGL::AddPixelShader(PixelShader* pPixelShader)
@@ -26,14 +26,19 @@ namespace Renderer
         if (pPSOpenGL == nullptr)
             return;
 
-        ::glAttachShader(_shaderProgrmaId, pPSOpenGL->GetShaderId());
+        ::glAttachShader(_shaderProgramId, pPSOpenGL->GetShaderId());
     }
 
     bool ShaderProgramOpenGL::Link()
     {
-        glLinkProgram(_shaderProgrmaId);
+        glLinkProgram(_shaderProgramId);
         GLint success = false;
-        glGetProgramiv(_shaderProgrmaId, GL_LINK_STATUS, &success);
+        glGetProgramiv(_shaderProgramId, GL_LINK_STATUS, &success);
         return success;
+    }
+
+    void ShaderProgramOpenGL::Use()
+    {
+        ::glUseProgram(_shaderProgramId);
     }
 }
