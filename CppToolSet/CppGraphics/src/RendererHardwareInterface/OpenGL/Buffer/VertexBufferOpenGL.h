@@ -10,7 +10,13 @@ namespace Renderer
         explicit VertexBufferOpenGL(const float* vertices, unsigned int length);
         ~VertexBufferOpenGL() override;
 
+    public:
+        void Bind() override;
+        void UnBind() override;
+        void SetLayout(const BufferLayout& layout) override;
+
     private:
         unsigned int _renderId = 0;
+        BufferLayout _bufferLayout;
     };
 }

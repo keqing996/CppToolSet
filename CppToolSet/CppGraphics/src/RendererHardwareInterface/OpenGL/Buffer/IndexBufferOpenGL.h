@@ -10,6 +10,10 @@ namespace Renderer
         explicit IndexBufferOpenGL(const unsigned int* indices, unsigned int length);
         ~IndexBufferOpenGL() override;
 
+    public:
+        void Bind() override;
+        void UnBind() override;
+
     private:
         unsigned int _renderId = 0;
     };

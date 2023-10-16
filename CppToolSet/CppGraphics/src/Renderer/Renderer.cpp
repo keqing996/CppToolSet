@@ -1,6 +1,7 @@
 #include <array>
 
 #include "Renderer.h"
+#include "Buffer/BufferLayout.h"
 #include "Buffer/VertexBuffer.h"
 #include "Buffer/IndexBuffer.h"
 #include "Shader/ShaderProgram.h"
@@ -82,6 +83,12 @@ namespace Renderer
         GLuint vao;
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
+
+        BufferLayout layout = {
+                BufferElement {ShaderDataType::Float3, "a_Position"},
+                BufferElement {ShaderDataType::Float4, "a_Color"},
+                BufferElement {ShaderDataType::Float3, "a_Normal"},
+        };
 
         // Vertex Attrib
         glEnableVertexAttribArray(0);

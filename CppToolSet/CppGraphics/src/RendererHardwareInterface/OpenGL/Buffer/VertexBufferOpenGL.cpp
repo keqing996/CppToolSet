@@ -15,4 +15,19 @@ namespace Renderer
     {
         ::glDeleteBuffers(1, &_renderId);
     }
+
+    void VertexBufferOpenGL::Bind()
+    {
+        ::glBindBuffer(GL_ARRAY_BUFFER, _renderId);
+    }
+
+    void VertexBufferOpenGL::UnBind()
+    {
+        ::glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    void VertexBufferOpenGL::SetLayout(const BufferLayout& layout)
+    {
+        _bufferLayout = layout;
+    }
 }
