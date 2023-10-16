@@ -8,6 +8,7 @@
 #include "Shader/VertexShader.h"
 #include "Shader/PixelShader.h"
 #include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
+#include "RendererHardwareInterface/OpenGL/Shader/ShaderDataTypeOpenGL.h"
 
 namespace Renderer
 {
