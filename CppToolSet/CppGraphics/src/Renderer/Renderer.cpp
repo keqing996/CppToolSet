@@ -85,15 +85,23 @@ namespace Renderer
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
+        // Layout
         BufferLayout layout = {
                 BufferElement {ShaderDataType::Float3, "a_Position"},
                 BufferElement {ShaderDataType::Float4, "a_Color"},
                 BufferElement {ShaderDataType::Float3, "a_Normal"},
         };
 
+        pVertexBuffer->SetLayout(std::move(layout));
+
         // Vertex Attrib
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *) 0);
+        unsigned int index = 0;
+        auto vertexBufferLayout = pVertexBuffer->GetLayout();
+        for (const auto& element : vertexBufferLayout.GetLayout())
+        {
+            glEnableVertexAttribArray(index);
+            glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *) 0);
+        }
 
         IndexBuffer* pIndexBuffer = IndexBuffer::Create(Indeices.data(), Indeices.size());
 

@@ -30,4 +30,14 @@ namespace Renderer
     {
         _bufferLayout = layout;
     }
+
+    void VertexBufferOpenGL::SetLayout(BufferLayout&& layout)
+    {
+        _bufferLayout = std::move(layout);
+    }
+
+    const BufferLayout &VertexBufferOpenGL::GetLayout()
+    {
+        return _bufferLayout;
+    }
 }

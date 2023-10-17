@@ -20,6 +20,7 @@ namespace Renderer
     class BufferLayout
     {
     public:
+        BufferLayout() = default;
         BufferLayout(const std::initializer_list<BufferElement>& inputLayout);
 
     public:

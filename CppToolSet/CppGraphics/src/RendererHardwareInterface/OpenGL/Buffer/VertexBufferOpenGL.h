@@ -14,6 +14,8 @@ namespace Renderer
         void Bind() override;
         void UnBind() override;
         void SetLayout(const BufferLayout& layout) override;
+        void SetLayout(BufferLayout&& layout) override;
+        const BufferLayout& GetLayout() override;
 
     private:
         unsigned int _renderId = 0;
