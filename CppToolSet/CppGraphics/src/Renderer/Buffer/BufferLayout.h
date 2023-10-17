@@ -13,8 +13,9 @@ namespace Renderer
         ShaderDataType dataType;
         unsigned int size;
         unsigned int offset;
+        bool normalized;
 
-        explicit BufferElement(ShaderDataType type, const std::string& name);
+        explicit BufferElement(ShaderDataType type, const std::string& name, bool normalized = false);
     };
 
     class BufferLayout
