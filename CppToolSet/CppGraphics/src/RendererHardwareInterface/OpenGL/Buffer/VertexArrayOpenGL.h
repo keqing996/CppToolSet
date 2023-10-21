@@ -8,7 +8,7 @@ namespace Renderer
     {
     public:
         VertexArrayOpenGL();
-        ~VertexArrayOpenGL() override = default;
+        ~VertexArrayOpenGL() override;
 
     public:
         void Bind() override;

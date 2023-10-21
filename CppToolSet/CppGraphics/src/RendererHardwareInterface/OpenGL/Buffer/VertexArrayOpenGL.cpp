@@ -10,6 +10,11 @@ namespace Renderer
         ::glCreateVertexArrays(1, &_vertexArrayId);
     }
 
+    VertexArrayOpenGL::~VertexArrayOpenGL()
+    {
+        ::glDeleteVertexArrays(1, &_vertexArrayId);
+    }
+
     void VertexArrayOpenGL::Bind()
     {
         ::glBindVertexArray(_vertexArrayId);
