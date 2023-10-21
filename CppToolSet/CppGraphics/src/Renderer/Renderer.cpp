@@ -120,7 +120,11 @@ namespace Renderer
         // ------------- draw
         pVertexArray->Bind();
         pShader->Bind();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(
+                GL_TRIANGLES,
+                pVertexArray->GetCurrentIndexBuffer()->GetIndicesCount(),
+                GL_UNSIGNED_INT, 
+                nullptr);
         // ------------- draw
 
         delete pVertexArray;

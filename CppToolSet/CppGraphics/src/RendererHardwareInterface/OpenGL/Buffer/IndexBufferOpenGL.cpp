@@ -9,6 +9,7 @@ namespace Renderer
         ::glCreateBuffers(1, &_renderId);
         ::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _renderId);
         ::glBufferData(GL_ELEMENT_ARRAY_BUFFER, length * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+        _indicesLength = length;
     }
 
     IndexBufferOpenGL::~IndexBufferOpenGL()
@@ -24,5 +25,10 @@ namespace Renderer
     void IndexBufferOpenGL::UnBind() const
     {
         ::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    unsigned int IndexBufferOpenGL::GetIndicesCount() const
+    {
+        return _indicesLength;
     }
 }

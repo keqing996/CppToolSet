@@ -56,4 +56,14 @@ namespace Renderer
 
         _pCurrentIndexBuffer = pIndexBuffer;
     }
+
+    const std::vector<const VertexBuffer*>& VertexArrayOpenGL::GetVertexBufferVector() const
+    {
+        return _vertexBufferVec;
+    }
+
+    const IndexBuffer* VertexArrayOpenGL::GetCurrentIndexBuffer() const
+    {
+        return _pCurrentIndexBuffer;
+    }
 }
