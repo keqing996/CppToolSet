@@ -2,6 +2,7 @@
 
 #include "Renderer.h"
 #include "Buffer/BufferLayout.h"
+#include "Buffer/VertexArray.h"
 #include "Buffer/VertexBuffer.h"
 #include "Buffer/IndexBuffer.h"
 #include "Shader/ShaderProgram.h"
@@ -99,11 +100,6 @@ namespace Renderer
 
         VertexBuffer* pVertexBuffer = VertexBuffer::Create(Vert.data(), Vert.size());
 
-        // Vertex Array
-        GLuint vao;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
         // Layout
         BufferLayout layout = {
                 BufferElement {ShaderDataType::Float3, "a_Position"},
@@ -113,30 +109,20 @@ namespace Renderer
 
         pVertexBuffer->SetLayout(std::move(layout));
 
-        // Vertex Attrib
-        unsigned int index = 0;
-        auto vertexBufferLayout = pVertexBuffer->GetLayout();
-        for (const auto& element : vertexBufferLayout.GetLayout())
-        {
-            glEnableVertexAttribArray(index);
-            glVertexAttribPointer(index,
-                                  GetShaderDataCount(element.dataType),
-                                  GetShaderDataTypeGlEnum(element.dataType),
-                                  element.normalized ? GL_TRUE : GL_FALSE,
-                                  vertexBufferLayout.GetStride(),
-                                  (GLvoid*)element.offset);
-
-            index++;
-        }
-
+        // Index Buffer
         IndexBuffer* pIndexBuffer = IndexBuffer::Create(Indeices.data(), Indeices.size());
+
+        // Vertex Array
+        VertexArray* pVertexArray = VertexArray::Create();
+        pVertexArray->AddVertexBuffer(pVertexBuffer);
+        pVertexArray->SetIndexBuffer(pIndexBuffer);
 
         // ------------- draw
         pShader->Use();
-        glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
         // ------------- draw
 
+        delete pVertexArray;
         delete pIndexBuffer;
         delete pVertexBuffer;
         delete pShader;

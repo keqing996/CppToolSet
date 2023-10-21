@@ -11,8 +11,8 @@ namespace Renderer
         ~IndexBufferOpenGL() override;
 
     public:
-        void Bind() override;
-        void UnBind() override;
+        void Bind() const override;
+        void UnBind() const override;
 
     private:
         unsigned int _renderId = 0;

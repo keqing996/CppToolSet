@@ -11,11 +11,11 @@ namespace Renderer
         ~VertexBufferOpenGL() override;
 
     public:
-        void Bind() override;
-        void UnBind() override;
+        void Bind() const override;
+        void UnBind() const override;
         void SetLayout(const BufferLayout& layout) override;
         void SetLayout(BufferLayout&& layout) override;
-        const BufferLayout& GetLayout() override;
+        const BufferLayout& GetLayout() const override;
 
     private:
         unsigned int _renderId = 0;

@@ -16,12 +16,12 @@ namespace Renderer
         ::glDeleteBuffers(1, &_renderId);
     }
 
-    void VertexBufferOpenGL::Bind()
+    void VertexBufferOpenGL::Bind() const
     {
         ::glBindBuffer(GL_ARRAY_BUFFER, _renderId);
     }
 
-    void VertexBufferOpenGL::UnBind()
+    void VertexBufferOpenGL::UnBind() const
     {
         ::glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -36,7 +36,7 @@ namespace Renderer
         _bufferLayout = std::move(layout);
     }
 
-    const BufferLayout &VertexBufferOpenGL::GetLayout()
+    const BufferLayout &VertexBufferOpenGL::GetLayout() const
     {
         return _bufferLayout;
     }

@@ -16,12 +16,12 @@ namespace Renderer
         ::glDeleteBuffers(1, &_renderId);
     }
 
-    void IndexBufferOpenGL::Bind()
+    void IndexBufferOpenGL::Bind() const
     {
         ::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _renderId);
     }
 
-    void IndexBufferOpenGL::UnBind()
+    void IndexBufferOpenGL::UnBind() const
     {
         ::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
