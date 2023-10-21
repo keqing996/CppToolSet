@@ -37,7 +37,7 @@ namespace Renderer
         return success;
     }
 
-    void ShaderProgramOpenGL::Use()
+    void ShaderProgramOpenGL::Bind()
     {
         ::glUseProgram(_shaderProgramId);
     }

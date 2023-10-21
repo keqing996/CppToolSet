@@ -118,7 +118,8 @@ namespace Renderer
         pVertexArray->SetIndexBuffer(pIndexBuffer);
 
         // ------------- draw
-        pShader->Use();
+        pVertexArray->Bind();
+        pShader->Bind();
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
         // ------------- draw
 
