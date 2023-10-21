@@ -7,13 +7,16 @@ namespace Renderer
     class IndexBufferOpenGL : public IndexBuffer
     {
     public:
-        explicit IndexBufferOpenGL(unsigned int* indices, unsigned int length);
+        explicit IndexBufferOpenGL(const unsigned int* indices, unsigned int length);
         ~IndexBufferOpenGL() override;
 
+    public:
         void Bind() const override;
         void UnBind() const override;
+        unsigned int GetIndicesCount() const override;
 
     private:
+        unsigned int _indicesLength = 0;
         unsigned int _renderId = 0;
     };
 }

@@ -66,7 +66,7 @@ void Application::DestroyWindow()
     ::DestroyWindow(_hWnd);
 }
 
-void Application::SetupRenderer(RendererApi api)
+void Application::SetupRenderer(Renderer::RendererApi api)
 {
     _pRender = Renderer::Renderer::Create(api);
     _pRender->SetUp();

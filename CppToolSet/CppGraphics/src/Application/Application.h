@@ -4,7 +4,7 @@
 #include "Util/NonCopyable.h"
 #include "Input/Keyboard/Keyboard.h"
 #include "Input/Mouse/Mouse.h"
-#include "Define/RendererApi.h"
+#include "Renderer/RendererApi.h"
 #include "Renderer/Renderer.h"
 
 class Application : public NonCopyable
@@ -13,7 +13,7 @@ public:
     ~Application();
     void InitWindow(int windowWidth, int windowHeight, const wchar_t* name);
     void DestroyWindow();
-    void SetupRenderer(RendererApi api);
+    void SetupRenderer(Renderer::RendererApi api);
     void DestroyRenderer();
     void RunLoop();
 

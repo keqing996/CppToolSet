@@ -1,11 +1,11 @@
 #include "IndexBuffer.h"
 #include "Application/Application.h"
-#include "Define/RendererApi.h"
+#include "Renderer/RendererApi.h"
 #include "RendererHardwareInterface/OpenGL/Buffer/IndexBufferOpenGL.h"
 
 namespace Renderer
 {
-    IndexBuffer* IndexBuffer::Create(unsigned int* indices, unsigned int length)
+    IndexBuffer* IndexBuffer::Create(const unsigned int* indices, unsigned int length)
     {
         switch (Renderer::GetApi())
         {

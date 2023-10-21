@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Util/NonCopyable.h"
-#include "Define/RendererApi.h"
+#include "RendererApi.h"
 
 namespace Renderer
 {

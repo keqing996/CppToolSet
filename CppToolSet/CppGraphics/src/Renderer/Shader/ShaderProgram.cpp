@@ -1,16 +1,17 @@
-#include "VertexBuffer.h"
-#include "Application/Application.h"
+#include "ShaderProgram.h"
 #include "Renderer/RendererApi.h"
-#include "RendererHardwareInterface/OpenGL/Buffer/VertexBufferOpenGL.h"
+#include "Renderer/Renderer.h"
+#include "RendererHardwareInterface/OpenGL/Shader/ShaderProgrmaOpenGL.h"
 
 namespace Renderer
 {
-    VertexBuffer* VertexBuffer::Create(const float* vertices, unsigned int length)
+
+    ShaderProgram* ShaderProgram::Create()
     {
         switch (Renderer::GetApi())
         {
             case RendererApi::OpenGL:
-                return new VertexBufferOpenGL(vertices, length);
+                return new ShaderProgramOpenGL();
             case RendererApi::Vulkan:
                 break;
             case RendererApi::D3D11:
@@ -22,5 +23,3 @@ namespace Renderer
         return nullptr;
     }
 }
-
-

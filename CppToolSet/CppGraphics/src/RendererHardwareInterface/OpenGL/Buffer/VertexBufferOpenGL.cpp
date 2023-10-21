@@ -4,10 +4,11 @@
 namespace Renderer
 {
 
-    VertexBufferOpenGL::VertexBufferOpenGL(float* vertices, unsigned int length)
+    VertexBufferOpenGL::VertexBufferOpenGL(const float* vertices, unsigned int length)
     {
         ::glCreateBuffers(1, &_renderId);
-        ::glBufferData(GL_ARRAY_BUFFER, length, vertices, GL_STATIC_DRAW);
+        ::glBindBuffer(GL_ARRAY_BUFFER, _renderId);
+        ::glBufferData(GL_ARRAY_BUFFER, length * sizeof(float), vertices, GL_STATIC_DRAW);
     }
 
     VertexBufferOpenGL::~VertexBufferOpenGL()
@@ -23,5 +24,20 @@ namespace Renderer
     void VertexBufferOpenGL::UnBind() const
     {
         ::glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    void VertexBufferOpenGL::SetLayout(const BufferLayout& layout)
+    {
+        _bufferLayout = layout;
+    }
+
+    void VertexBufferOpenGL::SetLayout(BufferLayout&& layout)
+    {
+        _bufferLayout = std::move(layout);
+    }
+
+    const BufferLayout &VertexBufferOpenGL::GetLayout() const
+    {
+        return _bufferLayout;
     }
 }
