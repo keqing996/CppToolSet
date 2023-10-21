@@ -106,6 +106,8 @@ namespace Renderer
                                   element.normalized ? GL_TRUE : GL_FALSE,
                                   vertexBufferLayout.GetStride(),
                                   (GLvoid*)element.offset);
+
+            index++;
         }
 
         IndexBuffer* pIndexBuffer = IndexBuffer::Create(Indeices.data(), Indeices.size());
