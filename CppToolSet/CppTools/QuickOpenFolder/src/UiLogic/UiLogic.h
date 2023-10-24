@@ -12,10 +12,11 @@ public:
     UiLogic();
 
 public:
-    void Update() const override;
+    void Update() override;
 
 private:
     std::wstring GetConfigPath() const;
+    void UpdateVsCodePath();
     void InitConfig();
     void WriteConfig();
 

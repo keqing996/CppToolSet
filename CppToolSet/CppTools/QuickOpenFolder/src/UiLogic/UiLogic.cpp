@@ -17,7 +17,7 @@ UiLogic::UiLogic()
     InitConfig();
 }
 
-void UiLogic::Update() const
+void UiLogic::Update()
 {
     // helper function
 
@@ -41,14 +41,7 @@ void UiLogic::Update() const
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
 
-    ImGui::Button("Test4", buttonSize);
-    ImGui::SameLine();
-
-    static char buf[128] = "click on a button to set focus";
-
-    ImGui::PushItemWidth(-1);
-    ImGui::InputText("##", buf, IM_ARRAYSIZE(buf));
-    ImGui::PopItemWidth();
+    UpdateVsCodePath();
 
     /*
     ImVec2 currentCursor = ImGui::GetCursorPos();
@@ -70,6 +63,24 @@ void UiLogic::Update() const
 */
     ImGui::PopStyleVar(2);
     ImGui::End();
+}
+
+void UiLogic::UpdateVsCodePath()
+{
+    static const char* title = "VS Code Path";
+    auto titleWidth = ImGui::CalcTextSize(title);
+
+    ImGui::SetCursorPosX(0.5 * (ImGui::GetWindowWidth() - titleWidth.x));
+    ImGui::Text(title);
+
+    ImGui::Button("Test4", {100, 0});
+    ImGui::SameLine();
+
+    static char buf[128] = "click on a button to set focus";
+
+    ImGui::PushItemWidth(-1);
+    ImGui::InputText("##", buf, IM_ARRAYSIZE(buf));
+    ImGui::PopItemWidth();
 }
 
 std::wstring UiLogic::GetConfigPath() const

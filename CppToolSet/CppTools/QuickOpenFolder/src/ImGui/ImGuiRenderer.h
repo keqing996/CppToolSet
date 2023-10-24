@@ -25,7 +25,7 @@ public:
     void ImGuiCleanUp();
 
     // business
-    void AddRenderDelegate(const ImGuiRenderDelegate* pRender);
+    void AddRenderDelegate(ImGuiRenderDelegate* pRender);
 
 private:
     ID3D11Device* _pD3dDevice = nullptr;
@@ -34,5 +34,5 @@ private:
     ID3D11RenderTargetView* _pMainRenderTargetView = nullptr;
 
 private:
-    std::vector<const ImGuiRenderDelegate*> _loopDelegate;
+    std::vector<ImGuiRenderDelegate*> _loopDelegate;
 };
