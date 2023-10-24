@@ -45,7 +45,10 @@ void UiLogic::Update() const
     ImGui::SameLine();
 
     static char buf[128] = "click on a button to set focus";
+
+    ImGui::PushItemWidth(-1);
     ImGui::InputText("##", buf, IM_ARRAYSIZE(buf));
+    ImGui::PopItemWidth();
 
     /*
     ImVec2 currentCursor = ImGui::GetCursorPos();
