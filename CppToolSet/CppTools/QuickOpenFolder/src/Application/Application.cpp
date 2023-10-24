@@ -29,7 +29,7 @@ bool Application::InitWindow(unsigned int windowWidth, unsigned int windowHeight
     rect.top = 100;
     rect.bottom = _height + rect.top;
 
-    DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_SYSMENU;
+    DWORD style = WS_CAPTION | WS_SYSMENU;
 
     ::AdjustWindowRect(&rect, style, FALSE);
 
