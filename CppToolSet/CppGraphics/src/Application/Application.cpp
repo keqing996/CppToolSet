@@ -4,6 +4,7 @@
 
 Application::~Application()
 {
+    DestroyEditor();
     DestroyRenderer();
     DestroyWindow();
 }
@@ -70,6 +71,9 @@ void Application::SetupRenderer(Renderer::RendererApi api)
 {
     _pRender = Renderer::Renderer::Create(api);
     _pRender->SetUp();
+
+    _pEditor = new Editor::Editor(api);
+    _pEditor->SetUp();
 }
 
 void Application::DestroyRenderer()
@@ -78,6 +82,14 @@ void Application::DestroyRenderer()
         _pRender->Destroy();
 
     delete _pRender;
+}
+
+void Application::DestroyEditor()
+{
+    if (_pEditor != nullptr)
+        _pEditor->Destroy();
+
+    delete _pEditor;
 }
 
 void Application::RunLoop()

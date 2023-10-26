@@ -6,6 +6,7 @@
 #include "Input/Mouse/Mouse.h"
 #include "Renderer/RendererApi.h"
 #include "Renderer/Renderer.h"
+#include "Editor/Editor.h"
 
 class Application : public NonCopyable
 {
@@ -15,6 +16,7 @@ public:
     void DestroyWindow();
     void SetupRenderer(Renderer::RendererApi api);
     void DestroyRenderer();
+    void DestroyEditor();
     void RunLoop();
 
 public: // Gettter
@@ -63,6 +65,9 @@ private:
 
     /* Render */
     Renderer::Renderer* _pRender = nullptr;
+
+    /* Editor */
+    Editor::Editor* _pEditor = nullptr;
 
 private:
     static Application* _instance;
