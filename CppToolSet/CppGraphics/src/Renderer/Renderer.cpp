@@ -131,7 +131,5 @@ namespace Renderer
         delete pIndexBuffer;
         delete pVertexBuffer;
         delete pShader;
-
-        SwapBuffer();
     }
 }

@@ -4,7 +4,6 @@
 
 Application::~Application()
 {
-    DestroyEditor();
     DestroyRenderer();
     DestroyWindow();
 }
@@ -78,18 +77,15 @@ void Application::SetupRenderer(Renderer::RendererApi api)
 
 void Application::DestroyRenderer()
 {
-    if (_pRender != nullptr)
-        _pRender->Destroy();
-
-    delete _pRender;
-}
-
-void Application::DestroyEditor()
-{
     if (_pEditor != nullptr)
         _pEditor->Destroy();
 
     delete _pEditor;
+
+    if (_pRender != nullptr)
+        _pRender->Destroy();
+
+    delete _pRender;
 }
 
 void Application::RunLoop()
@@ -110,6 +106,9 @@ void Application::RunLoop()
             ::DispatchMessage(&msg);
 
             _pRender->Render();
+            _pEditor->Update();
+
+            _pRender->SwapBuffer();
         }
 
         if (shouldStop)

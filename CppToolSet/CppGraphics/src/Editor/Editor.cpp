@@ -48,7 +48,24 @@ namespace Editor
 
         ImGui::NewFrame();
 
-        // ...
+        // temp
+        const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(main_viewport->WorkPos.x / 3, main_viewport->WorkPos.y / 2), ImGuiCond_Always);
+
+        ImGuiWindowFlags window_flags = 0;
+        window_flags |= ImGuiWindowFlags_NoTitleBar;
+        window_flags |= ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoResize;
+        window_flags |= ImGuiWindowFlags_NoCollapse;
+
+        ImGui::Begin("Test", nullptr, window_flags);
+
+        ImGui::Button("Test");
+
+        ImGui::End();
+
+
 
         ImGui::Render();
 

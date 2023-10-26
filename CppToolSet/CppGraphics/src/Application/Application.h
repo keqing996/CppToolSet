@@ -16,7 +16,6 @@ public:
     void DestroyWindow();
     void SetupRenderer(Renderer::RendererApi api);
     void DestroyRenderer();
-    void DestroyEditor();
     void RunLoop();
 
 public: // Gettter
