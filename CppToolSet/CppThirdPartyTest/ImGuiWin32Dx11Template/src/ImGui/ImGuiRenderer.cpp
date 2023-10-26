@@ -1,6 +1,5 @@
-
+#include "Application/Application.h"
 #include "ImGuiRenderer.h"
-#include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
@@ -117,13 +116,8 @@ void ImGuiRenderer::ImGuiCreateContext(HANDLE hWnd)
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX11_Init(_pD3dDevice, _pD3dDeviceContext);
 
-    // Get Dpi Scale
-    float dpiScale = ImGui_ImplWin32_GetDpiScaleForHwnd(hWnd);
-    ImGui::GetStyle().ScaleAllSizes(dpiScale);
-
     // Load Font
-    float fontSize = 16 * dpiScale;
-    ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    ImFont* font = ImGuiCreatFont("c:\\Windows\\Fonts\\consola.ttf", 16);
     IM_ASSERT(font != nullptr);
 }
 
@@ -132,8 +126,6 @@ void ImGuiRenderer::ImGuiRenderLoop()
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-
-
 
     for (auto p : _loopDelegate)
     {
@@ -177,3 +169,20 @@ void ImGuiRenderer::AddRenderDelegate(const ImGuiRenderDelegate* pRender)
 {
     _loopDelegate.push_back(pRender);
 }
+
+float ImGuiRenderer::ImGuiGetCurrentWindowDpi()
+{
+    auto hWnd = Application::GetInstance()->GetWindowHandle();
+    return ImGui_ImplWin32_GetDpiScaleForHwnd(hWnd);
+}
+
+ImFont* ImGuiRenderer::ImGuiCreatFont(const std::string& filePath, float fontSize)
+{
+    float dpiScale = ImGuiGetCurrentWindowDpi();
+    ImGui::GetStyle().ScaleAllSizes(dpiScale);
+
+    ImGuiIO& io = ImGui::GetIO();
+    return io.Fonts->AddFontFromFileTTF(filePath.c_str(), dpiScale * fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+}
+
+

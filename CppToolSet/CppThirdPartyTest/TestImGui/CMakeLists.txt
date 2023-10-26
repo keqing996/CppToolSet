@@ -6,7 +6,7 @@ set(TargetName im_gui_template)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/imgui-1.89/)
+set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/imgui/)
 
 file (GLOB_RECURSE src_files src/*.cpp)
 

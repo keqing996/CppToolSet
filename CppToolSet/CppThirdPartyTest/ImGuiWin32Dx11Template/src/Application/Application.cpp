@@ -139,6 +139,11 @@ int Application::GetWindowWidth() const
     return _height;
 }
 
+HWND Application::GetWindowHandle() const
+{
+    return _hWnd;
+}
+
 #pragma endregion
 
 #pragma region [Static Instance]

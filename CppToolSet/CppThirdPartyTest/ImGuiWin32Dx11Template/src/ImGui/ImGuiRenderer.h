@@ -4,9 +4,11 @@
 #include <Windows.h>
 #include <d3d11.h>
 #include <vector>
+#include <string>
 
 #include "Util/NonCopyable.h"
 #include "ImGuiRenderDelegate.h"
+#include "imgui.h"
 
 class ImGuiRenderer : public NonCopyable
 {
@@ -26,6 +28,10 @@ public:
 
     // business
     void AddRenderDelegate(const ImGuiRenderDelegate* pRender);
+
+public:
+    static float ImGuiGetCurrentWindowDpi();
+    static ImFont* ImGuiCreatFont(const std::string& filePath, float fontSize);
 
 private:
     ID3D11Device* _pD3dDevice = nullptr;
