@@ -4,8 +4,8 @@
 #include "Util/NonCopyable.h"
 #include "Input/Keyboard/Keyboard.h"
 #include "Input/Mouse/Mouse.h"
-#include "Define/RendererApi.h"
-#include "RendererApi/RenderHardwareInterface.h"
+#include "Renderer/RendererApi.h"
+#include "Renderer/Renderer.h"
 
 class Application : public NonCopyable
 {
@@ -13,14 +13,17 @@ public:
     ~Application();
     void InitWindow(int windowWidth, int windowHeight, const wchar_t* name);
     void DestroyWindow();
-    void SetupRenderer(RendererApi api);
+    void SetupRenderer(Renderer::RendererApi api);
     void DestroyRenderer();
     void RunLoop();
+
+public: // Gettter
     int GetWindowHeight() const;
     int GetWindowWidth() const;
     HWND GetWindowHandle() const;
     Input::Keyboard::Accessor GetKeyboardAccessor();
     Input::Mouse::Accessor GetMouseAccessor();
+    const Renderer::Renderer* GetRenderer() const;
 
 private:
     Application() = default;
@@ -58,12 +61,12 @@ private:
     Input::Keyboard _keyboard = Input::Keyboard{};
     Input::Mouse _mouse = Input::Mouse{};
 
-    /* Renderer */
-    RenderHardwareInterface* _pRhi = nullptr;
+    /* Render */
+    Renderer::Renderer* _pRender = nullptr;
 
 private:
     static Application* _instance;
-    static constexpr LPCWSTR WND_CLASS_NAME = L"Graphic Renderer";
+    static constexpr LPCWSTR WND_CLASS_NAME = L"Graphic Render";
 
 public:
     static void CreateInstance();

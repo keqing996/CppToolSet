@@ -1,6 +1,6 @@
 
 #include "Application.h"
-#include "RendererApi/OpenGL/RhiOpenGL.h"
+#include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
 
 Application::~Application()
 {
@@ -66,24 +66,18 @@ void Application::DestroyWindow()
     ::DestroyWindow(_hWnd);
 }
 
-void Application::SetupRenderer(RendererApi api)
+void Application::SetupRenderer(Renderer::RendererApi api)
 {
-    switch (api)
-    {
-        case RendererApi::OpenGL:
-        default:
-            _pRhi = new RhiOpenGL();
-    }
-
-    _pRhi->SetUp();
+    _pRender = Renderer::Renderer::Create(api);
+    _pRender->SetUp();
 }
 
 void Application::DestroyRenderer()
 {
-    if (_pRhi != nullptr)
-        _pRhi->Destroy();
+    if (_pRender != nullptr)
+        _pRender->Destroy();
 
-    delete _pRhi;
+    delete _pRender;
 }
 
 void Application::RunLoop()
@@ -103,7 +97,7 @@ void Application::RunLoop()
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
 
-            _pRhi->Renderer();
+            _pRender->Render();
         }
 
         if (shouldStop)
@@ -136,6 +130,11 @@ Input::Keyboard::Accessor Application::GetKeyboardAccessor()
 Input::Mouse::Accessor Application::GetMouseAccessor()
 {
     return _mouse.GetAccessor();
+}
+
+const Renderer::Renderer* Application::GetRenderer() const
+{
+    return _pRender;
 }
 
 #pragma endregion
