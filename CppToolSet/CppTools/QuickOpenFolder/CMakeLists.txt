@@ -4,7 +4,7 @@ project (QuickOpenFolder)
 
 set(TargetName quick_open_folder)
 set(CMAKE_CXX_STANDARD 20)
-set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/imgui-1.89/)
+set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/imgui/)
 
 add_compile_definitions(_UNICODE UNICODE) # windows wchar
 add_compile_definitions(NOMINMAX) # cancel windows min max macro
