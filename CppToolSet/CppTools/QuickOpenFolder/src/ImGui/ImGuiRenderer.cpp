@@ -133,8 +133,6 @@ void ImGuiRenderer::ImGuiRenderLoop()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-
-
     for (auto p : _loopDelegate)
     {
         if (p != nullptr)
@@ -173,7 +171,7 @@ void ImGuiRenderer::ImGuiCleanUp()
     ImGui::DestroyContext();
 }
 
-void ImGuiRenderer::AddRenderDelegate(const ImGuiRenderDelegate* pRender)
+void ImGuiRenderer::AddRenderDelegate(ImGuiRenderDelegate* pRender)
 {
     _loopDelegate.push_back(pRender);
 }

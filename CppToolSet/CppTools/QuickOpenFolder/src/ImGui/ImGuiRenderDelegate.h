@@ -4,5 +4,5 @@
 class ImGuiRenderDelegate
 {
 public:
-    virtual void Update() const = 0;
+    virtual void Update() = 0;
 };

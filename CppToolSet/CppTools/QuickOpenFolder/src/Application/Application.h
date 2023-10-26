@@ -13,6 +13,7 @@ public:
     void RunLoop();
     int GetWindowHeight() const;
     int GetWindowWidth() const;
+    HWND GetWindowHandle() const;
 
 private:
     Application() = default;

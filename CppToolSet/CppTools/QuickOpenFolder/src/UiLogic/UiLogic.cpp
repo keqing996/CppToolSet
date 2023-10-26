@@ -2,7 +2,9 @@
 #include <filesystem>
 #include <fstream>
 
+#include "Application/Application.h"
 #include "imgui.h"
+#include "imgui_impl_win32.h"
 #include "UiLogic.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
@@ -15,10 +17,26 @@ using RapidJsonPrettyWriterW = rapidjson::PrettyWriter<RapidJsonStringBufferW, r
 UiLogic::UiLogic()
 {
     InitConfig();
+
+    // Get Dpi Scale
+    float dpiScale = ImGui_ImplWin32_GetDpiScaleForHwnd(Application::GetInstance()->GetWindowHandle());
+    ImGui::GetStyle().ScaleAllSizes(dpiScale);
+
+    // Load Font
+    float fontSize = 20 * dpiScale;
+
+    auto io = ImGui::GetIO();
+    _bigFont = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+
 }
 
-void UiLogic::Update() const
+void UiLogic::Update()
 {
+    // helper function
+
+
+
+
     const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y), ImGuiCond_Always);
     ImGui::SetNextWindowSize(main_viewport->WorkSize, ImGuiCond_Always);
@@ -29,10 +47,58 @@ void UiLogic::Update() const
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_NoCollapse;
 
+    ImVec2 buttonSize {100, 0};
+    ImVec2 windowSize = ImGui::GetWindowSize();
+
     ImGui::Begin("Quick Open Folder", nullptr, window_flags);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
 
+    UpdateVsCodePath();
 
+    /*
+    ImVec2 currentCursor = ImGui::GetCursorPos();
+
+    ImVec2 buttonBeginPos {
+            (windowSize.x - (buttonSize.x) * 3 - (ImGui::GetStyle().ItemSpacing.x) * 2) / 2,
+            currentCursor.y
+        };
+
+    ImGui::SetCursorPos(buttonBeginPos);
+
+    ImGui::Button("Test1", buttonSize);
+    ImGui::SameLine();
+    ImGui::Button("Test2", buttonSize);
+    ImGui::SameLine();
+    ImGui::Button("Test3", buttonSize);
+
+    ImGui::Button("Test4", buttonSize);
+*/
+    ImGui::PopStyleVar(2);
     ImGui::End();
+}
+
+void UiLogic::UpdateVsCodePath()
+{
+    static const char* title = "VS Code Path";
+
+    ImGui::PushFont(_bigFont);
+    {
+        auto titleWidth = ImGui::CalcTextSize(title);
+
+        ImGui::SetCursorPosX(0.5 * (ImGui::GetWindowWidth() - titleWidth.x));
+        ImGui::Text(title);
+    }
+    ImGui::PopFont();
+
+    ImGui::Button("...", {45, 0});
+    ImGui::SameLine();
+
+    static char buf[128] = "click on a button to set focus";
+
+    ImGui::PushItemWidth(-1);
+    ImGui::InputText("##", buf, IM_ARRAYSIZE(buf));
+    ImGui::PopItemWidth();
 }
 
 std::wstring UiLogic::GetConfigPath() const
