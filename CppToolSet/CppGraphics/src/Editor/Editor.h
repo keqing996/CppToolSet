@@ -14,6 +14,7 @@ namespace Editor
 
     public:
         void SetUp();
+        void Update();
         void Destroy();
 
     private:

@@ -11,16 +11,28 @@ namespace Editor
     {
     }
 
-    void EditorBackendOpenGL::Destroy()
-    {
-
-    }
-
-    void EditorBackendOpenGL::SetUpBackend()
+    void EditorBackendOpenGL::SetUp()
     {
         auto hWnd = Application::GetInstance()->GetWindowHandle();
         ImGui_ImplWin32_InitForOpenGL(hWnd);
         ImGui_ImplOpenGL3_Init();
+    }
+
+    void EditorBackendOpenGL::Destroy()
+    {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+    }
+
+    void EditorBackendOpenGL::BeforeUpdate()
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+    }
+
+    void EditorBackendOpenGL::AfterUpdate()
+    {
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
 
