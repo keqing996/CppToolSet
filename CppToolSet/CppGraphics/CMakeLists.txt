@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.26)
 project(CppGraphics)
 
 set(TargetName renderer)
-set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/imgui-1.89/)
+set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/imgui/)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(OpenGL REQUIRED)
