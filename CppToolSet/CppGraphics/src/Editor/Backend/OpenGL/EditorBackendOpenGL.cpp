@@ -19,7 +19,7 @@ namespace Editor
     void EditorBackendOpenGL::SetUpBackend()
     {
         auto hWnd = Application::GetInstance()->GetWindowHandle();
-        //ImGui_ImplWin32_InitForOpenGL(hWnd);
+        ImGui_ImplWin32_InitForOpenGL(hWnd);
         ImGui_ImplOpenGL3_Init();
     }
 
