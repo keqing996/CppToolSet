@@ -10,8 +10,11 @@ namespace Editor
         virtual ~EditorBackend() = default;
 
     public:
-        virtual void SetUp() = 0;
+        void SetUp();
         virtual void Destroy() = 0;
+
+    private:
+        virtual void SetUpBackend() = 0;
 
     public:
         static EditorBackend* Create(Renderer::RendererApi api);

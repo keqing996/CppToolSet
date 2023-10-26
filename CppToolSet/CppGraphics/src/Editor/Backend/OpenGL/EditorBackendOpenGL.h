@@ -10,7 +10,9 @@ namespace Editor
         virtual ~EditorBackendOpenGL();
 
     public:
-        void SetUp() override;
         void Destroy() override;
+
+    private:
+        void SetUpBackend() override;
     };
 }
