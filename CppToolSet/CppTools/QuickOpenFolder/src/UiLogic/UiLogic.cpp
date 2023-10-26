@@ -2,7 +2,9 @@
 #include <filesystem>
 #include <fstream>
 
+#include "Application/Application.h"
 #include "imgui.h"
+#include "imgui_impl_win32.h"
 #include "UiLogic.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
@@ -15,6 +17,17 @@ using RapidJsonPrettyWriterW = rapidjson::PrettyWriter<RapidJsonStringBufferW, r
 UiLogic::UiLogic()
 {
     InitConfig();
+
+    // Get Dpi Scale
+    float dpiScale = ImGui_ImplWin32_GetDpiScaleForHwnd(Application::GetInstance()->GetWindowHandle());
+    ImGui::GetStyle().ScaleAllSizes(dpiScale);
+
+    // Load Font
+    float fontSize = 20 * dpiScale;
+
+    auto io = ImGui::GetIO();
+    _bigFont = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+
 }
 
 void UiLogic::Update()
@@ -68,12 +81,17 @@ void UiLogic::Update()
 void UiLogic::UpdateVsCodePath()
 {
     static const char* title = "VS Code Path";
-    auto titleWidth = ImGui::CalcTextSize(title);
 
-    ImGui::SetCursorPosX(0.5 * (ImGui::GetWindowWidth() - titleWidth.x));
-    ImGui::Text(title);
+    ImGui::PushFont(_bigFont);
+    {
+        auto titleWidth = ImGui::CalcTextSize(title);
 
-    ImGui::Button("Test4", {100, 0});
+        ImGui::SetCursorPosX(0.5 * (ImGui::GetWindowWidth() - titleWidth.x));
+        ImGui::Text(title);
+    }
+    ImGui::PopFont();
+
+    ImGui::Button("...", {45, 0});
     ImGui::SameLine();
 
     static char buf[128] = "click on a button to set focus";

@@ -5,6 +5,7 @@
 
 #include "ImGui/ImGuiRenderDelegate.h"
 #include "Def/DataDef.h"
+#include "imgui.h"
 
 class UiLogic : public ImGuiRenderDelegate
 {
@@ -21,6 +22,7 @@ private:
     void WriteConfig();
 
 private:
+    ImFont* _bigFont = nullptr;
     std::wstring _vsCodePathString;
     std::vector<Folder> _allFolder;
 };
