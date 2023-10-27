@@ -3,7 +3,7 @@
 #include "WinApiBaseDefine.h"
 #include <string>
 
-namespace WindowsApi::Console
+namespace WinApi::Console
 {
     enum class ConsoleColor
     {
@@ -18,13 +18,13 @@ namespace WindowsApi::Console
         Cyan
     };
 
-    HANDLE GetStdOutputHandle();
+    void SetConsoleOutputUtf8();
 
-    HANDLE GetStdInputHandle();
+    void* GetStdOutputHandle();
 
-    HANDLE GetStdErrorHandle();
+    void* GetStdInputHandle();
 
-    CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle);
+    void* GetStdErrorHandle();
 
     void SetWindowResizeEnable(bool enable);
 
@@ -32,7 +32,7 @@ namespace WindowsApi::Console
 
     void SetWindowMinEnable(bool enable);
 
-    void SetColor(HANDLE consoleHandle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
+    void SetColor(void* consoleHandle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
 
     void ClearScreen();
 }

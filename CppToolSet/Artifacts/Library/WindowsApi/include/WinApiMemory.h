@@ -2,7 +2,7 @@
 
 #include "WinApiBaseDefine.h"
 
-namespace WindowsApi::Memory
+namespace WinApi::Memory
 {
 
 }

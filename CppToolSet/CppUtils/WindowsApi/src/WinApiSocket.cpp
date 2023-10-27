@@ -10,14 +10,29 @@
 
 namespace WinApi::Socket
 {
-    CreateSocketAddrResult CreateAddrFromIpv4(const std::wstring& ipStr, int port)
+
+    static std::string gLastError {};
+
+    template<typename T>
+    inline void* TypeToHandle(T x)
+    {
+        return reinterpret_cast<void*>(x);
+    }
+
+    template<typename T>
+    inline T HandleToType(void* x)
+    {
+        return reinterpret_cast<T>(x);
+    }
+
+    std::optional<SOCKADDR_IN> CreateAddrFromIpv4(const std::string& ipStr, int port)
     {
         in_addr dst{};
-        int result = ::InetPton(AF_INET, ipStr.c_str(), &dst);
+        int result = ::InetPtonA(AF_INET, ipStr.c_str(), &dst);
         if (result != 1)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, {}, std::format(L"ip error: {}", errorCode)};
+            gLastError = std::format("ip error: {}", ::WSAGetLastError());
+            return std::nullopt;
         }
 
         SOCKADDR_IN sockAddrIn;
@@ -25,47 +40,64 @@ namespace WinApi::Socket
         sockAddrIn.sin_addr.S_un.S_addr = dst.S_un.S_addr;
         sockAddrIn.sin_port = ::htons(port);
 
-        return {true, sockAddrIn, L""};
+        return sockAddrIn;
     }
 
-    IpInfoResult GetIpv4FromAddr(SOCKADDR_IN addr)
+    std::optional<SocketAddr> GetAddrFromSocketAddr(const SOCKADDR_IN& addr)
     {
-        wchar_t pIpStr[16] {0};
-        auto pErrMsg = ::InetNtop(AF_INET, &addr.sin_addr.S_un.S_addr, pIpStr, sizeof(pIpStr));
+        char pIpStr[16] {0};
+        auto pErrMsg = ::InetNtopA(AF_INET, &addr.sin_addr.S_un.S_addr, pIpStr, sizeof(pIpStr));
 
         if (pErrMsg != nullptr)
         {
-            return { false, L"", 0, {pErrMsg} };
+            gLastError = std::string { pErrMsg };
+            return std::nullopt;
         }
 
         auto port = ::ntohs(addr.sin_port);
-        return { true, {pIpStr}, port, L""};
+        SocketAddr result { {pIpStr}, port };
+        return result;
     }
 
-    ActionResult InitWinSocketsEnvironment()
+    template<int FD, int FD_BIT>
+    bool GetEnumEventsFdBitResult(const WSANETWORKEVENTS& wsaNetEvents)
+    {
+        return (wsaNetEvents.lNetworkEvents & FD)
+               && (wsaNetEvents.iErrorCode[FD_BIT] == 0);
+    }
+
+    const std::string& LastErrorMessage()
+    {
+        return gLastError;
+    }
+
+    bool StartUp()
     {
         WORD wVersion = MAKEWORD(2, 2);
         WSADATA wsadata;
 
         auto wsaStartUpResult = ::WSAStartup(wVersion, &wsadata);
         if (0 != wsaStartUpResult)
-            return { false, std::format(L"was start up error: {}", wsaStartUpResult)};
+        {
+            gLastError = std::format("Wsa start up failed with code {}", wsaStartUpResult);
+            return false;
+        }
 
         if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wHighVersion) != 2)
         {
-            ::WSACleanup();
-            return { false, L"wsa start up: version 2.2 not exist." };
+            gLastError = std::format("Wsa version not 2.2, is {}.{}", wsadata.wHighVersion, wsadata.wVersion);
+            return false;
         }
 
-        return { true, L"" };
+        return true;
     }
 
-    void CleanWinSocketsEnvironment()
+    void CleanUp()
     {
         ::WSACleanup();
     }
 
-    CreateSocketResult CreateTcpIpv4Socket()
+    std::optional<void*> CreateIpv4TcpSocket()
     {
         int addressFamily = AF_INET;
         int socketType = SOCK_STREAM;
@@ -75,188 +107,197 @@ namespace WinApi::Socket
 
         if (socket == INVALID_SOCKET)
         {
-            return {false, socket, std::format(L"socket create failed, af = {}, type = {}. protocol = {}",
-                                               addressFamily, socketType, protocol)};
+            gLastError = std::format("socket create failed, af = {}, type = {}. protocol = {}",
+                                     addressFamily, socketType, protocol);
+            return std::nullopt;
         }
 
-        return {true, socket, L""};
+        return TypeToHandle(socket);
     }
 
-    void CloseSocket(const SOCKET* pSocket)
+    void CloseSocket(SocketHandle socket)
     {
-        if (*pSocket != INVALID_SOCKET)
-            ::closesocket(*pSocket);
+        ::closesocket(HandleToType<SOCKET>(socket));
     }
 
-    ActionResult Send(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
+    bool Send(SocketHandle socket, Byte* pDataBuffer, int bufferSize)
     {
-        auto sendResult = ::send(*pSocket, pDataBuffer, bufferSize, 0);
+        auto sendResult = ::send(HandleToType<SOCKET>(socket), pDataBuffer, bufferSize, 0);
         if (sendResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket send error: {}", errorCode)};
+            gLastError = std::format("socket send error: {}", ::WSAGetLastError());
+            return false;
         }
 
-        return {true, L""};
+        return true;
     }
 
-    ReceiveResult Receive(const SOCKET* pSocket, Byte* pDataBuffer, int bufferSize)
+    std::optional<int> Receive(SocketHandle socket, Byte* pDataBuffer, int bufferSize)
     {
         // receiveResult < 0 -> error
         // receiveResult > 0 -> receive size
-        auto receiveResult = ::recv(*pSocket, pDataBuffer, bufferSize, 0);
+        auto receiveResult = ::recv(HandleToType<SOCKET>(socket), pDataBuffer, bufferSize, 0);
         if (receiveResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, 0, std::format(L"socket receive error: {}", errorCode)};
+            gLastError = std::format("socket receive error: {}", ::WSAGetLastError());
+            return std::nullopt;
         }
 
-        return {true, receiveResult, L""};
+        return receiveResult;
     }
 
-    ActionResult Connect(const SOCKET* pSocket, std::wstring ipStr, int port)
+    bool Connect(SocketHandle socket, const std::string& ipStr, int port)
     {
         auto createAddrResult = CreateAddrFromIpv4(ipStr, port);
-        if (!createAddrResult.success)
-            return {false, createAddrResult.errorMessage};
+        if (!createAddrResult.has_value())
+            return false;
 
-        SOCKADDR_IN serverAddr = createAddrResult.result;
+        SOCKADDR_IN serverAddr = createAddrResult.value();
 
         auto connectResult = ::connect(
-                *pSocket,
-                reinterpret_cast<SOCKADDR*>(&serverAddr),
+                HandleToType<SOCKET>(socket),
+                HandleToType<SOCKADDR*>(&serverAddr),
                 sizeof(SOCKADDR));
 
         if (connectResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket connect error: {}", errorCode)};
+            gLastError = std::format("socket connect error: {}", ::WSAGetLastError());
+            return false;
         }
 
-        return {true, L""};
+        return true;
     }
 
-    ActionResult Bind(const SOCKET* pSocket, std::wstring ipStr, int port)
+    bool Bind(SocketHandle socket, const std::string& ipStr, int port)
     {
         auto createAddrResult = CreateAddrFromIpv4(ipStr, port);
-        if (!createAddrResult.success)
-            return {false, createAddrResult.errorMessage};
+        if (!createAddrResult.has_value())
+            return false;
 
-        SOCKADDR_IN serverAddr = createAddrResult.result;
+        SOCKADDR_IN serverAddr = createAddrResult.value();
 
         auto bindResult = ::bind(
-                *pSocket,
-                reinterpret_cast<SOCKADDR*>(&serverAddr),
+                HandleToType<SOCKET>(socket),
+                HandleToType<SOCKADDR*>(&serverAddr),
                 sizeof(SOCKADDR));
 
         if (bindResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket bind error: {}", errorCode)};
+            gLastError = std::format("socket bind error: {}", ::WSAGetLastError());
+            return false;
         }
 
-        return {true, L""};
+        return true;
     }
 
-    ActionResult Listen(const SOCKET* pSocket)
+    bool Listen(SocketHandle socket)
     {
-        auto bindResult = ::listen(*pSocket, SOMAXCONN);
+        auto bindResult = ::listen(HandleToType<SOCKET>(socket), SOMAXCONN);
         if (bindResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket listen error: {}", errorCode)};
+            gLastError = std::format("socket listen error: {}", ::WSAGetLastError());
+            return false;
         }
 
-        return {true, L""};
+        return true;
     }
 
-    AcceptResult Accept(const SOCKET* pSocket)
+    std::optional<SocketAddr> Accept(SocketHandle socket)
     {
         sockaddr_in addrIn {};
         int len = sizeof(sockaddr_in);
-        auto acceptResult = ::accept(*pSocket, (sockaddr*)&addrIn, &len);
+        auto acceptResult = ::accept(HandleToType<SOCKET>(socket), (sockaddr*)&addrIn, &len);
         if (acceptResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, addrIn, std::format(L"socket accept error: {}", errorCode)};
+            gLastError = std::format("socket accept error: {}", ::WSAGetLastError());
+            return std::nullopt;
         }
 
-        return {true, addrIn, L""};
+        return GetAddrFromSocketAddr(addrIn);
     }
 
-    CreateEventResult SocketCreateEvent()
+    std::optional<WsaEventHandle> CreateWsaEvent()
     {
         WSAEVENT wsaEvent = ::WSACreateEvent();
         if (wsaEvent == WSA_INVALID_EVENT)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, WSA_INVALID_EVENT, std::format(L"socket accept error: {}", errorCode)};
+            gLastError = std::format("socket create event error: {}", ::WSAGetLastError());
+            return std::nullopt;
         }
 
-        return {true, wsaEvent, L""};
+        return TypeToHandle(wsaEvent);
     }
 
-    bool EnumEventsIsAccept(const EnumEventsResult &result)
+    void CloseWsaEvent(WsaEventHandle wsaEvent)
     {
-        return GetEnumEventsFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>(result);
+        ::WSACloseEvent(wsaEvent);
     }
 
-    bool EnumEventsIsWrite(const EnumEventsResult &result)
+    bool WsaEventSelect(SocketHandle socket, WsaEventHandle wsaEvent, const EventType* events, uint32_t eventNum)
     {
-        return GetEnumEventsFdBitResult<FD_WRITE, FD_WRITE_BIT>(result);
-    }
+        long mask = 0;
+        for (int i = 0; i < eventNum; i++)
+        {
+            switch (events[i])
+            {
+                case EventType::Read:   mask |= FD_READ; break;
+                case EventType::Write:  mask |= FD_WRITE; break;
+                case EventType::Accept: mask |= FD_ACCEPT; break;
+                case EventType::Connect:mask |= FD_CONNECT; break;
+                case EventType::Close:  mask |= FD_CLOSE; break;
+            }
+        }
 
-    bool EnumEventsIsRead(const EnumEventsResult &result)
-    {
-        return GetEnumEventsFdBitResult<FD_READ, FD_READ_BIT>(result);
-    }
+        int eventSelectResult = ::WSAEventSelect(HandleToType<SOCKET>(socket),
+                HandleToType<WSAEVENT>(wsaEvent),mask);
 
-    bool EnumEventsIsClose(const EnumEventsResult &result)
-    {
-        return GetEnumEventsFdBitResult<FD_CLOSE, FD_CLOSE_BIT>(result);
-    }
-
-    void SocketCloseEvent(WSAEVENT* wsaEvent)
-    {
-        ::WSACloseEvent(*wsaEvent);
-        *wsaEvent = WSA_INVALID_EVENT;
-    }
-
-    ActionResult SocketEventSelect(const SOCKET* pSocket, WSAEVENT wsaEvent, long e)
-    {
-        int eventSelectResult = ::WSAEventSelect(*pSocket, wsaEvent, e);
         if (eventSelectResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, std::format(L"socket event select error: {}", errorCode)};
+            gLastError = std::format("socket event select error: {}", ::WSAGetLastError());
+            return false;
         }
 
-        return {true, L""};
+        return true;
     }
 
-    DWORD SocketWaitForMultipleEvents(DWORD numberOfEvents, const WSAEVENT* pEventArray, DWORD timeOut, bool waitAll, bool alertable)
+    void WsaEventReset(WsaEventHandle wsaEvent)
+    {
+        ::WSAResetEvent(HandleToType<WSAEVENT>(wsaEvent));
+    }
+
+    uint32_t WaitForMultipleWsaEvents(const WsaEventHandle* pEventArray, uint32_t numberOfEvents, uint32_t timeOut, bool waitAll, bool alertable)
     {
         if (timeOut == 0)
             timeOut = WSA_INFINITE;
 
-        return ::WSAWaitForMultipleEvents(numberOfEvents, pEventArray, waitAll, timeOut, alertable);
+        return ::WSAWaitForMultipleEvents(numberOfEvents, reinterpret_cast<const WSAEVENT*>(pEventArray),
+                                          waitAll, timeOut, alertable);
     }
 
-    void SocketResetEvent(WSAEVENT wsaEvent)
+    uint32_t GetWsaEnumEventBaseIndex()
     {
-        ::WSAResetEvent(wsaEvent);
+        return WSA_WAIT_EVENT_0;
     }
 
-    EnumEventsResult SocketEnumNetworkEvents(const SOCKET* pSocket, WSAEVENT wsaEvent)
+    std::optional<EnumEventResult> SocketEnumNetworkEvents(SocketHandle socket, WsaEventHandle wsaEvent)
     {
-        WSANETWORKEVENTS  triggeredEvents;
-        int enumResult = ::WSAEnumNetworkEvents(*pSocket, wsaEvent, &triggeredEvents);
+        WSANETWORKEVENTS triggeredEvents;
+        int enumResult = ::WSAEnumNetworkEvents(HandleToType<SOCKET>(socket),
+                HandleToType<WSAEVENT>(wsaEvent), &triggeredEvents);
+
         if (enumResult == SOCKET_ERROR)
         {
-            int errorCode = ::WSAGetLastError();
-            return {false, triggeredEvents, std::format(L"socket enum event error: {}", errorCode)};
+            gLastError = std::format("socket enum event error: {}", ::WSAGetLastError());
+            return std::nullopt;
         }
 
-        return {true, triggeredEvents, L""};
+        EnumEventResult result;
+        result.read = GetEnumEventsFdBitResult<FD_READ, FD_READ_BIT>(triggeredEvents);
+        result.write = GetEnumEventsFdBitResult<FD_WRITE, FD_WRITE_BIT>(triggeredEvents);
+        result.accept = GetEnumEventsFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>(triggeredEvents);
+        result.connect = GetEnumEventsFdBitResult<FD_CONNECT, FD_CONNECT_BIT>(triggeredEvents);
+        result.close = GetEnumEventsFdBitResult<FD_CLOSE, FD_CLOSE_BIT>(triggeredEvents);
+
+        return result;
     }
 }

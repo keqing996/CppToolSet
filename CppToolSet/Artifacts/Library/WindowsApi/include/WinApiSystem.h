@@ -3,10 +3,10 @@
 #include "WinApiBaseDefine.h"
 #include <string>
 
-namespace WindowsApi
+namespace WinApi
 {
-    std::wstring WinGetUserName();
+    std::string WinGetUserName();
 
-    bool WinCreateProcess(std::wstring cmdLine);
+    bool WinCreateProcess(std::string cmdLine);
 
 }
