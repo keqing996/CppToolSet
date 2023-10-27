@@ -17,23 +17,23 @@ HANDLE hConsoleHandle;
 int SEND_BUFFER_SIZE = 1024;
 int RECEIVE_BUFFER_SIZE = 4096;
 
-void SetConsoleColor(WindowsApi::Console::ConsoleColor c)
+void SetConsoleColor(WinApi::Console::ConsoleColor c)
 {
-    WindowsApi::Console::SetColor(hConsoleHandle, c, WindowsApi::Console::ConsoleColor::Black);
+    WinApi::Console::SetColor(hConsoleHandle, c, WinApi::Console::ConsoleColor::Black);
 }
 
 void LogError(const std::string& message)
 {
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::Red);
+    SetConsoleColor(WinApi::Console::ConsoleColor::Red);
     std::cout << message << std::endl;
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+    SetConsoleColor(WinApi::Console::ConsoleColor::None);
 }
 
 void LogError(const std::wstring& message)
 {
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::Red);
+    SetConsoleColor(WinApi::Console::ConsoleColor::Red);
     std::wcout << message << std::endl;
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+    SetConsoleColor(WinApi::Console::ConsoleColor::None);
 }
 
 int main(int argc, char* argv[])
@@ -46,47 +46,44 @@ int main(int argc, char* argv[])
     cmd.ParseCheck(argc, argv);
 
     std::string ipStr = cmd.Get<std::string>("ip");
-    std::wstring ipWStr = StringUtil::StringToWString(ipStr);
-
     int port = cmd.Get<int>("port");
 
-    hConsoleHandle = WindowsApi::Console::GetStdOutputHandle();
+    WinApi::Console::SetConsoleOutputUtf8();
+    hConsoleHandle = WinApi::Console::GetStdOutputHandle();
 
     // Init WSA
-    auto initResult = WindowsApi::Socket::InitWinSocketsEnvironment();
-    if (!initResult.success)
+    if (!WinApi::Socket::StartUp())
     {
-        LogError(initResult.errorMessage);
-        WindowsApi::Socket::CleanWinSocketsEnvironment();
+        LogError(WinApi::Socket::LastErrorMessage());
+        WinApi::Socket::CleanUp();
         std::cin.get();
         return 1;
     }
 
     // Create socket
-    auto createSocketResult = WindowsApi::Socket::CreateTcpIpv4Socket();
-    if (!createSocketResult.success)
+    auto createSocketResult = WinApi::Socket::CreateIpv4TcpSocket();
+    if (!createSocketResult.has_value())
     {
-        LogError(createSocketResult.errorMessage);
-        WindowsApi::Socket::CleanWinSocketsEnvironment();
+        LogError(WinApi::Socket::LastErrorMessage());
+        WinApi::Socket::CleanUp();
         std::cin.get();
         return 1;
     }
 
-    SOCKET socket = createSocketResult.result;
+    WinApi::Socket::SocketHandle socket = createSocketResult.value();
 
     // Connect socket
-    auto connectResult = WindowsApi::Socket::Connect(&socket, ipWStr, port);
-    if (!connectResult.success)
+    if (!WinApi::Socket::Connect(&socket, ipStr, port))
     {
-        LogError(connectResult.errorMessage);
-        WindowsApi::Socket::CleanWinSocketsEnvironment();
-        WindowsApi::Socket::CloseSocket(&socket);
+        LogError(WinApi::Socket::LastErrorMessage());
+        WinApi::Socket::CloseSocket(socket);
+        WinApi::Socket::CleanUp();
         std::cin.get();
         return 1;
     }
 
-    std::shared_ptr<char> pSendBuffer {new WindowsApi::Socket::Byte[SEND_BUFFER_SIZE]};
-    std::shared_ptr<char> pReceiveBuffer {new WindowsApi::Socket::Byte[RECEIVE_BUFFER_SIZE]};
+    std::shared_ptr<char> pSendBuffer {new WinApi::Socket::Byte[SEND_BUFFER_SIZE]};
+    std::shared_ptr<char> pReceiveBuffer {new WinApi::Socket::Byte[RECEIVE_BUFFER_SIZE]};
     std::atomic<bool> shouldStop = false;
     std::mutex threadMt;
 
@@ -100,28 +97,28 @@ int main(int argc, char* argv[])
 
             ::ZeroMemory(pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
 
-            auto receiveResult = WindowsApi::Socket::Receive(&socket, pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
-            if (!receiveResult.success)
+            auto receiveResult = WinApi::Socket::Receive(socket, pReceiveBuffer.get(), RECEIVE_BUFFER_SIZE);
+            if (!receiveResult.has_value())
             {
                 std::lock_guard lockGuard(threadMt);
-                LogError(receiveResult.errorMessage);
+                LogError(WinApi::Socket::LastErrorMessage());
                 shouldStop.store(false);
                 break;
             }
 
-            if (receiveResult.result > 0)
+            if (receiveResult.value() > 0)
             {
                 std::string_view receiveData(pReceiveBuffer.get());
                 std::lock_guard lockGuard(threadMt);
 
-                SetConsoleColor(WindowsApi::Console::ConsoleColor::Green);
+                SetConsoleColor(WinApi::Console::ConsoleColor::Green);
                 std::cout << "\nReceive:";
-                SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+                SetConsoleColor(WinApi::Console::ConsoleColor::None);
                 std::cout << receiveData << "\n" << std::endl;
 
-                SetConsoleColor(WindowsApi::Console::ConsoleColor::Cyan);
+                SetConsoleColor(WinApi::Console::ConsoleColor::Cyan);
                 std::cout << "\nSend:";
-                SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+                SetConsoleColor(WinApi::Console::ConsoleColor::None);
             }
 
             Sleep(1000);
@@ -143,11 +140,10 @@ int main(int argc, char* argv[])
         (pSendBuffer.get())[sendStr.length()] = '\r';
         (pSendBuffer.get())[sendStr.length() + 1] = '\n';
 
-        auto sendResult = WindowsApi::Socket::Send(&socket, pSendBuffer.get(), sendStr.length() + 2);
-        if (!sendResult.success)
+        if (!WinApi::Socket::Send(socket, pSendBuffer.get(), sendStr.length() + 2))
         {
             std::lock_guard lockGuard {threadMt};
-            LogError(sendResult.errorMessage);
+            LogError(WinApi::Socket::LastErrorMessage());
             shouldStop.store(false);
             break;
         }
@@ -157,8 +153,8 @@ int main(int argc, char* argv[])
 
     std::cout << "socket end" << std::endl;
 
-    WindowsApi::Socket::CloseSocket(&socket);
-    WindowsApi::Socket::CleanWinSocketsEnvironment();
+    WinApi::Socket::CloseSocket(socket);
+    WinApi::Socket::CleanUp();
 
     std::cin.get();
 	return 0;
