@@ -123,7 +123,7 @@ void ImGuiRenderer::ImGuiCreateContext(HANDLE hWnd)
 
     // Load Font
     float fontSize = 16 * dpiScale;
-    ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\msyhl.ttc", fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
     IM_ASSERT(font != nullptr);
 }
 
