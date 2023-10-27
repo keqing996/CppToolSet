@@ -1,12 +1,34 @@
 
+
 #include "../include/WinApiConsole.h"
 
+#include <Windows.h>
 
-namespace WindowsApi::Console
+
+namespace WinApi::Console
 {
     HWND GetWindowHandle()
     {
         return ::GetConsoleWindow();
+    }
+
+    CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle)
+    {
+        CONSOLE_SCREEN_BUFFER_INFOEX info;
+        info.cbSize = sizeof(info);
+
+        ::GetConsoleScreenBufferInfoEx(consoleHandle, &info);
+
+        // windows bug, https://stackoverflow.com/questions/35901572/setconsolescreenbufferinfoex-bug
+        info.srWindow.Right++;
+        info.srWindow.Bottom++;
+
+        return info;
+    }
+
+    void SetConsoleOutputUtf8()
+    {
+        ::SetConsoleOutputCP(CP_UTF8);
     }
 
     HANDLE GetStdOutputHandle()
@@ -22,20 +44,6 @@ namespace WindowsApi::Console
     HANDLE GetStdErrorHandle()
     {
         return ::GetStdHandle(STD_ERROR_HANDLE);
-    }
-
-    CONSOLE_SCREEN_BUFFER_INFOEX GetScreenBufferInfo(HANDLE consoleHandle)
-    {
-        CONSOLE_SCREEN_BUFFER_INFOEX info;
-        info.cbSize = sizeof(info);
-
-        ::GetConsoleScreenBufferInfoEx(consoleHandle, &info);
-
-        // windows bug, https://stackoverflow.com/questions/35901572/setconsolescreenbufferinfoex-bug
-        info.srWindow.Right++;
-        info.srWindow.Bottom++;
-
-        return info;
     }
 
     void SetWindowResizeEnable(bool enable)

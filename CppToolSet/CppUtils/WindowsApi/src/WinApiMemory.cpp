@@ -1,6 +1,6 @@
 #include "../include/WinApiMemory.h"
 
-namespace WindowsApi::Memory
+namespace WinApi::Memory
 {
 
 }

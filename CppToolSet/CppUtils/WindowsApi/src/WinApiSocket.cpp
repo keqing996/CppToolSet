@@ -1,13 +1,14 @@
 
 #include "../include/WinApiSocket.h"
-
+#include <Windows.h>
+#include <WinSock2.h>
 #include <iphlpapi.h>
 #include <ws2tcpip.h>
 #include <format>
 
 #pragma comment(lib, "Ws2_32.lib")
 
-namespace WindowsApi::Socket
+namespace WinApi::Socket
 {
     CreateSocketAddrResult CreateAddrFromIpv4(const std::wstring& ipStr, int port)
     {

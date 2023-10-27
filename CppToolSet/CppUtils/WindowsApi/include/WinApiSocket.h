@@ -3,9 +3,8 @@
 #include "WinApiBaseDefine.h"
 #include <string>
 #include <thread>
-#include <WinSock2.h>
 
-namespace WindowsApi::Socket
+namespace WinApi::Socket
 {
 
 #pragma region [Define]
