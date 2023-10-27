@@ -13,6 +13,21 @@ namespace WinApi::Socket
 
     static std::string gLastError {};
 
+    EnumEventResult::EnumEventResult()
+    {
+        std::fill(_events.begin(), _events.end(), false);
+    }
+
+    bool EnumEventResult::operator[](EventType t) const
+    {
+        return _events[static_cast<int>(t)];
+    }
+
+    bool& EnumEventResult::operator[](EventType t)
+    {
+        return _events[static_cast<int>(t)];
+    }
+
     template<typename T>
     inline void* TypeToHandle(T x)
     {
@@ -292,11 +307,12 @@ namespace WinApi::Socket
         }
 
         EnumEventResult result;
-        result.read = GetEnumEventsFdBitResult<FD_READ, FD_READ_BIT>(triggeredEvents);
-        result.write = GetEnumEventsFdBitResult<FD_WRITE, FD_WRITE_BIT>(triggeredEvents);
-        result.accept = GetEnumEventsFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>(triggeredEvents);
-        result.connect = GetEnumEventsFdBitResult<FD_CONNECT, FD_CONNECT_BIT>(triggeredEvents);
-        result.close = GetEnumEventsFdBitResult<FD_CLOSE, FD_CLOSE_BIT>(triggeredEvents);
+
+        result[EventType::Read] = GetEnumEventsFdBitResult<FD_READ, FD_READ_BIT>(triggeredEvents);
+        result[EventType::Write] = GetEnumEventsFdBitResult<FD_WRITE, FD_WRITE_BIT>(triggeredEvents);
+        result[EventType::Accept] = GetEnumEventsFdBitResult<FD_ACCEPT, FD_ACCEPT_BIT>(triggeredEvents);
+        result[EventType::Connect] = GetEnumEventsFdBitResult<FD_CONNECT, FD_CONNECT_BIT>(triggeredEvents);
+        result[EventType::Close] = GetEnumEventsFdBitResult<FD_CLOSE, FD_CLOSE_BIT>(triggeredEvents);
 
         return result;
     }

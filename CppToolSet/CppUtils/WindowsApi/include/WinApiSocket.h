@@ -4,6 +4,7 @@
 #include <string>
 #include <thread>
 #include <optional>
+#include <array>
 
 namespace WinApi::Socket
 {
@@ -11,13 +12,14 @@ namespace WinApi::Socket
     using SocketHandle = void*;
     using WsaEventHandle = void*;
 
-    enum class EventType
+    enum class EventType : int
     {
         Read,
         Write,
         Accept,
         Connect,
-        Close
+        Close,
+        Count
     };
 
     struct SocketAddr
@@ -26,13 +28,15 @@ namespace WinApi::Socket
         unsigned int port;
     };
 
-    struct EnumEventResult
+    class EnumEventResult
     {
-        bool read;
-        bool write;
-        bool accept;
-        bool connect;
-        bool close;
+    public:
+        EnumEventResult();
+        bool operator[] (EventType t) const;
+        bool& operator[] (EventType t);
+
+    private:
+        std::array<bool, static_cast<int>(EventType::Count)> _events;
     };
 
     const std::string& LastErrorMessage();
