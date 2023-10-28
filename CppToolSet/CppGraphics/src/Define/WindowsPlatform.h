@@ -9,3 +9,12 @@
 #endif
 
 #include <Windows.h>
+
+namespace Renderer
+{
+    struct RhiOpenGLData
+    {
+        HDC _hDC;
+        HGLRC _hRC;
+    };
+}

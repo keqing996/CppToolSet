@@ -13,18 +13,9 @@
 
 namespace Renderer
 {
-    Renderer* Renderer::Create(RendererApi api)
+    RendererApi Renderer::SetApi(RendererApi api)
     {
         _api = api;
-
-        switch (api)
-        {
-            case RendererApi::OpenGL:
-            default:
-                return new RhiOpenGL();
-        }
-
-        return nullptr;
     }
 
     RendererApi Renderer::GetApi()
@@ -76,9 +67,6 @@ namespace Renderer
         };
 
         constexpr std::array<unsigned int, 3> Indeices = { 0, 1, 2 };
-
-        glClearColor(0.2f, 0.2f, 0.2f, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         ShaderProgram* pShader = ShaderProgram::Create();
 
