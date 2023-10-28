@@ -1,22 +1,23 @@
 #include "EditorBackend.h"
 #include "Application/Application.h"
+#include "Define/RendererApi.h"
 #include "OpenGL/EditorBackendOpenGL.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 
 namespace Editor
 {
-    EditorBackend* EditorBackend::Create(Renderer::RendererApi api)
+    EditorBackend* EditorBackend::Create(RendererApi api)
     {
         switch (api)
         {
-            case Renderer::RendererApi::OpenGL:
+            case RendererApi::OpenGL:
                 return new EditorBackendOpenGL();
-            case Renderer::RendererApi::Vulkan:
+            case RendererApi::Vulkan:
                 break;
-            case Renderer::RendererApi::D3D11:
+            case RendererApi::D3D11:
                 break;
-            case Renderer::RendererApi::D3D12:
+            case RendererApi::D3D12:
                 break;
         }
 

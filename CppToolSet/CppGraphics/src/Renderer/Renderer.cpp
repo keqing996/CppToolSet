@@ -34,7 +34,7 @@ namespace Renderer
 
     void Renderer::Render()
     {
-        constexpr LPCSTR pvsCode = R"(
+        constexpr const char* pvsCode = R"(
             #version 420 core
 
             layout (location = 0) in vec3 a_Position;
@@ -51,7 +51,7 @@ namespace Renderer
             }
 )";
 
-        constexpr LPCSTR pfsCode = R"(
+        constexpr const char* pfsCode = R"(
             #version 420 core
 
             layout (location = 0) out vec4 color;

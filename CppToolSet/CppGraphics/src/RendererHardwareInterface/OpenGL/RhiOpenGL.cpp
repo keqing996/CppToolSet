@@ -1,12 +1,29 @@
 #include "RhiOpenGL.h"
 #include "Application/Application.h"
+#include "Define/WindowsPlatform.h"
 
 namespace Renderer
 {
+    struct RhiOpenGLData
+    {
+        HDC _hDC;
+        HGLRC _hRC;
+    };
+
+    RhiOpenGL::RhiOpenGL()
+    {
+        _pData = new RhiOpenGLData();
+    }
+
+    RhiOpenGL::~RhiOpenGL()
+    {
+        delete _pData;
+    }
+
     bool RhiOpenGL::SetUp()
     {
         auto pApplication = Application::GetInstance();
-        HWND hWnd = pApplication->GetWindowHandle();
+        HWND hWnd = reinterpret_cast<HWND>(pApplication->GetWindowHandle());
 
         // init openGL pixel format
         PIXELFORMATDESCRIPTOR pfd =
@@ -39,19 +56,19 @@ namespace Renderer
                         0
                 };
 
-        _hDC = ::GetDC(hWnd);
-        GLuint pixelFormat = ::ChoosePixelFormat(_hDC, &pfd);
-        auto setFormatSuccess = ::SetPixelFormat(_hDC, pixelFormat, &pfd);
+        _pData->_hDC = ::GetDC(hWnd);
+        GLuint pixelFormat = ::ChoosePixelFormat(_pData->_hDC, &pfd);
+        auto setFormatSuccess = ::SetPixelFormat(_pData->_hDC, pixelFormat, &pfd);
         if (!setFormatSuccess)
             return false;
 
         // create opengl renderer context
-        _hRC = ::wglCreateContext(_hDC);
-        auto makeContextSuccess = ::wglMakeCurrent(_hDC, _hRC);
+        _pData->_hRC = ::wglCreateContext(_pData->_hDC);
+        auto makeContextSuccess = ::wglMakeCurrent(_pData->_hDC, _pData->_hRC);
         if (!makeContextSuccess)
         {
             ::wglMakeCurrent(nullptr, nullptr);
-            ::wglDeleteContext(_hRC);
+            ::wglDeleteContext(_pData->_hRC);
             return false;
         }
 
@@ -60,7 +77,7 @@ namespace Renderer
         if (!gladSuccess)
         {
             ::wglMakeCurrent(nullptr, nullptr);
-            ::wglDeleteContext(_hRC);
+            ::wglDeleteContext(_pData->_hRC);
             return false;
         }
 
@@ -73,15 +90,15 @@ namespace Renderer
     void RhiOpenGL::Destroy()
     {
         ::wglMakeCurrent(nullptr, nullptr);
-        ::wglDeleteContext(_hRC);
+        ::wglDeleteContext(_pData->_hRC);
 
-        HWND hWnd = Application::GetInstance()->GetWindowHandle();
-        ::ReleaseDC(hWnd, _hDC);
+        HWND hWnd = reinterpret_cast<HWND>(Application::GetInstance()->GetWindowHandle());
+        ::ReleaseDC(hWnd, _pData->_hDC);
     }
 
     void RhiOpenGL::SwapBuffer()
     {
-        ::SwapBuffers(_hDC);
+        ::SwapBuffers(_pData->_hDC);
     }
 
 }
