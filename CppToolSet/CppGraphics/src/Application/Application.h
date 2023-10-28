@@ -4,7 +4,7 @@
 #include "Util/NonCopyable.h"
 #include "Input/Keyboard/Keyboard.h"
 #include "Input/Mouse/Mouse.h"
-#include "Renderer/RendererApi.h"
+#include "Define/RendererApi.h"
 #include "Renderer/Renderer.h"
 #include "Editor/Editor.h"
 
@@ -14,11 +14,11 @@ public:
     ~Application();
     void InitWindow(int windowWidth, int windowHeight, const wchar_t* name);
     void DestroyWindow();
-    void SetupRenderer(Renderer::RendererApi api);
+    void SetupRenderer(RendererApi api);
     void DestroyRenderer();
     void RunLoop();
 
-public: // Gettter
+public: // Getter
     int GetWindowHeight() const;
     int GetWindowWidth() const;
     HWND GetWindowHandle() const;

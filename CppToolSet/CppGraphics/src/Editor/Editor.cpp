@@ -5,7 +5,7 @@
 
 namespace Editor
 {
-    Editor::Editor(Renderer::RendererApi api)
+    Editor::Editor(RendererApi api)
     {
         _pBackend = EditorBackend::Create(api);
     }

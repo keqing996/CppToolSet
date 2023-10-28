@@ -8,9 +8,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(OpenGL REQUIRED)
 
-add_compile_definitions(_UNICODE UNICODE) # windows wchar
-add_compile_definitions(NOMINMAX) # cancel windows min max macro
-
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
 file (GLOB_RECURSE manifest_files manifest/*.manifest)

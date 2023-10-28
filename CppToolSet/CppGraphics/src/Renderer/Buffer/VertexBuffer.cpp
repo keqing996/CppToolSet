@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 #include "Application/Application.h"
-#include "Renderer/RendererApi.h"
+#include "Define/RendererApi.h"
 #include "RendererHardwareInterface/OpenGL/Buffer/VertexBufferOpenGL.h"
 
 namespace Renderer
