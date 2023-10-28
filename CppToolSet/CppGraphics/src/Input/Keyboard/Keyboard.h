@@ -11,8 +11,8 @@ namespace Input
     class Keyboard
     {
     public:
-        friend class Application;
-        friend class ApplicationWinImp;
+        friend class ::Application;
+        friend class ::ApplicationWinImp;
 
     public:
         class Event

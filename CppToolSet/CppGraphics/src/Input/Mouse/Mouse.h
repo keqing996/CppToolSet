@@ -11,8 +11,8 @@ namespace Input
     class Mouse: public NonCopyable
     {
     public:
-        friend class Application;
-        friend class ApplicationWinImp;
+        friend class ::Application;
+        friend class ::ApplicationWinImp;
 
     public:
         class Event
