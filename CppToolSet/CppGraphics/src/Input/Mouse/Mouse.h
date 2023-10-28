@@ -3,10 +3,17 @@
 #include <queue>
 #include "Util/NonCopyable.h"
 
+class Application;
+class ApplicationWinImp;
+
 namespace Input
 {
     class Mouse: public NonCopyable
     {
+    public:
+        friend class Application;
+        friend class ApplicationWinImp;
+
     public:
         class Event
         {
@@ -45,36 +52,24 @@ namespace Input
         };
 
     public:
-        class Accessor
-        {
-        public:
-            explicit Accessor(Mouse* pMouse);
-
-        public:
-            std::pair<int, int> GetPosition() const;
-            int GetPositionX() const;
-            int GetPositionY() const;
-            bool IsLeftPressed() const;
-            bool IsMiddlePressed() const;
-            bool IsRightPressed() const;
-            bool IsInWindow() const;
-            Mouse::Event RaiseEvent();
-            bool IsEmpty() const;
-            void Clear();
-
-        private:
-            Mouse* _pMouse;
-        };
-
-    public:
         Mouse() = default;
         ~Mouse() = default;
         Mouse(const Mouse& mouse) = delete;
         Mouse& operator= (const Mouse& mouse) = delete;
 
     public:
-        Accessor GetAccessor();
+        std::pair<int, int> GetPosition() const;
+        int GetPositionX() const;
+        int GetPositionY() const;
+        bool IsLeftPressed() const;
+        bool IsMiddlePressed() const;
+        bool IsRightPressed() const;
+        bool IsInWindow() const;
+        Mouse::Event RaiseEvent();
+        bool IsEmpty() const;
+        void Clear();
 
+    private:
         void OnMouseMove(int x, int y);
 
         void OnLeftMousePressed(int x, int y);

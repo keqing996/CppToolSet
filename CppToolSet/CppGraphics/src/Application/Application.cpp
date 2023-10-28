@@ -94,19 +94,14 @@ void* Application::GetWindowHandle() const
     return reinterpret_cast<void*>(_pImpl->GetWindowHandle());
 }
 
-ApplicationWinImp* Application::GetWindowImp()
+const Input::Keyboard& Application::GetKeyboard() const
 {
-    return _pImpl;
+    return _keyboard;
 }
 
-Input::Keyboard::Accessor Application::GetKeyboardAccessor()
+const Input::Mouse& Application::GetMouse() const
 {
-    return _keyboard.GetAccessor();
-}
-
-Input::Mouse::Accessor Application::GetMouseAccessor()
-{
-    return _mouse.GetAccessor();
+    return _mouse;
 }
 
 const Renderer::Renderer* Application::GetRenderer() const

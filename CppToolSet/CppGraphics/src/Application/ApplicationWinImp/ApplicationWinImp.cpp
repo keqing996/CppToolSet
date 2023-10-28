@@ -1,12 +1,6 @@
 #include "ApplicationWinImp.h"
 #include "Application/Application.h"
 
-LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    Application* pApp = Application::GetInstance();
-    return pApp->GetWindowImp()->HandleMsgDispatch(pApp, hWnd, msg, wParam, lParam);
-}
-
 ApplicationWinImp::ApplicationWinImp()
 {
 }
@@ -73,6 +67,12 @@ void ApplicationWinImp::DestroyWindow()
 
 #pragma region [Windows Message]
 
+LRESULT ApplicationWinImp::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    Application* pApp = Application::GetInstance();
+    return pApp->_pImpl->HandleMsgDispatch(pApp, hWnd, msg, wParam, lParam);
+}
+
 LRESULT ApplicationWinImp::HandleMsgDispatch(Application* pApp, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -137,7 +137,7 @@ LRESULT ApplicationWinImp::OnMsgSize(Application* pApp, HWND hWnd, UINT msg, WPA
 LRESULT ApplicationWinImp::OnMsgWmKeyDownAndSysKeyDown(Application* pApp, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     // if first press down, lParam & 0x40000000 = 1
-    if (!(lParam & 0x40000000) || pApp->_keyboard.GetAccessor().IsAutoRepeatEnabled())
+    if (!(lParam & 0x40000000) || pApp->_keyboard.IsAutoRepeatEnabled())
         pApp->_keyboard.OnKeyPressed(static_cast<unsigned char>(wParam));
 
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -164,7 +164,7 @@ LRESULT ApplicationWinImp::OnMsgWmMouseMove(Application* pApp, HWND hWnd, UINT m
     if (pt.x >= 0 && pt.x < pApp->_width && pt.y > 0 && pt.y < pApp->_height)
     {
         pApp->_mouse.OnMouseMove(pt.x, pt.y);
-        if (!pApp->_mouse.GetAccessor().IsInWindow())
+        if (!pApp->_mouse.IsInWindow())
         {
             SetCapture(_hWnd);
             pApp->_mouse.OnMouseEnter();

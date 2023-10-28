@@ -3,10 +3,17 @@
 #include <queue>
 #include <bitset>
 
+class Application;
+class ApplicationWinImp;
+
 namespace Input
 {
     class Keyboard
     {
+    public:
+        friend class Application;
+        friend class ApplicationWinImp;
+
     public:
         class Event
         {
@@ -25,31 +32,6 @@ namespace Input
             bool IsValid() const;
         };
 
-        class Accessor
-        {
-        public:
-            explicit Accessor(Keyboard* pKeyboard);
-
-        public:
-            bool IsKeyPressed(unsigned char keycode) const;
-            Event ReadKey();
-            bool IsKeyEmpty() const;
-            void ClearKey();
-
-            wchar_t ReadCharW();
-            bool IsCharEmpty() const;
-            void ClearChar();
-
-            void Clear();
-
-            void EnableAutoRepeat();
-            void DisableAutoRepeat();
-            bool IsAutoRepeatEnabled() const;
-
-        private:
-            Keyboard* _pKeyboard;
-        };
-
     public:
         Keyboard() = default;
         ~Keyboard() = default;
@@ -57,7 +39,22 @@ namespace Input
         Keyboard& operator= (const Keyboard&) = delete;
 
     public:
-        Accessor GetAccessor();
+        bool IsKeyPressed(unsigned char keycode) const;
+        Event ReadKey();
+        bool IsKeyEmpty() const;
+        void ClearKey();
+
+        wchar_t ReadCharW();
+        bool IsCharEmpty() const;
+        void ClearChar();
+
+        void Clear();
+
+        void EnableAutoRepeat();
+        void DisableAutoRepeat();
+        bool IsAutoRepeatEnabled() const;
+
+    private:
         void OnKeyPressed(unsigned char keycode);
         void OnKeyReleased(unsigned char keycode);
         void OnCharW(wchar_t c);

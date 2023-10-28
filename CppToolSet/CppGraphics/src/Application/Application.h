@@ -25,9 +25,8 @@ public: // Getter
     int GetWindowHeight() const;
     int GetWindowWidth() const;
     void* GetWindowHandle() const;
-    ApplicationWinImp* GetWindowImp();
-    Input::Keyboard::Accessor GetKeyboardAccessor();
-    Input::Mouse::Accessor GetMouseAccessor();
+    const Input::Keyboard& GetKeyboard() const;
+    const Input::Mouse& GetMouse() const;
     const Renderer::Renderer* GetRenderer() const;
 
 private:

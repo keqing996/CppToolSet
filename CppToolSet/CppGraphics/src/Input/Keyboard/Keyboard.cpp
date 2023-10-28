@@ -35,17 +35,12 @@ namespace Input
 
 #pragma region [Accessor]
 
-    Keyboard::Accessor::Accessor(Keyboard* pKeyboard)
+    Keyboard::Event Keyboard::ReadKey()
     {
-        _pKeyboard = pKeyboard;
-    }
-
-    Keyboard::Event Keyboard::Accessor::ReadKey()
-    {
-        if (!_pKeyboard->_keyBuffer.empty())
+        if (!_keyBuffer.empty())
         {
-            auto keyboardEvent = _pKeyboard->_keyBuffer.front();
-            _pKeyboard->_keyBuffer.pop();
+            auto keyboardEvent = _keyBuffer.front();
+            _keyBuffer.pop();
             return keyboardEvent;
         }
         else
@@ -54,76 +49,71 @@ namespace Input
         }
     }
 
-    bool Keyboard::Accessor::IsKeyPressed(unsigned char keycode) const
+    bool Keyboard::IsKeyPressed(unsigned char keycode) const
     {
-        return _pKeyboard->_keyStateSet[keycode];
+        return _keyStateSet[keycode];
     }
 
-    bool Keyboard::Accessor::IsKeyEmpty() const
+    bool Keyboard::IsKeyEmpty() const
     {
-        return _pKeyboard->_keyBuffer.empty();
+        return _keyBuffer.empty();
     }
 
-    void Keyboard::Accessor::ClearKey()
+    void Keyboard::ClearKey()
     {
-        while (!_pKeyboard->_keyBuffer.empty())
+        while (!_keyBuffer.empty())
         {
-            _pKeyboard->_keyBuffer.pop();
+            _keyBuffer.pop();
         }
     }
 
-    wchar_t Keyboard::Accessor::ReadCharW()
+    wchar_t Keyboard::ReadCharW()
     {
-        if (!_pKeyboard->_charBuffer.empty())
+        if (!_charBuffer.empty())
         {
-            wchar_t top = _pKeyboard->_charBuffer.front();
-            _pKeyboard->_charBuffer.pop();
+            wchar_t top = _charBuffer.front();
+            _charBuffer.pop();
             return top;
         }
 
         return 0;
     }
 
-    bool Keyboard::Accessor::IsCharEmpty() const
+    bool Keyboard::IsCharEmpty() const
     {
-        return _pKeyboard->_charBuffer.empty();
+        return _charBuffer.empty();
     }
 
-    void Keyboard::Accessor::ClearChar()
+    void Keyboard::ClearChar()
     {
-        while (!_pKeyboard->_charBuffer.empty())
+        while (!_charBuffer.empty())
         {
-            _pKeyboard->_charBuffer.pop();
+            _charBuffer.pop();
         }
     }
 
-    void Keyboard::Accessor::Clear()
+    void Keyboard::Clear()
     {
         ClearKey();
         ClearChar();
     }
 
-    void Keyboard::Accessor::EnableAutoRepeat()
+    void Keyboard::EnableAutoRepeat()
     {
-        _pKeyboard->_autoRepeat = true;
+        _autoRepeat = true;
     }
 
-    void Keyboard::Accessor::DisableAutoRepeat()
+    void Keyboard::DisableAutoRepeat()
     {
-        _pKeyboard->_autoRepeat = false;
+        _autoRepeat = false;
     }
 
-    bool Keyboard::Accessor::IsAutoRepeatEnabled() const
+    bool Keyboard::IsAutoRepeatEnabled() const
     {
-        return _pKeyboard->_autoRepeat;
+        return _autoRepeat;
     }
 
 #pragma endregion
-
-    Keyboard::Accessor Keyboard::GetAccessor()
-    {
-        return Keyboard::Accessor{ this };
-    }
 
     void Keyboard::OnKeyPressed(unsigned char keycode)
     {
