@@ -1,62 +1,44 @@
 #pragma once
 
-#include <Windows.h>
 #include "Util/NonCopyable.h"
 #include "Input/Keyboard/Keyboard.h"
 #include "Input/Mouse/Mouse.h"
-#include "Renderer/RendererApi.h"
+#include "Define/RendererApi.h"
 #include "Renderer/Renderer.h"
 #include "Editor/Editor.h"
+#include "ApplicationWinImp/ApplicationWinImp.h"
 
 class Application : public NonCopyable
 {
 public:
+    friend class ApplicationWinImp;
+
+public:
     ~Application();
-    void InitWindow(int windowWidth, int windowHeight, const wchar_t* name);
+    void InitWindow(int windowWidth, int windowHeight);
     void DestroyWindow();
-    void SetupRenderer(Renderer::RendererApi api);
+    void SetupRenderer(RendererApi api);
     void DestroyRenderer();
     void RunLoop();
 
-public: // Gettter
+public: // Getter
     int GetWindowHeight() const;
     int GetWindowWidth() const;
-    HWND GetWindowHandle() const;
-    Input::Keyboard::Accessor GetKeyboardAccessor();
-    Input::Mouse::Accessor GetMouseAccessor();
+    void* GetWindowHandle() const;
+    const Input::Keyboard& GetKeyboard() const;
+    const Input::Mouse& GetMouse() const;
     const Renderer::Renderer* GetRenderer() const;
 
 private:
-    Application() = default;
+    Application();
 
 private:
-    static LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT HandleMsgDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    /* System */
-    LRESULT OnMsgWmClose(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmKillFocus(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgSize(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    /* Input - Keyboard */
-    LRESULT OnMsgWmKeyDownAndSysKeyDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmKeyUpAndSysKeyUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmChar(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    /* Input - Mouse */
-    LRESULT OnMsgWmMouseMove(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmLButtonDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmLButtonUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmMButtonDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmMButtonUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmRButtonDown(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmRButtonUp(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT OnMsgWmMouseWheel(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-private:
+    /* imp */
+    ApplicationWinImp* _pImpl = nullptr;
 
     /* Basic */
     int _height = 0;
     int _width = 0;
-    HINSTANCE _hInst = ::GetModuleHandle(nullptr);
-    HWND _hWnd = nullptr;
 
     /* Input */
     Input::Keyboard _keyboard = Input::Keyboard{};
@@ -70,7 +52,7 @@ private:
 
 private:
     static Application* _instance;
-    static constexpr LPCWSTR WND_CLASS_NAME = L"Graphic Render";
+    static constexpr const char* WINDOW_NAME = "Graphic Render";
 
 public:
     static void CreateInstance();

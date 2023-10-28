@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Backend/EditorBackend.h"
-#include "Renderer/RendererApi.h"
+#include "Define/RendererApi.h"
 #include "Util/NonCopyable.h"
 
 namespace Editor
@@ -9,7 +9,7 @@ namespace Editor
     class Editor
     {
     public:
-        explicit Editor(Renderer::RendererApi api);
+        explicit Editor(RendererApi api);
         ~Editor() = default;
 
     public:

@@ -1,6 +1,6 @@
 #include "IndexBuffer.h"
 #include "Application/Application.h"
-#include "Renderer/RendererApi.h"
+#include "Define/RendererApi.h"
 #include "RendererHardwareInterface/OpenGL/Buffer/IndexBufferOpenGL.h"
 
 namespace Renderer

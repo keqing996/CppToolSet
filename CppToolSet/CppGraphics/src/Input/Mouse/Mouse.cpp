@@ -47,52 +47,47 @@ namespace Input
 
 #pragma region [Accessor]
 
-    Mouse::Accessor::Accessor(Mouse* pMouse)
+    std::pair<int, int> Mouse::GetPosition() const
     {
-        _pMouse = pMouse;
+        return {_x, _y};
     }
 
-    std::pair<int, int> Mouse::Accessor::GetPosition() const
+    int Mouse::GetPositionX() const
     {
-        return {_pMouse->_x, _pMouse->_y};
+        return _x;
     }
 
-    int Mouse::Accessor::GetPositionX() const
+    int Mouse::GetPositionY() const
     {
-        return _pMouse->_x;
+        return _y;
     }
 
-    int Mouse::Accessor::GetPositionY() const
+    bool Mouse::IsLeftPressed() const
     {
-        return _pMouse->_y;
+        return _leftPressed;
     }
 
-    bool Mouse::Accessor::IsLeftPressed() const
+    bool Mouse::IsMiddlePressed() const
     {
-        return _pMouse->_leftPressed;
+        return _middlePressed;
     }
 
-    bool Mouse::Accessor::IsMiddlePressed() const
+    bool Mouse::IsRightPressed() const
     {
-        return _pMouse->_middlePressed;
+        return _rightPressed;
     }
 
-    bool Mouse::Accessor::IsRightPressed() const
+    bool Mouse::IsInWindow() const
     {
-        return _pMouse->_rightPressed;
+        return _isMouseInWindow;
     }
 
-    bool Mouse::Accessor::IsInWindow() const
+    Mouse::Event Mouse::RaiseEvent()
     {
-        return _pMouse->_isMouseInWindow;
-    }
-
-    Mouse::Event Mouse::Accessor::RaiseEvent()
-    {
-        if (!_pMouse->_buffer.empty())
+        if (!_buffer.empty())
         {
-            auto evt = _pMouse->_buffer.front();
-            _pMouse->_buffer.pop();
+            auto evt = _buffer.front();
+            _buffer.pop();
             return evt;
         }
         else
@@ -101,23 +96,18 @@ namespace Input
         }
     }
 
-    bool Mouse::Accessor::IsEmpty() const
+    bool Mouse::IsEmpty() const
     {
-        return _pMouse->_buffer.empty();
+        return _buffer.empty();
     }
 
-    void Mouse::Accessor::Clear()
+    void Mouse::Clear()
     {
-        while (!_pMouse->_buffer.empty())
-            _pMouse->_buffer.pop();
+        while (!_buffer.empty())
+            _buffer.pop();
     }
 
 #pragma endregion
-
-    Mouse::Accessor Mouse::GetAccessor()
-    {
-        return Mouse::Accessor{ this };
-    }
 
     void Mouse::OnMouseMove(int x, int y)
     {

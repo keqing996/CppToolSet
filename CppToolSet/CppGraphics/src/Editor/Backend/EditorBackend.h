@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer/RendererApi.h"
+#include "Define/RendererApi.h"
 
 namespace Editor
 {
@@ -16,6 +16,6 @@ namespace Editor
         virtual void AfterUpdate() = 0;
 
     public:
-        static EditorBackend* Create(Renderer::RendererApi api);
+        static EditorBackend* Create(RendererApi api);
     };
 }

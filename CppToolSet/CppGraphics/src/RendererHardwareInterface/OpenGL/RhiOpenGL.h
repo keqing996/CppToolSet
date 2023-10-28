@@ -1,16 +1,17 @@
 #pragma once
 
-#include <Windows.h>
-
 #include "RendererHardwareInterface/OpenGL/GLAD/Glad.h"
 #include "Renderer/Renderer.h"
 
 namespace Renderer
 {
+    struct RhiOpenGLData;
+
     class RhiOpenGL : public Renderer
     {
     public:
-        ~RhiOpenGL() override = default;
+        RhiOpenGL();
+        ~RhiOpenGL() override;
 
     public:
         bool SetUp() override;
@@ -18,8 +19,8 @@ namespace Renderer
         void SwapBuffer() override;
 
     private:
-        HDC _hDC;
-        HGLRC _hRC;
+        RhiOpenGLData* _pData;
+
     };
 }
 
