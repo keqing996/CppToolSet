@@ -74,7 +74,7 @@ void Application::RunLoop()
 
             _pRenderCommand->ClearColor(Vec4{0.2f, 0.2f, 0.2f, 1.0f});
 
-            _pRender->Render();
+            _pRender->Render(_pRenderCommand);
             _pEditor->Update();
 
             _pRenderCommand->SwapBuffer();

@@ -101,6 +101,17 @@ namespace Renderer
         ::SwapBuffers(_pData->_hDC);
     }
 
+    void RhiOpenGL::Submit(VertexArray* pVertArray, ShaderProgram* pShader)
+    {
+        pVertArray->Bind();
+        pShader->Bind();
+        ::glDrawElements(
+                GL_TRIANGLES,
+                pVertArray->GetCurrentIndexBuffer()->GetIndicesCount(),
+                GL_UNSIGNED_INT,
+                nullptr);
+    }
+
     const RhiOpenGLData* RhiOpenGL::GetData() const
     {
         return _pData;

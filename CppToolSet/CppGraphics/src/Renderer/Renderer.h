@@ -2,17 +2,18 @@
 
 #include "Util/NonCopyable.h"
 #include "Define/RendererApi.h"
+#include "RendererCommand.h"
 
 namespace Renderer
 {
     class Renderer: public NonCopyable
     {
     public: // static
-        static RendererApi SetApi(RendererApi api);
+        static void SetApi(RendererApi api);
         static RendererApi GetApi();
 
     public:
-        void Render();
+        void Render(RendererCommand* pCommand);
 
     private:
         inline static RendererApi _api;
