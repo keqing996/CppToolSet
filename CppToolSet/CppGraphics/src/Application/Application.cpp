@@ -1,4 +1,4 @@
-
+#include "Define/Math.h"
 #include "Application.h"
 #include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
 
@@ -29,8 +29,12 @@ void Application::DestroyWindow()
 
 void Application::SetupRenderer(RendererApi api)
 {
-    _pRender = Renderer::Renderer::Create(api);
-    _pRender->SetUp();
+    Renderer::Renderer::SetApi(api);
+
+    _pRender = new Renderer::Renderer();
+
+    _pRenderCommand = Renderer::RendererCommand::Create(api);
+    _pRenderCommand->SetUp();
 
     _pEditor = new Editor::Editor(api);
     _pEditor->SetUp();
@@ -44,7 +48,9 @@ void Application::DestroyRenderer()
     delete _pEditor;
 
     if (_pRender != nullptr)
-        _pRender->Destroy();
+        _pRenderCommand->Destroy();
+
+    delete _pRenderCommand;
 
     delete _pRender;
 }
@@ -66,10 +72,12 @@ void Application::RunLoop()
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
 
-            _pRender->Render();
+            _pRenderCommand->ClearColor(Vec4{0.2f, 0.2f, 0.2f, 1.0f});
+
+            _pRender->Render(_pRenderCommand);
             _pEditor->Update();
 
-            _pRender->SwapBuffer();
+            _pRenderCommand->SwapBuffer();
         }
 
         if (shouldStop)
@@ -112,8 +120,6 @@ const Renderer::Renderer* Application::GetRenderer() const
 #pragma endregion
 
 #pragma region [Static Instance]
-
-Application* Application::_instance = nullptr;
 
 void Application::CreateInstance()
 {

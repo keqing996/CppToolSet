@@ -5,6 +5,7 @@
 #include "Input/Mouse/Mouse.h"
 #include "Define/RendererApi.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/RendererCommand.h"
 #include "Editor/Editor.h"
 #include "ApplicationWinImp/ApplicationWinImp.h"
 
@@ -44,6 +45,9 @@ private:
     Input::Keyboard _keyboard = Input::Keyboard{};
     Input::Mouse _mouse = Input::Mouse{};
 
+    /* Rhi */
+    Renderer::RendererCommand* _pRenderCommand = nullptr;
+
     /* Render */
     Renderer::Renderer* _pRender = nullptr;
 
@@ -51,8 +55,8 @@ private:
     Editor::Editor* _pEditor = nullptr;
 
 private:
-    static Application* _instance;
-    static constexpr const char* WINDOW_NAME = "Graphic Render";
+    inline static Application* _instance = nullptr;
+    inline static constexpr const char* WINDOW_NAME = "Graphic Render";
 
 public:
     static void CreateInstance();
