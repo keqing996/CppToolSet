@@ -1,16 +1,12 @@
-// Dear ImGui: standalone example application for DirectX 11
 
-// Learn about Dear ImGui:
-// - FAQ                  https://dearimgui.com/faq
-// - Getting Started      https://dearimgui.com/getting-started
-// - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
-// - Introduction, links and more at the top of imgui.cpp
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <tchar.h>
+
+#include "Window/WinWindow.h"
 
 // Data
 static ID3D11Device*            g_pd3dDevice = nullptr;
@@ -24,28 +20,21 @@ bool CreateDeviceD3D(HWND hWnd);
 void CleanupDeviceD3D();
 void CreateRenderTarget();
 void CleanupRenderTarget();
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // Main code
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCmdShow)
 {
-    // Create application window
-    //ImGui_ImplWin32_EnableDpiAwareness();
-    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
-    ::RegisterClassExW(&wc);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, nullptr, nullptr, wc.hInstance, nullptr);
+    UI::Win32Window mainWin("MainWindow", "UiWindow", 1200, 800);
 
     // Initialize Direct3D
-    if (!CreateDeviceD3D(hwnd))
+    if (!CreateDeviceD3D(mainWin.GetWindowHandle()))
     {
         CleanupDeviceD3D();
-        ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
         return 1;
     }
 
     // Show the window
-    ::ShowWindow(hwnd, SW_SHOWDEFAULT);
-    ::UpdateWindow(hwnd);
+    mainWin.Show();
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -76,7 +65,7 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCm
     }
 
     // Setup Platform/Renderer backends
-    ImGui_ImplWin32_Init(hwnd);
+    ImGui_ImplWin32_Init(mainWin.GetWindowHandle());
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
     // Load Fonts
@@ -101,20 +90,12 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCm
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
-    bool done = false;
-    while (!done)
+    while (true)
     {
-        // Poll and handle messages (inputs, window resize, etc.)
-        // See the WndProc() function below for our to dispatch events to the Win32 backend.
-        MSG msg;
-        while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT)
-                done = true;
-        }
-        if (done)
+        bool isQuit = false;
+        mainWin.Update(&isQuit);
+
+        if (isQuit)
             break;
 
         // Handle window resize (we don't resize directly in the WM_SIZE handler)
@@ -192,8 +173,6 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCm
     ImGui::DestroyContext();
 
     CleanupDeviceD3D();
-    ::DestroyWindow(hwnd);
-    ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
     return 0;
 }
