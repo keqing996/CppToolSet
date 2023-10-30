@@ -8,33 +8,8 @@
 #include "Shader/ShaderProgram.h"
 #include "Shader/VertexShader.h"
 #include "Shader/PixelShader.h"
-#include "RendererHardwareInterface/OpenGL/RhiOpenGL.h"
-#include "RendererHardwareInterface/OpenGL/Shader/ShaderDataTypeOpenGL.h"
 
-namespace Renderer
-{
-    Renderer* Renderer::Create(RendererApi api)
-    {
-        _api = api;
-
-        switch (api)
-        {
-            case RendererApi::OpenGL:
-            default:
-                return new RhiOpenGL();
-        }
-
-        return nullptr;
-    }
-
-    RendererApi Renderer::GetApi()
-    {
-        return _api;
-    }
-
-    void Renderer::Render()
-    {
-        constexpr const char* pvsCode = R"(
+static constexpr const char* pvsCode = R"(
             #version 420 core
 
             layout (location = 0) in vec3 a_Position;
@@ -51,7 +26,7 @@ namespace Renderer
             }
 )";
 
-        constexpr const char* pfsCode = R"(
+static constexpr const char* pfsCode = R"(
             #version 420 core
 
             layout (location = 0) out vec4 color;
@@ -66,20 +41,31 @@ namespace Renderer
             }
 )";
 
-        constexpr std::array<float, 3 * (3 + 4)> Vert =  {
-                // left
-                -0.5f, -0.5f, 0.0f, 0.2f, 0.5f, 1.7f, 1.0f,
-                // right
-                0.5f, -0.5f, 0.0f, 0.1f, 0.6f, 0.3f, 1.0f,
-                // top
-                0.0f, 0.5f, 0.0f, 0.8f, 0.2f, 0.1f, 1.0f
-        };
+static constexpr std::array<float, 3 * (3 + 4)> Vert =  {
+        // left
+        -0.5f, -0.5f, 0.0f, 0.2f, 0.5f, 1.7f, 1.0f,
+        // right
+        0.5f, -0.5f, 0.0f, 0.1f, 0.6f, 0.3f, 1.0f,
+        // top
+        0.0f, 0.5f, 0.0f, 0.8f, 0.2f, 0.1f, 1.0f
+};
 
-        constexpr std::array<unsigned int, 3> Indeices = { 0, 1, 2 };
+static constexpr std::array<unsigned int, 3> Indeices = { 0, 1, 2 };
 
-        glClearColor(0.2f, 0.2f, 0.2f, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+namespace Renderer
+{
+    void Renderer::SetApi(RendererApi api)
+    {
+        _api = api;
+    }
 
+    RendererApi Renderer::GetApi()
+    {
+        return _api;
+    }
+
+    void Renderer::Render(RendererCommand* pCommand)
+    {
         ShaderProgram* pShader = ShaderProgram::Create();
 
         {
@@ -117,15 +103,7 @@ namespace Renderer
         pVertexArray->AddVertexBuffer(pVertexBuffer);
         pVertexArray->SetIndexBuffer(pIndexBuffer);
 
-        // ------------- draw
-        pVertexArray->Bind();
-        pShader->Bind();
-        glDrawElements(
-                GL_TRIANGLES,
-                pVertexArray->GetCurrentIndexBuffer()->GetIndicesCount(),
-                GL_UNSIGNED_INT, 
-                nullptr);
-        // ------------- draw
+        pCommand->Submit(pVertexArray, pShader);
 
         delete pVertexArray;
         delete pIndexBuffer;

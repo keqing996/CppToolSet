@@ -4,11 +4,11 @@
 
 namespace Renderer
 {
-    struct RhiOpenGLData
+    void RhiOpenGL::ClearColor(Eigen::Vector4f color)
     {
-        HDC _hDC;
-        HGLRC _hRC;
-    };
+        glClearColor(color.x(), color.y(), color.z(), color.w());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
 
     RhiOpenGL::RhiOpenGL()
     {
@@ -99,6 +99,22 @@ namespace Renderer
     void RhiOpenGL::SwapBuffer()
     {
         ::SwapBuffers(_pData->_hDC);
+    }
+
+    void RhiOpenGL::Submit(VertexArray* pVertArray, ShaderProgram* pShader)
+    {
+        pVertArray->Bind();
+        pShader->Bind();
+        ::glDrawElements(
+                GL_TRIANGLES,
+                pVertArray->GetCurrentIndexBuffer()->GetIndicesCount(),
+                GL_UNSIGNED_INT,
+                nullptr);
+    }
+
+    const RhiOpenGLData* RhiOpenGL::GetData() const
+    {
+        return _pData;
     }
 
 }
