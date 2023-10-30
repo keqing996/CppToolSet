@@ -24,6 +24,8 @@ namespace UI
 
     public:
         HWND GetWindowHandle() const;
+        ID3D11Device* GetD3dDevice() const;
+        ID3D11DeviceContext* GetD3dDeviceContext() const;
 
     protected: /* message */
         static LRESULT WINAPI WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -58,10 +60,10 @@ namespace UI
         std::vector<IWinMsgReceiver*> _winMsgReceiverVec;
 
         /* D3D */
-        ID3D11Device* pD3dDevice = nullptr;
-        ID3D11DeviceContext* pD3dDeviceContext = nullptr;
-        IDXGISwapChain* pSwapChain = nullptr;
-        ID3D11RenderTargetView* pMainRenderTarget = nullptr;
+        ID3D11Device* _pD3dDevice = nullptr;
+        ID3D11DeviceContext* _pD3dDeviceContext = nullptr;
+        IDXGISwapChain* _pSwapChain = nullptr;
+        ID3D11RenderTargetView* _pMainRenderTarget = nullptr;
     };
 }
 

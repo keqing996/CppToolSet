@@ -52,18 +52,28 @@ namespace UI
     void Win32Window::ClearColor()
     {
         const float clear_color_with_alpha[4] = { 0.45f, 0.55f, 0.60f, 1.00f };
-        pD3dDeviceContext->OMSetRenderTargets(1, &pMainRenderTarget, nullptr);
-        pD3dDeviceContext->ClearRenderTargetView(pMainRenderTarget, clear_color_with_alpha);
+        _pD3dDeviceContext->OMSetRenderTargets(1, &_pMainRenderTarget, nullptr);
+        _pD3dDeviceContext->ClearRenderTargetView(_pMainRenderTarget, clear_color_with_alpha);
     }
 
     void Win32Window::SwapChain()
     {
-        pSwapChain->Present(1, 0);
+        _pSwapChain->Present(1, 0);
     }
 
     HWND Win32Window::GetWindowHandle() const
     {
         return _hWnd;
+    }
+
+    ID3D11Device* Win32Window::GetD3dDevice() const
+    {
+        return _pD3dDevice;
+    }
+
+    ID3D11DeviceContext* Win32Window::GetD3dDeviceContext() const
+    {
+        return _pD3dDeviceContext;
     }
 
     LRESULT Win32Window::WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -138,7 +148,7 @@ namespace UI
             _height = newHeight;
 
             D3dDestroyRenderTarget();
-            pSwapChain->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0);
+            _pSwapChain->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0);
             D3dCreateRenderTarget();
         }
 
@@ -228,9 +238,9 @@ namespace UI
         //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
         D3D_FEATURE_LEVEL featureLevel;
         const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
-        HRESULT res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &pSwapChain, &pD3dDevice, &featureLevel, &pD3dDeviceContext);
+        HRESULT res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pD3dDevice, &featureLevel, &_pD3dDeviceContext);
         if (res == DXGI_ERROR_UNSUPPORTED) // Try high-performance WARP software driver if hardware is not available.
-            res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &pSwapChain, &pD3dDevice, &featureLevel, &pD3dDeviceContext);
+            res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pD3dDevice, &featureLevel, &_pD3dDeviceContext);
         if (res != S_OK)
             return false;
 
@@ -241,8 +251,8 @@ namespace UI
     void Win32Window::D3dCreateRenderTarget()
     {
         ID3D11Texture2D* pBackBuffer;
-        pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-        pD3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pMainRenderTarget);
+        _pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+        _pD3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &_pMainRenderTarget);
         pBackBuffer->Release();
     }
 
@@ -250,31 +260,31 @@ namespace UI
     {
         D3dDestroyRenderTarget();
 
-        if (pSwapChain)
+        if (_pSwapChain)
         {
-            pSwapChain->Release();
-            pSwapChain = nullptr;
+            _pSwapChain->Release();
+            _pSwapChain = nullptr;
         }
 
-        if (pD3dDeviceContext)
+        if (_pD3dDeviceContext)
         {
-            pD3dDeviceContext->Release();
-            pD3dDeviceContext = nullptr;
+            _pD3dDeviceContext->Release();
+            _pD3dDeviceContext = nullptr;
         }
 
-        if (pD3dDevice)
+        if (_pD3dDevice)
         {
-            pD3dDevice->Release();
-            pD3dDevice = nullptr;
+            _pD3dDevice->Release();
+            _pD3dDevice = nullptr;
         }
     }
 
     void Win32Window::D3dDestroyRenderTarget()
     {
-        if (pMainRenderTarget)
+        if (_pMainRenderTarget)
         {
-            pMainRenderTarget->Release();
-            pMainRenderTarget = nullptr;
+            _pMainRenderTarget->Release();
+            _pMainRenderTarget = nullptr;
         }
     }
 
