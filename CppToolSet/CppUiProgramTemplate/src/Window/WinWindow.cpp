@@ -23,7 +23,7 @@ namespace UI
         Win32RegisterWindow();
         Win32CreateWindow();
 
-        if (D3dCreateDevice())
+        if (!D3dCreateDevice())
             return false;
 
         return true;
@@ -99,7 +99,7 @@ namespace UI
     void Win32Window::AddWinMsgProc(IWinMsgReceiver* pWinMsgReceiver)
     {
         auto itr = std::find(_winMsgReceiverVec.begin(), _winMsgReceiverVec.end(), pWinMsgReceiver);
-        if (itr != _winMsgReceiverVec.end())
+        if (itr == _winMsgReceiverVec.end())
             _winMsgReceiverVec.push_back(pWinMsgReceiver);
     }
 
