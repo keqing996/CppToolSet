@@ -91,7 +91,7 @@ namespace UI
         }
 
         if (pThis != nullptr)
-            pThis->OnWinMsg(hWnd, msg, wParam, lParam);
+            return pThis->OnWinMsg(hWnd, msg, wParam, lParam);
         else
             return ::DefWindowProc(hWnd, msg, wParam, lParam);
     }

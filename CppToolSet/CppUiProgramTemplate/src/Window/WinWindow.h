@@ -21,6 +21,8 @@ namespace UI
         void UpdateWinMessage(bool* isQuit);
         void ClearColor();
         void SwapChain();
+        void AddWinMsgProc(IWinMsgReceiver* pWinMsgReceiver);
+        void RemoveWinMsgProc(IWinMsgReceiver* pWinMsgReceiver);
 
     public:
         HWND GetWindowHandle() const;
@@ -29,9 +31,6 @@ namespace UI
 
     protected: /* message */
         static LRESULT WINAPI WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-        void AddWinMsgProc(IWinMsgReceiver* pWinMsgReceiver);
-        void RemoveWinMsgProc(IWinMsgReceiver* pWinMsgReceiver);
 
         virtual LRESULT OnWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
         LRESULT OnWinMsgSize(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
