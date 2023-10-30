@@ -5,44 +5,28 @@ namespace UI
 {
     Win32Window::Win32Window(const char* windowRegisterName, const char* windowTitle, int width, int height)
         : _windowRegisterName(windowRegisterName)
+        , _windowTitle(windowTitle)
         , _width(width)
         , _height(height)
     {
-        WNDCLASSEX wc = {
-                sizeof(wc),
-                CS_CLASSDC,
-                WndProcDispatch,
-                0L,
-                0L,
-                GetModuleHandle(nullptr),
-                nullptr,
-                nullptr,
-                nullptr,
-                nullptr,
-                windowRegisterName,
-                nullptr
-        };
-
-        ::RegisterClassEx(&wc);
-
-        _hWnd = ::CreateWindow(
-                wc.lpszClassName,
-                windowTitle,
-                WS_OVERLAPPEDWINDOW,
-                100,
-                100,
-                width,
-                height,
-                nullptr,
-                nullptr,
-                wc.hInstance,
-                this);
     }
 
     Win32Window::~Win32Window()
     {
-        ::DestroyWindow(_hWnd);
-        ::UnregisterClass(_windowRegisterName, GetModuleHandle(nullptr));
+        D3dDestroyDevice();
+        Win32DestroyWindow();
+        Win32UnRegisterWindow();
+    }
+
+    bool Win32Window::SetUp()
+    {
+        Win32RegisterWindow();
+        Win32CreateWindow();
+
+        if (D3dCreateDevice())
+            return false;
+
+        return true;
     }
 
     void Win32Window::Show()
@@ -51,7 +35,7 @@ namespace UI
         ::UpdateWindow(_hWnd);
     }
 
-    void Update(bool* isQuit)
+    void Win32Window::UpdateWinMessage(bool* isQuit)
     {
         MSG msg;
         while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
@@ -63,6 +47,18 @@ namespace UI
             if (*isQuit)
                 break;
         }
+    }
+
+    void Win32Window::ClearColor()
+    {
+        const float clear_color_with_alpha[4] = { 0.45f, 0.55f, 0.60f, 1.00f };
+        pD3dDeviceContext->OMSetRenderTargets(1, &pMainRenderTarget, nullptr);
+        pD3dDeviceContext->ClearRenderTargetView(pMainRenderTarget, clear_color_with_alpha);
+    }
+
+    void Win32Window::SwapChain()
+    {
+        pSwapChain->Present(1, 0);
     }
 
     HWND Win32Window::GetWindowHandle() const
@@ -133,8 +129,18 @@ namespace UI
         if (wParam == SIZE_MINIMIZED)
             return FALSE;
 
-        _width = (int)LOWORD(lParam);
-        _height = (int)HIWORD(lParam);
+        int newWidth = (int)LOWORD(lParam);
+        int newHeight = (int)HIWORD(lParam);
+
+        if (_width != newWidth || _height != newHeight)
+        {
+            _width = newWidth;
+            _height = newHeight;
+
+            D3dDestroyRenderTarget();
+            pSwapChain->ResizeBuffers(0, _width, _height, DXGI_FORMAT_UNKNOWN, 0);
+            D3dCreateRenderTarget();
+        }
 
         return ::DefWindowProcW(hWnd, msg, wParam, lParam);
     }
@@ -152,4 +158,125 @@ namespace UI
         ::PostQuitMessage(0);
         return FALSE;
     }
+
+    void Win32Window::Win32RegisterWindow()
+    {
+        WNDCLASSEX wc = {
+                sizeof(wc),
+                CS_CLASSDC,
+                WndProcDispatch,
+                0L,
+                0L,
+                GetModuleHandle(nullptr),
+                nullptr,
+                nullptr,
+                nullptr,
+                nullptr,
+                _windowRegisterName,
+                nullptr
+        };
+
+        ::RegisterClassEx(&wc);
+    }
+
+    void Win32Window::Win32CreateWindow()
+    {
+        _hWnd = ::CreateWindow(
+                _windowRegisterName,
+                _windowTitle,
+                WS_OVERLAPPEDWINDOW,
+                100,
+                100,
+                _width,
+                _height,
+                nullptr,
+                nullptr,
+                GetModuleHandle(nullptr),
+                this);
+    }
+
+    void Win32Window::Win32DestroyWindow()
+    {
+        ::DestroyWindow(_hWnd);
+    }
+
+    void Win32Window::Win32UnRegisterWindow()
+    {
+        ::UnregisterClass(_windowRegisterName, GetModuleHandle(nullptr));
+    }
+
+    bool Win32Window::D3dCreateDevice()
+    {
+        // Setup swap chain
+        DXGI_SWAP_CHAIN_DESC sd;
+        ZeroMemory(&sd, sizeof(sd));
+        sd.BufferCount = 2;
+        sd.BufferDesc.Width = 0;
+        sd.BufferDesc.Height = 0;
+        sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        sd.BufferDesc.RefreshRate.Numerator = 60;
+        sd.BufferDesc.RefreshRate.Denominator = 1;
+        sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+        sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        sd.OutputWindow = _hWnd;
+        sd.SampleDesc.Count = 1;
+        sd.SampleDesc.Quality = 0;
+        sd.Windowed = TRUE;
+        sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+        UINT createDeviceFlags = 0;
+        //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+        D3D_FEATURE_LEVEL featureLevel;
+        const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
+        HRESULT res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &pSwapChain, &pD3dDevice, &featureLevel, &pD3dDeviceContext);
+        if (res == DXGI_ERROR_UNSUPPORTED) // Try high-performance WARP software driver if hardware is not available.
+            res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &pSwapChain, &pD3dDevice, &featureLevel, &pD3dDeviceContext);
+        if (res != S_OK)
+            return false;
+
+        D3dCreateRenderTarget();
+        return true;
+    }
+
+    void Win32Window::D3dCreateRenderTarget()
+    {
+        ID3D11Texture2D* pBackBuffer;
+        pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+        pD3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pMainRenderTarget);
+        pBackBuffer->Release();
+    }
+
+    void Win32Window::D3dDestroyDevice()
+    {
+        D3dDestroyRenderTarget();
+
+        if (pSwapChain)
+        {
+            pSwapChain->Release();
+            pSwapChain = nullptr;
+        }
+
+        if (pD3dDeviceContext)
+        {
+            pD3dDeviceContext->Release();
+            pD3dDeviceContext = nullptr;
+        }
+
+        if (pD3dDevice)
+        {
+            pD3dDevice->Release();
+            pD3dDevice = nullptr;
+        }
+    }
+
+    void Win32Window::D3dDestroyRenderTarget()
+    {
+        if (pMainRenderTarget)
+        {
+            pMainRenderTarget->Release();
+            pMainRenderTarget = nullptr;
+        }
+    }
+
+
 }
