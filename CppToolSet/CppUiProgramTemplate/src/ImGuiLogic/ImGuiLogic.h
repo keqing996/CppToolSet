@@ -16,6 +16,6 @@ namespace UI
         virtual void Update();
         void EndFrame();
 
-        void OnWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
+        void OnWinMsg(int64 hWnd, uint32 msg, int64 wParam, int64 lParam) override;
     };
 }

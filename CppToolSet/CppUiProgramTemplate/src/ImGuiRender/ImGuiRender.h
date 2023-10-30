@@ -1,7 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
-#include "Define/WindowsPlatformMinDef.h"
+#include "Define/WindowsPlatform.h"
 
 namespace UI
 {

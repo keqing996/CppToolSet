@@ -117,7 +117,11 @@ namespace UI
             for (auto pWinMsgReceiver : _winMsgReceiverVec)
             {
                 if (pWinMsgReceiver != nullptr)
-                    pWinMsgReceiver->OnWinMsg(hWnd, msg, wParam, lParam);
+                    pWinMsgReceiver->OnWinMsg(
+                            reinterpret_cast<int64>(hWnd),
+                            static_cast<uint32>(msg),
+                            static_cast<int64>(wParam),
+                            static_cast<int64>(lParam));
             }
         }
 

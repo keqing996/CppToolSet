@@ -4,7 +4,7 @@
 #include <vector>
 #include <functional>
 #include <d3d11.h>
-#include "Define/WindowsPlatformMinDef.h"
+#include "Define/WindowsPlatform.h"
 #include "IWinMsgReceiver.h"
 
 namespace UI

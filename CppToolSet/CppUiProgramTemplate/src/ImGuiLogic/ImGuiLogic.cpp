@@ -1,5 +1,6 @@
 #include "ImGuiLogic.h"
 #include "imgui.h"
+#include "Define/WindowsPlatform.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -65,8 +66,12 @@ namespace UI
         ImGui::Render();
     }
 
-    void ImGuiLogic::OnWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    void ImGuiLogic::OnWinMsg(int64 hWnd, uint32 msg, int64 wParam, int64 lParam)
     {
-        ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+        ImGui_ImplWin32_WndProcHandler(
+                reinterpret_cast<HWND>(hWnd),
+                static_cast<UINT>(msg),
+                static_cast<WPARAM>(wParam),
+                static_cast<LPARAM>(lParam));
     }
 }
