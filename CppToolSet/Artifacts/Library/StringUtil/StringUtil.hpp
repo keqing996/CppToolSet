@@ -8,133 +8,236 @@
 
 namespace StringUtil
 {
-    auto StringToWString(std::string str) -> std::wstring
-    {
-        std::wstring wStr(str.length(), 0);
-        std::transform(str.begin(), str.end(), wStr.begin(), [] (char c)
-        {
-            return (wchar_t)c;
-        });
-
-        return wStr;
-    }
-
-    auto WStringToString(std::wstring wStr) -> std::string
-    {
-        std::string str(wStr.length(), 0);
-        std::transform(wStr.begin(), wStr.end(), str.begin(), [] (wchar_t c)
-        {
-            return (char)c;
-        });
-
-        return str;
-    }
-
-    template<typename Encoding, typename DelimType>
-    auto SplitView(
-            const std::basic_string<Encoding>& inputStr,
-            DelimType delim)
-    -> std::vector<std::basic_string_view<Encoding>>
-    {
-        auto split = std::views::split(inputStr, delim);
-
-        std::vector<std::basic_string_view<Encoding>> result;
-        for (const auto& element : split)
-            result.emplace_back(element.begin(), element.end());
-
-        return result;
-    }
-
-    template<typename Encoding, typename DelimType>
-    auto Split(
-            const std::basic_string<Encoding>& inputStr,
-            DelimType delim)
-    -> std::vector<std::basic_string<Encoding>>
-    {
-        auto split = std::views::split(inputStr, delim);
-
-        std::vector<std::basic_string<Encoding>> result;
-        for (const auto& element : split)
-            result.emplace_back(element.begin(), element.end());
-
-        return result;
-    }
+    template<typename Encoding>
+    using Str = std::basic_string<Encoding>;
 
     template<typename Encoding>
-    auto Join(
-            const std::vector<std::basic_string<Encoding>>& strVec,
-            const std::basic_string<Encoding>& delim)
-    -> std::basic_string<Encoding>
-    {
-        std::basic_ostringstream<Encoding> oss;
+    using StrView = std::basic_string_view<Encoding>;
 
-        for (auto itr = strVec.begin(); itr != strVec.end(); ++itr)
+    class Convert
+    {
+    public:
+        Convert() = delete;
+
+    private:
+        template<typename EncodeFrom, typename EncodeTo>
+        static Str<EncodeTo> CharByCharConvert(const Str<EncodeFrom>& sourceStr)
         {
-            oss << *itr;
-            if (itr != strVec.end() - 1)
-                oss << delim;
+            Str<EncodeTo> toStr(sourceStr.length(), 0);
+
+            std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [] (EncodeFrom c)
+            {
+                return (EncodeTo)c;
+            });
+
+            return toStr;
         }
 
-        return oss.str();
-    }
-
-    template<typename Encoding>
-    auto ReplaceInPlace(
-            std::basic_string<Encoding>& inStr,
-            const std::basic_string<Encoding>& from,
-            const std::basic_string<Encoding>& to)
-    -> void
-    {
-        size_t startPos = 0;
-        while((startPos = inStr.find(from, startPos)) != std::string::npos)
+        template<typename EncodeFrom, typename EncodeTo>
+        static Str<EncodeTo> CharByCharConvert(const StrView<EncodeFrom>& sourceStr)
         {
-            inStr.replace(startPos, from.length(), to);
-            startPos += to.length();
+            Str<EncodeTo> toStr(sourceStr.length(), 0);
+
+            std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [] (EncodeFrom c)
+            {
+                return (EncodeTo)c;
+            });
+
+            return toStr;
         }
-    }
 
-    template<typename Encoding>
-    auto Replace(
-            const std::basic_string<Encoding>& inStr,
-            const std::basic_string<Encoding>& from,
-            const std::basic_string<Encoding>& to)
-    -> std::basic_string<Encoding>
+        template<typename EncodeFrom, typename EncodeTo>
+        static Str<EncodeTo> CharByCharConvert(const EncodeFrom* sourceStr)
+        {
+            StrView<EncodeFrom> sourceStrView(sourceStr);
+            Str<EncodeTo> toStr(sourceStrView.length(), 0);
+
+            std::transform(sourceStrView.begin(), sourceStrView.end(), toStr.begin(), [] (EncodeFrom c)
+            {
+                return (EncodeTo)c;
+            });
+
+            return toStr;
+        }
+
+    public:
+        inline static std::string U8StringToString(const std::u8string& u8str)
+        {
+            return CharByCharConvert<char8_t, char>(u8str);
+        }
+
+        inline static std::string U8StringToString(const std::u8string_view & u8str)
+        {
+            return CharByCharConvert<char8_t, char>(u8str);
+        }
+
+        inline static std::string U8StringToString(const char8_t* u8str)
+        {
+            return CharByCharConvert<char8_t, char>(u8str);
+        }
+
+        inline static std::u8string StringToU8String(const std::string& str)
+        {
+            return CharByCharConvert<char, char8_t>(str);
+        }
+
+        inline static std::u8string StringToU8String(const std::string_view& str)
+        {
+            return CharByCharConvert<char, char8_t>(str);
+        }
+
+        inline static std::u8string StringToU8String(const char* str)
+        {
+            return CharByCharConvert<char, char8_t>(str);
+        }
+
+        inline static wchar_t CharToWideChar(char c)
+        {
+            wchar_t ret;
+            mbtowc(&ret, &c, 1);
+            return ret;
+        }
+
+        inline static char WideChatToChar(wchar_t c)
+        {
+            char ret;
+            wctomb_s(NULL, &ret, c, 1);	return ret;
+        }
+
+        inline static std::wstring StringToWideString(const std::string& str)
+        {
+            if (str.empty())
+                return {};
+
+            const char* cstr = str.c_str();
+            size_t len = str.length() + 1;
+            size_t reqsize = 0;
+            int convertResult;
+
+            convertResult = mbstowcs_s(&reqsize, nullptr, 0, cstr, len);
+            if (convertResult != 0)
+                return {};
+
+            if (!reqsize)
+                return {};
+
+            std::vector<wchar_t> buffer(reqsize, 0);
+            convertResult = mbstowcs_s(nullptr, &buffer[0], len, cstr, len);
+            if (convertResult != 0)
+                return {};
+
+            return std::wstring(buffer.begin(), buffer.end() - 1);
+        }
+/*
+        //// Convert a wide string to a narrow string//
+        inline static std::string narrow(const std::wstring& str)
+        {
+            const wchar_t* cstr = str.c_str();
+            size_t len = str.length() + 1;
+            size_t reqsize = 0;
+            if(wcstombs_s(&reqsize, NULL, 0, cstr, len) != 0)
+                throw RecoverableException("Cannot narrow string - invalid character detected");
+            if(!reqsize)
+                throw RecoverableException("Failed to narrow string");
+            std::vector<Byte> buffer(reqsize, 0);
+            if(wcstombs_s(NULL, &buffer[0], len, cstr, len) != 0)
+                throw RecoverableException("Cannot narrow string - invalid character detected");
+            return std::string(buffer.begin(), buffer.end() - 1);
+        }
+
+*/
+
+    };
+
+
+    class Operation
     {
-        std::basic_string<Encoding> result = inStr;
-        ReplaceInPlace(result, from, to);
-        return result;
-    }
+    public:
+        Operation() = delete;
 
-    template<typename Encoding>
-    auto TrimInPlace(
-            std::basic_string<Encoding>& inStr,
-            const std::basic_string<Encoding>& trimStr)
-    -> void
-    {
-        ReplaceInPlace<Encoding>(inStr, trimStr, "");
-    }
+    public:
+        template<typename Encoding, typename DelimType>
+        std::vector<StrView<Encoding>> SplitView(const Str<Encoding>& inputStr, DelimType delim)
+        {
+            auto split = std::views::split(inputStr, delim);
 
-    template<typename Encoding>
-    auto TrimInPlace(std::basic_string<Encoding>& inStr) -> void
-    {
-        TrimInPlace<Encoding>(inStr, " ");
-    }
+            std::vector<StrView<Encoding>> result;
+            for (const auto& element : split)
+                result.emplace_back(element.begin(), element.end());
 
-    template<typename Encoding>
-    auto Trim(
-            std::basic_string<Encoding>& inStr,
-            const std::basic_string<Encoding>& trimStr)
-    -> std::basic_string<Encoding>
-    {
-        return Replace<Encoding>(inStr, trimStr, "");
-    }
+            return result;
+        }
 
-    template<typename Encoding>
-    auto Trim(std::basic_string<Encoding>& inStr) -> std::basic_string<Encoding>
-    {
-        return Trim<Encoding>(inStr, " ");
-    }
+        template<typename Encoding, typename DelimType>
+        std::vector<Str<Encoding>> Split(const Str<Encoding>& inputStr, DelimType delim)
+        {
+            auto split = std::views::split(inputStr, delim);
 
+            std::vector<Str<Encoding>> result;
+            for (const auto& element : split)
+                result.emplace_back(element.begin(), element.end());
+
+            return result;
+        }
+
+        template<typename Encoding>
+        Str<Encoding> Join(const std::vector<Str<Encoding>>& strVec, const Str<Encoding>& delim)
+        {
+            std::basic_ostringstream<Encoding> oss;
+
+            for (auto itr = strVec.begin(); itr != strVec.end(); ++itr)
+            {
+                oss << *itr;
+                if (itr != strVec.end() - 1)
+                    oss << delim;
+            }
+
+            return oss.str();
+        }
+
+        template<typename Encoding>
+        void ReplaceInPlace(Str<Encoding>& inStr, const Str<Encoding>& from, const Str<Encoding>& to)
+        {
+            size_t startPos = 0;
+            while((startPos = inStr.find(from, startPos)) != std::string::npos)
+            {
+                inStr.replace(startPos, from.length(), to);
+                startPos += to.length();
+            }
+        }
+
+        template<typename Encoding>
+        Str<Encoding> Replace(const Str<Encoding>& inStr, const Str<Encoding>& from, const Str<Encoding>& to)
+        {
+            Str<Encoding> result = inStr;
+            ReplaceInPlace(result, from, to);
+            return result;
+        }
+
+        template<typename Encoding>
+        void TrimInPlace(Str<Encoding>& inStr, const Str<Encoding>& trimStr)
+        {
+            ReplaceInPlace<Encoding>(inStr, trimStr, "");
+        }
+
+        template<typename Encoding>
+        void TrimInPlace(Str<Encoding>& inStr)
+        {
+            TrimInPlace<Encoding>(inStr, " ");
+        }
+
+        template<typename Encoding>
+        Str<Encoding> Trim(Str<Encoding>& inStr, const Str<Encoding>& trimStr)
+        {
+            return Replace<Encoding>(inStr, trimStr, "");
+        }
+
+        template<typename Encoding>
+        Str<Encoding> Trim(Str<Encoding>& inStr)
+        {
+            return Trim<Encoding>(inStr, " ");
+        }
+    };
 }
 
 
