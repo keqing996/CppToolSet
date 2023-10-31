@@ -8,7 +8,7 @@
 
 namespace StringUtil
 {
-    auto StringToWString(std::string str) -> std::wstring
+    inline auto StringToWString(std::string str) -> std::wstring
     {
         std::wstring wStr(str.length(), 0);
         std::transform(str.begin(), str.end(), wStr.begin(), [] (char c)
@@ -19,7 +19,7 @@ namespace StringUtil
         return wStr;
     }
 
-    auto WStringToString(std::wstring wStr) -> std::string
+    inline auto WStringToString(std::wstring wStr) -> std::string
     {
         std::string str(wStr.length(), 0);
         std::transform(wStr.begin(), wStr.end(), str.begin(), [] (wchar_t c)
