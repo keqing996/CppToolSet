@@ -18,12 +18,5 @@ namespace UI
     protected:
         // Top Window
         Win32Window* _pTopWindow;
-
-        // Font
-        static constexpr int NORMAL_FONT_SIZE = 16;
-        static constexpr int LARGE_FONT_SIZE = 20;
-        ImFont* _pFontNormalMsYaHei = nullptr;
-        ImFont* _pFontLargeMsYaHei = nullptr;
-
     };
 }

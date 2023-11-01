@@ -96,9 +96,9 @@ namespace UI
         return _pD3dDeviceContext;
     }
 
-    float Win32Window::GetDpiScale() const
+    ImGuiRender* Win32Window::GetRender() const
     {
-        return _pImGuiRender == nullptr ? 1 : _pImGuiRender->GetDpiScale(reinterpret_cast<int64>(_hWnd));
+        return _pImGuiRender;
     }
 
     LRESULT Win32Window::WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -220,7 +220,7 @@ namespace UI
                 WndProcDispatch,
                 0L,
                 0L,
-                GetModuleHandle(nullptr),
+                ::GetModuleHandle(nullptr),
                 nullptr,
                 nullptr,
                 nullptr,
@@ -244,8 +244,10 @@ namespace UI
                 _height,
                 nullptr,
                 nullptr,
-                GetModuleHandle(nullptr),
+                ::GetModuleHandle(nullptr),
                 this);
+
+        ::SetWindowTextW(_hWnd, _windowTitle.c_str());
     }
 
     void Win32Window::Win32DestroyWindow()

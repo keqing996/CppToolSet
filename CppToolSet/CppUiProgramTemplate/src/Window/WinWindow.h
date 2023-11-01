@@ -31,7 +31,7 @@ namespace UI
         HWND GetWindowHandle() const;
         ID3D11Device* GetD3dDevice() const;
         ID3D11DeviceContext* GetD3dDeviceContext() const;
-        float GetDpiScale() const;
+        ImGuiRender* GetRender() const;
 
     protected: /* message */
         static LRESULT WINAPI WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
