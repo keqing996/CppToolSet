@@ -20,5 +20,7 @@ namespace UI
         void RenderDrawData();
 
         void OnWinMsg(int64 hWnd, uint32 msg, int64 wParam, int64 lParam) override;
+
+        float GetDpiScale(int64 hWnd) const;
     };
 }

@@ -63,4 +63,9 @@ namespace UI
                 static_cast<WPARAM>(wParam),
                 static_cast<LPARAM>(lParam));
     }
+
+    float ImGuiRender::GetDpiScale(int64 hWnd) const
+    {
+        return ImGui_ImplWin32_GetDpiScaleForHwnd(reinterpret_cast<HWND>(hWnd));
+    }
 }

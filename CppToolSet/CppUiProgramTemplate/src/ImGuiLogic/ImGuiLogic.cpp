@@ -1,5 +1,4 @@
 #include "ImGuiLogic.h"
-#include "imgui.h"
 #include "Window/WinWindow.h"
 
 namespace UI
@@ -8,6 +7,22 @@ namespace UI
         : _pTopWindow(topWindow)
     {
         _pTopWindow->AddImGuiLogicUpdater(this);
+
+        ImGuiIO& io = ImGui::GetIO();
+        float dpiScale = _pTopWindow->GetDpiScale();
+        ImGui::GetStyle().ScaleAllSizes(dpiScale);
+
+        _pFontNormalMsYaHei = io.Fonts->AddFontFromFileTTF(
+                "c:\\Windows\\Fonts\\msyhl.ttc",
+                dpiScale * NORMAL_FONT_SIZE,
+                nullptr,
+                io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+
+        _pFontLargeMsYaHei = io.Fonts->AddFontFromFileTTF(
+                "c:\\Windows\\Fonts\\msyhl.ttc",
+                dpiScale * LARGE_FONT_SIZE,
+                nullptr,
+                io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
     }
 
     ImGuiLogic::~ImGuiLogic()
@@ -39,7 +54,9 @@ namespace UI
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
+        ImGui::PushFont(_pFontLargeMsYaHei);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::PopFont();
         ImGui::End();
     }
 

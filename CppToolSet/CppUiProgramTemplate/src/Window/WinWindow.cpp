@@ -96,6 +96,11 @@ namespace UI
         return _pD3dDeviceContext;
     }
 
+    float Win32Window::GetDpiScale() const
+    {
+        return _pImGuiRender == nullptr ? 1 : _pImGuiRender->GetDpiScale(reinterpret_cast<int64>(_hWnd));
+    }
+
     LRESULT Win32Window::WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         Win32Window* pThis = nullptr;
