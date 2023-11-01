@@ -1,11 +1,12 @@
 #include "WinWindow.h"
 #include "Define/WindowsPlatform.h"
+#include "StringUtil.hpp"
 
 namespace UI
 {
     Win32Window::Win32Window(const char* windowRegisterName, const char* windowTitle, int width, int height)
-        : _windowRegisterName(windowRegisterName)
-        , _windowTitle(windowTitle)
+        : _windowRegisterName(StringUtil::Convert::StringToWideString(windowRegisterName))
+        , _windowTitle(StringUtil::Convert::StringToWideString(windowTitle))
         , _width(width)
         , _height(height)
     {
@@ -175,7 +176,7 @@ namespace UI
 
     void Win32Window::Win32RegisterWindow()
     {
-        WNDCLASSEX wc = {
+        WNDCLASSEXW wc = {
                 sizeof(wc),
                 CS_CLASSDC,
                 WndProcDispatch,
@@ -186,18 +187,18 @@ namespace UI
                 nullptr,
                 nullptr,
                 nullptr,
-                _windowRegisterName,
+                _windowRegisterName.c_str(),
                 nullptr
         };
 
-        ::RegisterClassEx(&wc);
+        ::RegisterClassExW(&wc);
     }
 
     void Win32Window::Win32CreateWindow()
     {
-        _hWnd = ::CreateWindow(
-                _windowRegisterName,
-                _windowTitle,
+        _hWnd = ::CreateWindowW(
+                _windowRegisterName.c_str(),
+                _windowTitle.c_str(),
                 WS_OVERLAPPEDWINDOW,
                 100,
                 100,
@@ -216,7 +217,7 @@ namespace UI
 
     void Win32Window::Win32UnRegisterWindow()
     {
-        ::UnregisterClass(_windowRegisterName, GetModuleHandle(nullptr));
+        ::UnregisterClassW(_windowRegisterName.c_str(), GetModuleHandle(nullptr));
     }
 
     bool Win32Window::D3dCreateDevice()

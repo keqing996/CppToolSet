@@ -52,8 +52,8 @@ namespace UI
         int _width;
         int _height;
         HWND _hWnd;
-        const char* _windowRegisterName;
-        const char* _windowTitle;
+        std::wstring _windowRegisterName;
+        std::wstring _windowTitle;
 
         /* Msg Receive */
         std::vector<IWinMsgReceiver*> _winMsgReceiverVec;

@@ -32,7 +32,7 @@ set_target_properties(${TargetName} PROPERTIES
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/ # eigen
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/StringUtil/ # string util
         ${IM_GUI_DIR}   # imgui
         ${IM_GUI_DIR}/backends # imgui backend
 )
