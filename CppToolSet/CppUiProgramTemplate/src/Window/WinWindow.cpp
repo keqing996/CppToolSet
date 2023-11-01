@@ -1,5 +1,4 @@
 #include "WinWindow.h"
-#include "Define/WindowsPlatform.h"
 #include "StringUtil.hpp"
 
 namespace UI
@@ -14,6 +13,7 @@ namespace UI
 
     Win32Window::~Win32Window()
     {
+        ImGuiDestroyRender();
         D3dDestroyDevice();
         Win32DestroyWindow();
         Win32UnRegisterWindow();
@@ -27,6 +27,8 @@ namespace UI
         if (!D3dCreateDevice())
             return false;
 
+        ImGuiCreateRender();
+
         return true;
     }
 
@@ -36,7 +38,7 @@ namespace UI
         ::UpdateWindow(_hWnd);
     }
 
-    void Win32Window::UpdateWinMessage(bool* isQuit)
+    void Win32Window::WinMessageLoop(bool* isQuit)
     {
         MSG msg;
         while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
@@ -48,6 +50,17 @@ namespace UI
             if (*isQuit)
                 break;
         }
+    }
+
+    void Win32Window::RenderLoop()
+    {
+        _pImGuiRender->NewFrame();
+        // logic update
+        _pImGuiRender->EndFrame();
+
+        ClearColor();
+        _pImGuiRender->RenderDrawData();
+        SwapChain();
     }
 
     void Win32Window::ClearColor()
@@ -109,6 +122,20 @@ namespace UI
         auto itr = std::find(_winMsgReceiverVec.begin(), _winMsgReceiverVec.end(), pWinMsgReceiver);
         if (itr != _winMsgReceiverVec.end())
             _winMsgReceiverVec.erase(itr);
+    }
+
+    void Win32Window::AddImGuiLogicUpdater(ImGuiLogic* pUpdater)
+    {
+        auto itr = std::find(_imGuiLogicVec.begin(), _imGuiLogicVec.end(), pUpdater);
+        if (itr == _imGuiLogicVec.end())
+            _imGuiLogicVec.push_back(pUpdater);
+    }
+
+    void Win32Window::RemoveImGuiLogicUpdater(ImGuiLogic* pUpdater)
+    {
+        auto itr = std::find(_imGuiLogicVec.begin(), _imGuiLogicVec.end(), pUpdater);
+        if (itr != _imGuiLogicVec.end())
+            _imGuiLogicVec.erase(itr);
     }
 
     LRESULT Win32Window::OnWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -293,5 +320,20 @@ namespace UI
         }
     }
 
+    void Win32Window::ImGuiCreateRender()
+    {
+        _pImGuiRender = new ImGuiRender();
+        _pImGuiRender->SetUp(_hWnd, _pD3dDevice, _pD3dDeviceContext);
+        AddWinMsgProc(_pImGuiRender);
+    }
 
+    void Win32Window::ImGuiDestroyRender()
+    {
+        if (_pImGuiRender != nullptr)
+        {
+            RemoveWinMsgProc(_pImGuiRender);
+            _pImGuiRender->Destroy();
+            delete _pImGuiRender;
+        }
+    }
 }

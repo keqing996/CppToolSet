@@ -1,6 +1,4 @@
 #include "Window/WinWindow.h"
-#include "ImGuiRender/ImGuiRender.h"
-#include "ImGuiLogic/ImGuiLogic.h"
 
 // Main code
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCmdShow)
@@ -10,39 +8,18 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCm
     if (!mainWin.SetUp())
         return 1;
 
-    // Show the window
     mainWin.Show();
-
-    UI::ImGuiLogic imGuiLogic;
-    imGuiLogic.SetUp();
-
-    mainWin.AddWinMsgProc(&imGuiLogic);
-
-    UI::ImGuiRender imGuiRender;
-    imGuiRender.SetUp(mainWin.GetWindowHandle(), mainWin.GetD3dDevice(), mainWin.GetD3dDeviceContext());
 
     while (true)
     {
         bool isQuit = false;
-        mainWin.UpdateWinMessage(&isQuit);
+        mainWin.WinMessageLoop(&isQuit);
 
         if (isQuit)
             break;
 
-        // Start the Dear ImGui frame
-        imGuiRender.NewFrame();
-        imGuiLogic.NewFrame();
-
-        imGuiLogic.Update();
-
-        imGuiLogic.EndFrame();
-
-        mainWin.ClearColor();
-        imGuiRender.RenderDrawData();
-        mainWin.SwapChain();
+        mainWin.RenderLoop();
     }
-
-    mainWin.RemoveWinMsgProc(&imGuiLogic);
 
     return 0;
 }
