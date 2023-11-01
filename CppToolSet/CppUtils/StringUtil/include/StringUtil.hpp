@@ -114,7 +114,7 @@ namespace StringUtil
             size_t reqsize = 0;
             int convertResult;
 
-            convertResult = mbstowcs_s(&reqsize, nullptr, 0, cstr, len);
+            convertResult = mbstowcs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
             if (convertResult != 0)
                 return {};
 
@@ -122,14 +122,14 @@ namespace StringUtil
                 return {};
 
             std::vector<wchar_t> buffer(reqsize, 0);
-            convertResult = mbstowcs_s(nullptr, &buffer[0], len, cstr, len);
+            convertResult = mbstowcs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
             if (convertResult != 0)
                 return {};
 
             return std::wstring(buffer.begin(), buffer.end() - 1);
         }
 
-        inline static std::string narrow(const std::wstring& wStr)
+        inline static std::string WideStringToString(const std::wstring& wStr)
         {
             if (wStr.empty())
                 return {};
@@ -139,7 +139,7 @@ namespace StringUtil
             size_t reqsize = 0;
             int convertResult;
 
-            convertResult = wcstombs_s(&reqsize, nullptr, 0, cstr, len);
+            convertResult = wcstombs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
             if (convertResult != 0)
                 return {};
 
@@ -147,7 +147,7 @@ namespace StringUtil
                 return {};
 
             std::vector<char> buffer(reqsize, 0);
-            convertResult = wcstombs_s(nullptr, &buffer[0], len, cstr, len);
+            convertResult = wcstombs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
             if (convertResult != 0)
                 return {};
 

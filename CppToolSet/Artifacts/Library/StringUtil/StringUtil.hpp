@@ -114,38 +114,45 @@ namespace StringUtil
             size_t reqsize = 0;
             int convertResult;
 
-            convertResult = mbstowcs_s(&reqsize, nullptr, 0, cstr, len);
+            convertResult = mbstowcs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
             if (convertResult != 0)
                 return {};
 
-            if (!reqsize)
+            if (reqsize == 0)
                 return {};
 
             std::vector<wchar_t> buffer(reqsize, 0);
-            convertResult = mbstowcs_s(nullptr, &buffer[0], len, cstr, len);
+            convertResult = mbstowcs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
             if (convertResult != 0)
                 return {};
 
             return std::wstring(buffer.begin(), buffer.end() - 1);
         }
-/*
-        //// Convert a wide string to a narrow string//
-        inline static std::string narrow(const std::wstring& str)
+
+        inline static std::string WideStringToString(const std::wstring& wStr)
         {
-            const wchar_t* cstr = str.c_str();
-            size_t len = str.length() + 1;
+            if (wStr.empty())
+                return {};
+
+            const wchar_t* cstr = wStr.c_str();
+            size_t len = wStr.length() + 1;
             size_t reqsize = 0;
-            if(wcstombs_s(&reqsize, NULL, 0, cstr, len) != 0)
-                throw RecoverableException("Cannot narrow string - invalid character detected");
-            if(!reqsize)
-                throw RecoverableException("Failed to narrow string");
-            std::vector<Byte> buffer(reqsize, 0);
-            if(wcstombs_s(NULL, &buffer[0], len, cstr, len) != 0)
-                throw RecoverableException("Cannot narrow string - invalid character detected");
+            int convertResult;
+
+            convertResult = wcstombs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
+            if (convertResult != 0)
+                return {};
+
+            if (reqsize == 0)
+                return {};
+
+            std::vector<char> buffer(reqsize, 0);
+            convertResult = wcstombs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
+            if (convertResult != 0)
+                return {};
+
             return std::string(buffer.begin(), buffer.end() - 1);
         }
-
-*/
 
     };
 
@@ -157,7 +164,7 @@ namespace StringUtil
 
     public:
         template<typename Encoding, typename DelimType>
-        std::vector<StrView<Encoding>> SplitView(const Str<Encoding>& inputStr, DelimType delim)
+        static std::vector<StrView<Encoding>> SplitView(const Str<Encoding>& inputStr, DelimType delim)
         {
             auto split = std::views::split(inputStr, delim);
 
@@ -169,7 +176,7 @@ namespace StringUtil
         }
 
         template<typename Encoding, typename DelimType>
-        std::vector<Str<Encoding>> Split(const Str<Encoding>& inputStr, DelimType delim)
+        static std::vector<Str<Encoding>> Split(const Str<Encoding>& inputStr, DelimType delim)
         {
             auto split = std::views::split(inputStr, delim);
 
@@ -181,7 +188,7 @@ namespace StringUtil
         }
 
         template<typename Encoding>
-        Str<Encoding> Join(const std::vector<Str<Encoding>>& strVec, const Str<Encoding>& delim)
+        static Str<Encoding> Join(const std::vector<Str<Encoding>>& strVec, const Str<Encoding>& delim)
         {
             std::basic_ostringstream<Encoding> oss;
 
@@ -196,7 +203,7 @@ namespace StringUtil
         }
 
         template<typename Encoding>
-        void ReplaceInPlace(Str<Encoding>& inStr, const Str<Encoding>& from, const Str<Encoding>& to)
+        static void Replace(Str<Encoding>& inStr, const Str<Encoding>& from, const Str<Encoding>& to)
         {
             size_t startPos = 0;
             while((startPos = inStr.find(from, startPos)) != std::string::npos)
@@ -207,35 +214,26 @@ namespace StringUtil
         }
 
         template<typename Encoding>
-        Str<Encoding> Replace(const Str<Encoding>& inStr, const Str<Encoding>& from, const Str<Encoding>& to)
+        static void TrimStart(Str<Encoding>& str)
         {
-            Str<Encoding> result = inStr;
-            ReplaceInPlace(result, from, to);
-            return result;
+            str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](Encoding ch){
+                return !std::isspace(static_cast<int>(ch));
+            }));
         }
 
         template<typename Encoding>
-        void TrimInPlace(Str<Encoding>& inStr, const Str<Encoding>& trimStr)
+        static void TrimEnd(Str<Encoding>& str)
         {
-            ReplaceInPlace<Encoding>(inStr, trimStr, "");
+            str.erase(std::find_if(str.rbegin(), str.rend(), [](Encoding ch){
+                return !std::isspace(static_cast<int>(ch));
+            }).base(), str.end());
         }
 
         template<typename Encoding>
-        void TrimInPlace(Str<Encoding>& inStr)
+        static void Trim(Str<Encoding>& str)
         {
-            TrimInPlace<Encoding>(inStr, " ");
-        }
-
-        template<typename Encoding>
-        Str<Encoding> Trim(Str<Encoding>& inStr, const Str<Encoding>& trimStr)
-        {
-            return Replace<Encoding>(inStr, trimStr, "");
-        }
-
-        template<typename Encoding>
-        Str<Encoding> Trim(Str<Encoding>& inStr)
-        {
-            return Trim<Encoding>(inStr, " ");
+            TrimStart(str);
+            TrimEnd(str);
         }
     };
 }
