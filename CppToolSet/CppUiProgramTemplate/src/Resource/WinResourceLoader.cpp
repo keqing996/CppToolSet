@@ -30,4 +30,14 @@ namespace UI
         else
             return std::nullopt;
     }
+
+    std::optional<WinIconResource> WinResourceLoader::LoadIconResource(int id)
+    {
+        auto hIcon = ::LoadIconW(GetModuleHandle(nullptr), MAKEINTRESOURCE(id));
+        if (hIcon == nullptr)
+            return std::nullopt;
+
+        WinIconResource result { hIcon };
+        return result;
+    }
 }

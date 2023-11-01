@@ -1,5 +1,7 @@
 #include "WinWindow.h"
 #include "StringUtil.hpp"
+#include "Resource/Resource.h"
+#include "Resource/WinResourceLoader.h"
 
 namespace UI
 {
@@ -214,6 +216,9 @@ namespace UI
 
     void Win32Window::Win32RegisterWindow()
     {
+        auto loadIcon = WinResourceLoader::LoadIconResource(IDI_ICON1);
+        HICON hIcon = loadIcon.has_value() ? static_cast<HICON>(loadIcon.value().hIcon) : nullptr;
+
         WNDCLASSEXW wc = {
                 sizeof(wc),
                 CS_CLASSDC,
@@ -221,12 +226,12 @@ namespace UI
                 0L,
                 0L,
                 ::GetModuleHandle(nullptr),
-                nullptr,
+                hIcon,
                 nullptr,
                 nullptr,
                 nullptr,
                 _windowRegisterName.c_str(),
-                nullptr
+                hIcon
         };
 
         ::RegisterClassExW(&wc);
