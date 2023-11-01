@@ -1,18 +1,18 @@
 #include "ImGuiLogic.h"
 #include "imgui.h"
-#include "Define/WindowsPlatform.h"
-
+#include "Window/WinWindow.h"
 
 namespace UI
 {
-    ImGuiLogic::ImGuiLogic()
+    ImGuiLogic::ImGuiLogic(Win32Window* topWindow)
+        : _pTopWindow(topWindow)
     {
-
+        _pTopWindow->AddImGuiLogicUpdater(this);
     }
 
     ImGuiLogic::~ImGuiLogic()
     {
-        ImGui::DestroyContext();
+        _pTopWindow->RemoveImGuiLogicUpdater(this);
     }
 
     void ImGuiLogic::Update()
@@ -42,8 +42,6 @@ namespace UI
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
     }
-
-
 
 
 }

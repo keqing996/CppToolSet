@@ -1,4 +1,5 @@
 #include "Window/WinWindow.h"
+#include "ImGuiLogic/ImGuiLogic.h"
 
 // Main code
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCmdShow)
@@ -7,6 +8,8 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCm
 
     if (!mainWin.SetUp())
         return 1;
+
+    UI::ImGuiLogic* pLogic = new UI::ImGuiLogic(&mainWin);
 
     mainWin.Show();
 
@@ -20,6 +23,8 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev,PWSTR lpCmdLine,int nCm
 
         mainWin.RenderLoop();
     }
+
+    delete pLogic;
 
     return 0;
 }

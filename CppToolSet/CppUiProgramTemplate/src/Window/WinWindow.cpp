@@ -55,7 +55,13 @@ namespace UI
     void Win32Window::RenderLoop()
     {
         _pImGuiRender->NewFrame();
-        // logic update
+
+        std::for_each(_imGuiLogicVec.begin(), _imGuiLogicVec.end(), [](ImGuiLogic* pUpdater)
+        {
+            if (pUpdater != nullptr)
+                pUpdater->Update();
+        });
+
         _pImGuiRender->EndFrame();
 
         ClearColor();

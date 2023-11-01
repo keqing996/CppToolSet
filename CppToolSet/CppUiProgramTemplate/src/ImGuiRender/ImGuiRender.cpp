@@ -35,6 +35,7 @@ namespace UI
     {
         ImGui_ImplDX11_Shutdown();
         ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
     }
 
     void ImGuiRender::NewFrame()
