@@ -8,10 +8,11 @@
 #include "IWinMsgReceiver.h"
 #include "ImGuiRender/ImGuiRender.h"
 #include "ImGuiLogic/ImGuiLogic.h"
+#include "Util/NonCopyable.h"
 
 namespace UI
 {
-    class Win32Window
+    class Win32Window: public NonCopyable
     {
     public:
         Win32Window(const char* windowRegisterName, const char* windowTitle, int width, int height);

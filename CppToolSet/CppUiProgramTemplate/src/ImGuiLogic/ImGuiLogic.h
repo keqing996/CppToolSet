@@ -1,12 +1,13 @@
 #pragma once
 
 #include "imgui.h"
+#include "Util/NonCopyable.h"
 
 namespace UI
 {
     class Win32Window;
 
-    class ImGuiLogic
+    class ImGuiLogic : public NonCopyable
     {
     public:
         explicit ImGuiLogic(Win32Window* topWindow);

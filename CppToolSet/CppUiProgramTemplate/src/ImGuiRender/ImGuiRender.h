@@ -3,13 +3,14 @@
 #include <d3d11.h>
 #include "Define/WindowsPlatform.h"
 #include "Window/IWinMsgReceiver.h"
+#include "Util/NonCopyable.h"
 
 struct ImFontAtlas;
 struct ImFont;
 
 namespace UI
 {
-    class ImGuiRender : public IWinMsgReceiver
+    class ImGuiRender : public IWinMsgReceiver, public NonCopyable
     {
     public:
         ImGuiRender();
