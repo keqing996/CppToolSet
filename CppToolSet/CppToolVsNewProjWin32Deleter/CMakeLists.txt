@@ -2,19 +2,16 @@ cmake_minimum_required(VERSION 3.26)
 
 project(VsNewProjWin32Deleter)
 
-set(TargetName vs_sln_win32_deleter)
-
+set(TargetName tool_vs_win32_deleter)
 set(CMAKE_CXX_STANDARD 20)
-
-add_compile_definitions(_UNICODE UNICODE) # windows wchar
 
 file (GLOB_RECURSE src_files src/*.cpp)
 
-add_executable(${TargetName} ${src_files} ${res_files})
+add_executable(${TargetName} ${src_files})
 
 target_include_directories(${TargetName}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/
 )
 
 # copy config
@@ -31,6 +28,6 @@ if (CMAKE_BUILD_TYPE STREQUAL Release)
             COMMAND ${CMAKE_COMMAND}
             -E copy
             $<TARGET_FILE:${TargetName}>
-            "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Tool/"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/"
     )
 endif ()
