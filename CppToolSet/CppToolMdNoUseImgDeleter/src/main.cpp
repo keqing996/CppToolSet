@@ -56,7 +56,7 @@ int main()
                 continue;
 
             std::wstring imgPathStr = currPath.wstring() + L"\\" + regexResult[2].str();
-            StringUtil::ReplaceInPlace<wchar_t>(imgPathStr, L"%20", L" ");
+            Util::StringOperation::Replace<wchar_t>(imgPathStr, L"%20", L" ");
             std::filesystem::path imgPath {imgPathStr};
 
             if (_allImgSet.contains(imgPath))
