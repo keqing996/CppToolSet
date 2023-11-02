@@ -127,7 +127,7 @@ void RapidJsonGen()
 
     std::fstream fs("./test.json", std::ios::out);
     if (!fs.is_open())
-        return 1;
+        return;
 
     RapidJsonDoc doc;
     doc.SetArray();

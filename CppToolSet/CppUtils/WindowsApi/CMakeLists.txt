@@ -21,7 +21,7 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND}
         -E copy
         $<TARGET_FILE:${TargetName}>
-        "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Library/WindowsApi/lib/${FinalLibName}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Library/lib/WinApi/${FinalLibName}"
 )
 
 add_custom_command(
@@ -29,5 +29,5 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND}
         -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-        "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Library/WindowsApi/include/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Artifacts/Library/include/WinApi/"
 )
