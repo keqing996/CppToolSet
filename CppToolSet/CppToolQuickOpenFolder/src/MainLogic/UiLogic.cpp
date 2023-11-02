@@ -2,31 +2,19 @@
 #include <filesystem>
 #include <fstream>
 
-#include "Application/Application.h"
 #include "imgui_impl_win32.h"
 #include "UiLogic.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 
-using RapidJsonDocW = rapidjson::GenericDocument<rapidjson::UTF16<>>;
-using RapidJsonValueW = rapidjson::GenericValue<rapidjson::UTF16<>>;
-using RapidJsonStringBufferW = rapidjson::GenericStringBuffer<rapidjson::UTF16<>>;
-using RapidJsonPrettyWriterW = rapidjson::PrettyWriter<RapidJsonStringBufferW, rapidjson::UTF16<>, rapidjson::UTF16<>>;
+using RapidJsonDoc = rapidjson::GenericDocument<rapidjson::UTF8<>>;
+using RapidJsonValue = rapidjson::GenericValue<rapidjson::UTF8<>>;
+using RapidJsonStringBuffer = rapidjson::GenericStringBuffer<rapidjson::UTF8<>>;
+using RapidJsonPrettyWriter = rapidjson::PrettyWriter<RapidJsonStringBuffer, rapidjson::UTF8<>, rapidjson::UTF8<>>;
 
-UiLogic::UiLogic()
+UiLogic::UiLogic(UI::Win32Window* topWindow) : UI::ImGuiLogic(topWindow)
 {
     InitConfig();
-
-    // Get Dpi Scale
-    float dpiScale = ImGui_ImplWin32_GetDpiScaleForHwnd(Application::GetInstance()->GetWindowHandle());
-    ImGui::GetStyle().ScaleAllSizes(dpiScale);
-
-    // Load Font
-    float fontSize = 20 * dpiScale;
-
-    auto io = ImGui::GetIO();
-    _bigFont = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\consola.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
-
 }
 
 void UiLogic::Update()
@@ -60,7 +48,7 @@ void UiLogic::UpdateVsCodePath()
         auto titleWidth = ImGui::CalcTextSize(title);
 
         ImGui::SetCursorPosX(0.5 * (ImGui::GetWindowWidth() - titleWidth.x));
-        ImGui::Text(title);
+        ImGui::Text("%s", title);
     }
     ImGui::PopFont();
 
@@ -72,17 +60,17 @@ void UiLogic::UpdateVsCodePath()
     ImGui::SetNextItemWidth(-1);
 
     if (_vsCodePathString.empty())
-        ImGui::Text((const char*)(u8"中文"));
+        ImGui::Text("中文");
     else
         ImGui::Text("asdasds");
     //ImGui::InputText("##", _vsCodePathString.c_str(), 0, ImGuiInputTextFlags_ReadOnly);
 }
 
-std::wstring UiLogic::GetConfigPath() const
+std::string UiLogic::GetConfigPath() const
 {
     auto currentPath = std::filesystem::current_path();
-    auto configPath = currentPath /= L"quick_open_folder.json";
-    return configPath;
+    auto configPath = currentPath /= "quick_open_folder.json";
+    return configPath.string();
 }
 
 void UiLogic::InitConfig()
@@ -92,36 +80,36 @@ void UiLogic::InitConfig()
     if (!std::filesystem::exists(configPath))
     {
         // create file
-        std::wofstream fs(configPath, std::ios::out);
+        std::ofstream fs(configPath, std::ios::out);
         fs.close();
     }
 
     // read file content
-    std::wifstream inputFile(configPath);
-    std::wstringstream fileContent;
+    std::ifstream inputFile(configPath);
+    std::stringstream fileContent;
     fileContent << inputFile.rdbuf();
     inputFile.close();
 
     // read form json
-    RapidJsonDocW doc;
+    RapidJsonDoc doc;
     rapidjson::ParseResult parseOk = doc.Parse(fileContent.str().c_str());
     if (parseOk)
     {
-        if (doc.HasMember(L"VsCodePath") && doc[L"VsCodePath"].IsString())
-            _vsCodePathString = doc[L"VsCodePath"].GetString();
+        if (doc.HasMember("VsCodePath") && doc["VsCodePath"].IsString())
+            _vsCodePathString = doc["VsCodePath"].GetString();
         else
-            _vsCodePathString = L"";
+            _vsCodePathString = "";
 
-        if (doc.HasMember(L"FolderArray") && doc[L"FolderArray"].IsArray())
+        if (doc.HasMember("FolderArray") && doc["FolderArray"].IsArray())
         {
-            for (const auto& singleFolder: doc[L"FolderArray"].GetArray())
+            for (const auto& singleFolder: doc["FolderArray"].GetArray())
             {
-                if (singleFolder.HasMember(L"Name") && singleFolder[L"Name"].IsString()
-                    && singleFolder.HasMember(L"Path") && singleFolder[L"Path"].IsString())
+                if (singleFolder.HasMember("Name") && singleFolder["Name"].IsString()
+                    && singleFolder.HasMember("Path") && singleFolder["Path"].IsString())
                 {
                     _allFolder.emplace_back(
-                            singleFolder[L"Name"].GetString(),
-                            singleFolder[L"Path"].GetString()
+                            singleFolder["Name"].GetString(),
+                            singleFolder["Path"].GetString()
                     );
                 }
             }
@@ -129,7 +117,7 @@ void UiLogic::InitConfig()
     }
     else
     {
-        _vsCodePathString = L"";
+        _vsCodePathString = "";
     }
 }
 
@@ -143,36 +131,36 @@ void UiLogic::WriteConfig()
     if (!fs.is_open())
         return;
 
-    RapidJsonDocW doc;
+    RapidJsonDoc doc;
 
     if (_vsCodePathString.length() > 0)
     {
-        RapidJsonValueW value(_vsCodePathString.c_str(), _vsCodePathString.length());
-        doc.AddMember(L"VsCodePath", value, doc.GetAllocator());
+        RapidJsonValue value(_vsCodePathString.c_str(), _vsCodePathString.length());
+        doc.AddMember("VsCodePath", value, doc.GetAllocator());
     }
 
     if (!_allFolder.empty())
     {
-        RapidJsonValueW arr(rapidjson::kArrayType);
+        RapidJsonValue arr(rapidjson::kArrayType);
 
         for (const auto& f : _allFolder)
         {
-            RapidJsonValueW folderObj(rapidjson::kObjectType);
+            RapidJsonValue folderObj(rapidjson::kObjectType);
 
-            RapidJsonValueW name(f.name.c_str(), f.name.length());
-            RapidJsonValueW path(f.path.c_str(), f.path.length());
+            RapidJsonValue name(f.name.c_str(), f.name.length());
+            RapidJsonValue path(f.path.c_str(), f.path.length());
 
-            folderObj.AddMember(L"Name", name, doc.GetAllocator());
-            folderObj.AddMember(L"Path", path, doc.GetAllocator());
+            folderObj.AddMember("Name", name, doc.GetAllocator());
+            folderObj.AddMember("Path", path, doc.GetAllocator());
 
             arr.PushBack(folderObj, doc.GetAllocator());
         }
 
-        doc.AddMember(L"FolderArray", arr, doc.GetAllocator());
+        doc.AddMember("FolderArray", arr, doc.GetAllocator());
     }
 
-    RapidJsonStringBufferW sb;
-    RapidJsonPrettyWriterW writer {sb};
+    RapidJsonStringBuffer sb;
+    RapidJsonPrettyWriter writer {sb};
 
     doc.Accept(writer);
 

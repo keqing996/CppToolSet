@@ -2,19 +2,18 @@ cmake_minimum_required(VERSION 3.26)
 
 project (QuickOpenFolder)
 
-set(TargetName quick_open_folder)
+set(TargetName tool_quick_open_folder)
 set(CMAKE_CXX_STANDARD 20)
-set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/imgui/)
-
-add_compile_definitions(_UNICODE UNICODE) # windows wchar
-add_compile_definitions(NOMINMAX) # cancel windows min max macro
+set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/imgui/)
 
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
-file (GLOB_RECURSE manifest_files manifest/*.manifest)
+file (GLOB_RECURSE util_src_files ../CppUtils/src/*.cpp)
+file (GLOB_RECURSE manifest_files ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralResource/manifest/*.manifest)
 
 add_executable(${TargetName}
         ${src_files}
+        ${util_src_files}
         ${res_files}
         ${manifest_files}
         ${IM_GUI_DIR}/backends/imgui_impl_dx11.cpp
@@ -28,7 +27,8 @@ add_executable(${TargetName}
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/src/ # json
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/include/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/ # json
         ${IM_GUI_DIR}
         ${IM_GUI_DIR}/backends
 )
