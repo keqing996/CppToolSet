@@ -1,12 +1,11 @@
 #pragma once
 
-#include "WinApiBaseDefine.h"
 #include <string>
 
-namespace WinApi
+namespace WinApi::System
 {
-    std::string WinGetUserName();
+    std::wstring GetWindowsUserName();
 
-    bool WinCreateProcess(std::string cmdLine);
+    bool CreateDependentProcess(const std::wstring& cmdLine);
 
 }

@@ -1,9 +1,8 @@
 
-
+#include "../include/WinApiBaseDefine.h"
 #include "../include/WinApiConsole.h"
 
-#include <Windows.h>
-
+#include <iostream>
 
 namespace WinApi::Console
 {
@@ -24,6 +23,45 @@ namespace WinApi::Console
         info.srWindow.Bottom++;
 
         return info;
+    }
+
+    void CreateConsole()
+    {
+        if (!::AllocConsole())
+            return;
+
+        FILE* fDummy;
+        freopen_s(&fDummy, "CONIN$", "r", stdin);
+        freopen_s(&fDummy, "CONOUT$", "w", stderr);
+        freopen_s(&fDummy, "CONOUT$", "w", stdout);
+
+        // clear old std
+        std::cout.clear();
+        std::clog.clear();
+        std::cerr.clear();
+        std::cin.clear();
+
+        // std wide char stream
+        HANDLE hConOut = CreateFileW(L"CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        HANDLE hConIn = CreateFileW(L"CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        SetStdHandle(STD_OUTPUT_HANDLE, hConOut);
+        SetStdHandle(STD_ERROR_HANDLE, hConOut);
+        SetStdHandle(STD_INPUT_HANDLE, hConIn);
+
+        std::wcout.clear();
+        std::wclog.clear();
+        std::wcerr.clear();
+        std::wcin.clear();
+    }
+
+    void AttachConsole()
+    {
+        ::AttachConsole(ATTACH_PARENT_PROCESS);
+    }
+
+    void DetachConsole()
+    {
+        ::FreeConsole();
     }
 
     void SetConsoleOutputUtf8()

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "WinApiBaseDefine.h"
 #include <string>
 
 namespace WinApi::Console
@@ -17,6 +16,12 @@ namespace WinApi::Console
         Purple,
         Cyan
     };
+
+    void CreateConsole();
+
+    void AttachConsole();
+
+    void DetachConsole();
 
     void SetConsoleOutputUtf8();
 
