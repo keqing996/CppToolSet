@@ -1,7 +1,9 @@
+
+#include <WinApiBaseDefine.h>
+#include <WinApiResource.h>
+
 #include "WinWindow.h"
-#include "StringUtil.hpp"
 #include "Resource/Resource.h"
-#include "Resource/WinResourceLoader.h"
 
 namespace UI
 {
@@ -216,7 +218,7 @@ namespace UI
 
     void Win32Window::Win32RegisterWindow()
     {
-        auto loadIcon = WinResourceLoader::LoadIconResource(IDI_ICON1);
+        auto loadIcon = WinApi::Resource::LoadResource<WinApi::Resource::IconResource>(IDI_ICON1);
         HICON hIcon = loadIcon.has_value() ? static_cast<HICON>(loadIcon.value().hIcon) : nullptr;
 
         WNDCLASSEXW wc = {

@@ -12,6 +12,9 @@ file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
 file (GLOB_RECURSE manifest_files manifest/*.manifest)
 
+file (GLOB_RECURSE lib_files_d ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/lib/*_d*.lib)
+file (GLOB_RECURSE lib_files ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/lib/*.lib)
+
 add_executable(${TargetName}
         ${src_files}
         ${res_files}
@@ -33,6 +36,7 @@ target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
         ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/StringUtil/ # string util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/include/ # windows api
         ${IM_GUI_DIR}   # imgui
         ${IM_GUI_DIR}/backends # imgui backend
 )
@@ -43,6 +47,11 @@ find_library(D3D11_LIBRARY d3d11.lib
 )
 
 target_link_libraries(${TargetName}
-        ${OPENGL_LIBRARIES} # opengl import lib -> Windows Kits\10\Lib\10.0.xxx.0\um\x64\OpenGL32.Lib
         d3d11.lib # d3d
 )
+
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    target_link_libraries(${TargetName} ${lib_files_d} )
+else()
+    target_link_libraries(${TargetName} ${lib_files} )
+endif ()

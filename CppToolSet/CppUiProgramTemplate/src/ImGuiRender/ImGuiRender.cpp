@@ -1,9 +1,11 @@
+
+#include <WinApiResource.h>
+
 #include "ImGuiRender.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include "Resource/Resource.h"
-#include "Resource/WinResourceLoader.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -47,7 +49,7 @@ namespace UI
         ImGui::GetStyle().ScaleAllSizes(dpiScale);
 
         // Font
-        auto defaultFontRes = WinResourceLoader::LoadDataResource(IDR_TTF1);
+        auto defaultFontRes = WinApi::Resource::LoadResource<WinApi::Resource::DataResource>(IDR_TTF1);
         if (defaultFontRes.has_value())
         {
             _pFontNormalJetbrainsMonoMsYaHei = _pSharedImGuiFonts->AddFontFromMemoryTTF(

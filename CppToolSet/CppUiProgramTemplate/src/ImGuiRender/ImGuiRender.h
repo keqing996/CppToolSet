@@ -1,7 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
-#include "Define/WindowsPlatform.h"
+#include <WinApiBaseDefine.h>
 #include "Window/IWinMsgReceiver.h"
 #include "Util/NonCopyable.h"
 

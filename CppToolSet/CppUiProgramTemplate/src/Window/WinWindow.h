@@ -4,7 +4,8 @@
 #include <vector>
 #include <functional>
 #include <d3d11.h>
-#include "Define/WindowsPlatform.h"
+#include <StringUtil.hpp>
+
 #include "IWinMsgReceiver.h"
 #include "ImGuiRender/ImGuiRender.h"
 #include "ImGuiLogic/ImGuiLogic.h"
