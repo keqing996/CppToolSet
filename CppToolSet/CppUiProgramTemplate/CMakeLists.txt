@@ -10,21 +10,15 @@ find_package(OpenGL REQUIRED)
 
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
-file (GLOB_RECURSE manifest_files manifest/*.manifest)
-
-file (GLOB_RECURSE lib_files_d ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/lib/*_d*.lib)
-file (GLOB_RECURSE lib_files ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/lib/*.lib)
-
-if (CMAKE_BUILD_TYPE STREQUAL Debug)
-    add_compile_definitions(BUILD_DEBUG)
-endif ()
+file (GLOB_RECURSE util_src_files ../CppUtils/src/*.cpp)
+file (GLOB_RECURSE manifest_files ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralResource/manifest/*.manifest)
 
 add_executable(${TargetName}
         ${src_files}
+        ${util_src_files}
         ${res_files}
         ${manifest_files}
         ${IM_GUI_DIR}/backends/imgui_impl_dx11.cpp
-        ${IM_GUI_DIR}/backends/imgui_impl_opengl3.cpp
         ${IM_GUI_DIR}/backends/imgui_impl_win32.cpp
         ${IM_GUI_DIR}/imgui.cpp
         ${IM_GUI_DIR}/imgui_draw.cpp
@@ -39,8 +33,7 @@ set_target_properties(${TargetName} PROPERTIES
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/StringUtil/ # string util
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/include/ # windows api
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/include/ # util
         ${IM_GUI_DIR}   # imgui
         ${IM_GUI_DIR}/backends # imgui backend
 )
@@ -53,9 +46,3 @@ find_library(D3D11_LIBRARY d3d11.lib
 target_link_libraries(${TargetName}
         d3d11.lib # d3d
 )
-
-if (CMAKE_BUILD_TYPE STREQUAL Debug)
-    target_link_libraries(${TargetName} ${lib_files_d} )
-else()
-    target_link_libraries(${TargetName} ${lib_files} )
-endif ()

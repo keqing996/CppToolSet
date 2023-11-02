@@ -1,4 +1,4 @@
 #include "Resource/Resource.h"
 
-IDI_ICON1 ICON "acfun.ico"
-IDR_TTF1 RCDATA "ttf/MsyhJetbrainsMono.ttf"
+IDI_ICON1    ICON       "acfun.ico"
+IDR_TTF1     RCDATA     "../../GeneralResource/ttf/MsyhJetbrainsMono.ttf"

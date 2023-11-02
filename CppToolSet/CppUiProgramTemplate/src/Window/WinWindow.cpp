@@ -1,15 +1,15 @@
 
-#include <WinApiBaseDefine.h>
-#include <WinApiResource.h>
-
+#include "WinApi/WindowsPlatform.h"
+#include "WinApi/WinApiResource.h"
+#include "StringUtil.hpp"
 #include "WinWindow.h"
 #include "Resource/Resource.h"
 
 namespace UI
 {
     Win32Window::Win32Window(const char* windowRegisterName, const char* windowTitle, int width, int height)
-        : _windowRegisterName(StringUtil::Convert::StringToWideString(windowRegisterName))
-        , _windowTitle(StringUtil::Convert::StringToWideString(windowTitle))
+        : _windowRegisterName(Util::StringConvert::StringToWideString(windowRegisterName))
+        , _windowTitle(Util::StringConvert::StringToWideString(windowTitle))
         , _width(width)
         , _height(height)
     {

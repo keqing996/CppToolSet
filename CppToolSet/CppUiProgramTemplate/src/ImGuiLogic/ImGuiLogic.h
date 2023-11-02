@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imgui.h"
-#include "Util/NonCopyable.h"
+#include "NonCopyable.h"
 
 namespace UI
 {

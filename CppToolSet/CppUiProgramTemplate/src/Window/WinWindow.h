@@ -4,12 +4,11 @@
 #include <vector>
 #include <functional>
 #include <d3d11.h>
-#include <StringUtil.hpp>
 
 #include "IWinMsgReceiver.h"
 #include "ImGuiRender/ImGuiRender.h"
 #include "ImGuiLogic/ImGuiLogic.h"
-#include "Util/NonCopyable.h"
+#include "NonCopyable.h"
 
 namespace UI
 {

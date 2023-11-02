@@ -1,9 +1,9 @@
 #pragma once
 
 #include <d3d11.h>
-#include <WinApiBaseDefine.h>
+#include "WinApi/WindowsPlatform.h"
 #include "Window/IWinMsgReceiver.h"
-#include "Util/NonCopyable.h"
+#include "NonCopyable.h"
 
 struct ImFontAtlas;
 struct ImFont;
