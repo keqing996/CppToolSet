@@ -10,6 +10,7 @@ add_subdirectory(ThirdParty/src/gtest)
 add_subdirectory(CppUtils)
 add_subdirectory(CppUiProgramTemplate)
 add_subdirectory(CppToolVsNewProjWin32Deleter)
+add_subdirectory(CppToolFileToCharArray)
 # add_subdirectory(CppGraphics)
 
 
