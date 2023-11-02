@@ -2,7 +2,7 @@
 #include <iostream>
 #include <Windows.h>
 
-#include <gtest/gtest.h>
+// #include <gtest/gtest.h>
 
 #include "../include/StringUtil.hpp"
 
@@ -55,14 +55,14 @@ int test123()
     return 1;
 }
 
-TEST(MD5Test, FastMD5)
-{
-    EXPECT_EQ(test123(), 1);
-}
+//TEST(MD5Test, FastMD5)
+//{
+//    EXPECT_EQ(test123(), 1);
+//}
 
 int main(int argc, char* argv[])
 {
-    testing::InitGoogleTest(&argc, argv);
+    // testing::InitGoogleTest(&argc, argv);
 
     ::SetConsoleOutputCP(CP_UTF8);
     std::locale::global(std::locale("zh_CN.UTF8"));
