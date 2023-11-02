@@ -6,9 +6,16 @@ set(TargetName string_util)
 
 set(CMAKE_CXX_STANDARD 20)
 
-file (GLOB_RECURSE src_files src/*.cpp)
+file (GLOB_RECURSE src_files test/*.cpp)
 
 add_executable(${TargetName} ${src_files} ${res_files})
+
+target_link_libraries(${TargetName}
+        gtest
+        gtest_main
+)
+
+add_test(NAME test COMMAND ${TargetName})
 
 # copy hpp
 add_custom_command(
