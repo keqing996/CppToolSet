@@ -7,30 +7,31 @@
 #include <string>
 #include <format>
 #include "StringUtil.hpp"
-#include "WinApiConsole.h"
+#include "WinApi/WindowsPlatform.h"
+#include "WinApi/WinApiConsole.h"
 
 using wRegex = std::basic_regex<wchar_t>;
 
 HANDLE hConsoleHandle;
 std::vector<std::wstring> gFileContentBuffer;
 
-void SetConsoleColor(WindowsApi::Console::ConsoleColor c)
+void SetConsoleColor(WinApi::Console::ConsoleColor c)
 {
-    WindowsApi::Console::SetColor(hConsoleHandle, c, WindowsApi::Console::ConsoleColor::Black);
+    WinApi::Console::SetColor(hConsoleHandle, c, WinApi::Console::ConsoleColor::Black);
 }
 
 void LogError(const std::string& message)
 {
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::Red);
+    SetConsoleColor(WinApi::Console::ConsoleColor::Red);
     std::cout << message << std::endl;
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+    SetConsoleColor(WinApi::Console::ConsoleColor::None);
 }
 
 void LogError(const std::wstring& message)
 {
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::Red);
+    SetConsoleColor(WinApi::Console::ConsoleColor::Red);
     std::wcout << message << std::endl;
-    SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+    SetConsoleColor(WinApi::Console::ConsoleColor::None);
 }
 
 void ProcessMarkdownFile(const std::filesystem::path& mdPath)
@@ -47,7 +48,7 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
 
     // abstract file name
     std::string mdFileName = mdPath.filename().stem().string();
-    std::wstring mdFileNameW = StringUtil::StringToWString(mdFileName);
+    std::wstring mdFileNameW = Util::StringConvert::StringToWideString(mdFileName);
 
     // change resource folder name
     auto targetResPath = mdPath.parent_path() / mdFileName;
@@ -84,17 +85,18 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
             continue;
         }
 
-        SetConsoleColor(WindowsApi::Console::ConsoleColor::Cyan);
+        SetConsoleColor(WinApi::Console::ConsoleColor::Cyan);
         std::wcout << std::format(L"\t<--: {}", oneLineContent) << std::endl;
 
         std::wstring title = regexResult[1];
-        std::wstring imgPath = StringUtil::Replace<wchar_t>(regexResult[2], L"Resource/", L"");
+        std::wstring imgPath = regexResult[2];
+        Util::StringOperation::Replace<wchar_t>(imgPath, L"Resource/", L"");
         oneLineContent = std::format(L"{{% asset_img {} {} %}}", imgPath, title);
 
-        SetConsoleColor(WindowsApi::Console::ConsoleColor::Green);
+        SetConsoleColor(WinApi::Console::ConsoleColor::Green);
         std::wcout << std::format(L"\t-->: {}", oneLineContent) << std::endl;
 
-        SetConsoleColor(WindowsApi::Console::ConsoleColor::None);
+        SetConsoleColor(WinApi::Console::ConsoleColor::None);
 
         gFileContentBuffer.push_back(oneLineContent);
     }
@@ -163,7 +165,7 @@ void ProcessDirectory(const std::filesystem::path& path)
 
 int main()
 {
-    hConsoleHandle = WindowsApi::Console::GetStdOutputHandle();
+    hConsoleHandle = WinApi::Console::GetStdOutputHandle();
 
     std::wcout.imbue(std::locale {"zh_CN"});
 

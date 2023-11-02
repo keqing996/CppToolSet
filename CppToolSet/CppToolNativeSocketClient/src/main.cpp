@@ -1,5 +1,4 @@
 
-#include <windows.h>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -9,8 +8,9 @@
 #include <queue>
 
 #include "cmdline/cmdline.h"
-#include "WinApiSocket.h"
-#include "WinApiConsole.h"
+#include "WinApi/WindowsPlatform.h"
+#include "WinApi/WinApiSocket.h"
+#include "WinApi/WinApiConsole.h"
 #include "StringUtil.hpp"
 
 HANDLE hConsoleHandle;

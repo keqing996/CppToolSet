@@ -12,6 +12,8 @@ add_subdirectory(CppUiProgramTemplate)
 add_subdirectory(CppToolVsNewProjWin32Deleter)
 add_subdirectory(CppToolFileToCharArray)
 add_subdirectory(CppToolMdNoUseImgDeleter)
+add_subdirectory(CppToolHexoMarkDownTool)
+add_subdirectory(CppToolNativeSocketClient)
 # add_subdirectory(CppGraphics)
 
 
