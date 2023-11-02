@@ -1,6 +1,5 @@
-
+#include "../include/WinApiBaseDefine.h"
 #include "../include/WinApiSocket.h"
-#include <Windows.h>
 #include <WinSock2.h>
 #include <iphlpapi.h>
 #include <ws2tcpip.h>
@@ -260,6 +259,8 @@ namespace WinApi::Socket
                 case EventType::Accept: mask |= FD_ACCEPT; break;
                 case EventType::Connect:mask |= FD_CONNECT; break;
                 case EventType::Close:  mask |= FD_CLOSE; break;
+                case EventType::Count:
+                    break;
             }
         }
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "WinApiBaseDefine.h"
 #include <string>
 #include <thread>
 #include <optional>

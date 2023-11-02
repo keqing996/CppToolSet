@@ -1,18 +1,17 @@
 #include "../include/WinApiSystem.h"
+#include "../include/WinApiBaseDefine.h"
 
-#include <Windows.h>
-
-namespace WinApi
+namespace WinApi::System
 {
-    std::string WinGetUserName()
+    std::wstring GetWindowsUserName()
     {
-        char userNameBuffer[255];
+        wchar_t userNameBuffer[255];
         DWORD userNameBufferLen;
-        ::GetUserNameA(userNameBuffer, &userNameBufferLen);
+        ::GetUserName(userNameBuffer, &userNameBufferLen);
         return { userNameBuffer };
     }
 
-    bool WinCreateProcess(std::string cmd)
+    bool CreateDependentProcess(const std::wstring& cmdLine)
     {
         STARTUPINFO si;
         ::ZeroMemory( &si, sizeof(si) );
@@ -22,9 +21,9 @@ namespace WinApi
         ::ZeroMemory( &pi, sizeof(pi) );
 
         // Start the child process.
-        if( !::CreateProcessA(
+        if( !::CreateProcessW(
                 nullptr,                                // No module name (use command line)
-                const_cast<LPSTR>(cmd.c_str()),        // Command line
+                const_cast<LPWSTR>(cmdLine.c_str()),        // Command line
                 nullptr,                                // Process handle not inheritable
                 nullptr,                                // Thread handle not inheritable
                 FALSE,                                  // Set handle inheritance to FALSE
