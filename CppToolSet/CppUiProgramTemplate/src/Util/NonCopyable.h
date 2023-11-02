@@ -1,12 +1,17 @@
 #pragma once
 
-class NonCopyable
+namespace Util
 {
-protected:
-    NonCopyable() {}
-    ~NonCopyable() {}
+    class NonCopyable
+    {
+    protected:
+        NonCopyable() {}
+        ~NonCopyable() {}
 
-private:
-    NonCopyable( const NonCopyable& );
-    const NonCopyable& operator=( const NonCopyable& );
-};
+    private:
+        NonCopyable( const NonCopyable& );
+        const NonCopyable& operator=( const NonCopyable& );
+    };
+}
+
+

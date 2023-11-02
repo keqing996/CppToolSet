@@ -13,7 +13,7 @@
 
 namespace UI
 {
-    class Win32Window: public NonCopyable
+class Win32Window: public Util::NonCopyable
     {
     public:
         Win32Window(const char* windowRegisterName, const char* windowTitle, int width, int height);

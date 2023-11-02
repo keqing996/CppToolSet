@@ -15,6 +15,10 @@ file (GLOB_RECURSE manifest_files manifest/*.manifest)
 file (GLOB_RECURSE lib_files_d ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/lib/*_d*.lib)
 file (GLOB_RECURSE lib_files ${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/Library/WindowsApi/lib/*.lib)
 
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    add_compile_definitions(BUILD_DEBUG)
+endif ()
+
 add_executable(${TargetName}
         ${src_files}
         ${res_files}

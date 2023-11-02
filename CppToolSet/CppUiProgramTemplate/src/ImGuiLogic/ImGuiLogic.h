@@ -7,7 +7,7 @@ namespace UI
 {
     class Win32Window;
 
-    class ImGuiLogic : public NonCopyable
+class ImGuiLogic : public Util::NonCopyable
     {
     public:
         explicit ImGuiLogic(Win32Window* topWindow);
