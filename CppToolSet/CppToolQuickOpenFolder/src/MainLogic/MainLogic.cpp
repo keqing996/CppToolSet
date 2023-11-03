@@ -57,8 +57,12 @@ void MainLogic::UpdateVsCodePath()
 
     if (ImGui::Button("路径", {50, 0}))
     {
-        std::wstring newVsCodePath = WinApi::FileDialog::OpenFile(L"Choose VS Code Path");
-        _vsCodePathString = Util::StringConvert::WideStringToString(newVsCodePath);
+        auto newVsCodePath = WinApi::FileDialog::OpenFile(L"Choose VS Code Path");
+        if (newVsCodePath.has_value())
+        {
+            _vsCodePathString = Util::StringConvert::WideStringToString(newVsCodePath.value());
+            WriteConfig();
+        }
     }
 
     ImGui::SameLine();
@@ -138,6 +142,8 @@ void MainLogic::WriteConfig()
 
     RapidJsonDoc doc;
 
+    doc.SetObject();
+
     if (_vsCodePathString.length() > 0)
     {
         RapidJsonValue value(_vsCodePathString.c_str(), _vsCodePathString.length());
@@ -169,7 +175,7 @@ void MainLogic::WriteConfig()
 
     doc.Accept(writer);
 
-    fs << doc.GetString();
+    fs << sb.GetString();
 
     fs.close();
 }
