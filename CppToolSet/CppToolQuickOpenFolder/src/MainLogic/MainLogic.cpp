@@ -3,6 +3,8 @@
 #include <fstream>
 
 #include "Framework/Window/WinWindow.h"
+#include "StringUtil.hpp"
+#include "WinApi/WinApiFileDialog.h"
 #include "imgui_impl_win32.h"
 #include "MainLogic.h"
 #include "rapidjson/document.h"
@@ -53,18 +55,20 @@ void MainLogic::UpdateVsCodePath()
     }
     ImGui::PopFont();
 
-    ImGui::Button("...", {45, 0});
-    ImGui::SameLine();
+    if (ImGui::Button("路径", {50, 0}))
+    {
+        std::wstring newVsCodePath = WinApi::FileDialog::OpenFile(L"Choose VS Code Path");
+        _vsCodePathString = Util::StringConvert::WideStringToString(newVsCodePath);
+    }
 
-    //static char buf[128] = "click on a button to set focus";
+    ImGui::SameLine();
 
     ImGui::SetNextItemWidth(-1);
 
     if (_vsCodePathString.empty())
-        ImGui::Text("中文");
+        ImGui::Text("...");
     else
-        ImGui::Text("asdasds");
-    //ImGui::InputText("##", _vsCodePathString.c_str(), 0, ImGuiInputTextFlags_ReadOnly);
+        ImGui::Text("%s", _vsCodePathString.c_str());
 }
 
 std::string MainLogic::GetConfigPath() const
