@@ -109,6 +109,21 @@ namespace UiTemplate
         return "MainWindow";
     }
 
+    bool Win32Window::WindowHasMaxBox()
+    {
+        return true;
+    }
+
+    bool Win32Window::WindowHasMinBox()
+    {
+        return true;
+    }
+
+    bool Win32Window::WindowCanThickFrame()
+    {
+        return true;
+    }
+
     LRESULT Win32Window::WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         Win32Window* pThis = nullptr;
@@ -250,10 +265,24 @@ namespace UiTemplate
 
     void Win32Window::Win32CreateWindow()
     {
+        DWORD windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU;
+
+        if (WindowHasMaxBox())
+            windowStyle |= WS_MAXIMIZEBOX;
+
+        if (WindowHasMinBox())
+            windowStyle |= WS_MINIMIZEBOX;
+
+        if (WindowCanThickFrame())
+            windowStyle |= WS_THICKFRAME;
+
+        // TODO: Pop up window & drag & close
+        // WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_POPUP
+
         _hWnd = ::CreateWindowW(
                 _windowRegisterName.c_str(),
                 _windowTitle.c_str(),
-                WS_OVERLAPPEDWINDOW,
+                windowStyle,
                 100,
                 100,
                 _width,
