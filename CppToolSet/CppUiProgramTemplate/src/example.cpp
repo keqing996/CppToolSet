@@ -1,6 +1,7 @@
 
 #include "Framework/Window/WinWindow.h"
 #include "Framework/ImGuiLogic/ImGuiLogic.h"
+#include "WinApi/WinApiFileDialog.h"
 
 class WindowExample : public UiTemplate::Win32Window
 {

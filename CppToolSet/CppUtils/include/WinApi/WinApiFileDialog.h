@@ -4,5 +4,5 @@
 
 namespace WinApi::FileDialog
 {
-    std::wstring OpenFile();
+    std::wstring OpenFile(const std::wstring& titleMsg);
 }
