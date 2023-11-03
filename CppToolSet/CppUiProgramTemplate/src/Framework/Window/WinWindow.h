@@ -6,11 +6,11 @@
 #include <d3d11.h>
 
 #include "IWinMsgReceiver.h"
-#include "ImGuiRender/ImGuiRender.h"
-#include "ImGuiLogic/ImGuiLogic.h"
+#include "Framework/ImGuiRender/ImGuiRender.h"
+#include "Framework/ImGuiLogic/ImGuiLogic.h"
 #include "NonCopyable.h"
 
-namespace UI
+namespace UiTemplate
 {
 class Win32Window: public Util::NonCopyable
     {

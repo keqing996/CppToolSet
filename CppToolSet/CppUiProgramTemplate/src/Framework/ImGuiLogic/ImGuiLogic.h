@@ -3,11 +3,11 @@
 #include "imgui.h"
 #include "NonCopyable.h"
 
-namespace UI
+namespace UiTemplate
 {
     class Win32Window;
 
-class ImGuiLogic : public Util::NonCopyable
+    class ImGuiLogic : public Util::NonCopyable
     {
     public:
         explicit ImGuiLogic(Win32Window* topWindow);

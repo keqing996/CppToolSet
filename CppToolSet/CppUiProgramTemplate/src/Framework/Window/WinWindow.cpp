@@ -5,7 +5,7 @@
 #include "WinWindow.h"
 #include "Resource/Resource.h"
 
-namespace UI
+namespace UiTemplate
 {
     Win32Window::Win32Window(const char* windowRegisterName, const char* windowTitle, int width, int height)
         : _windowRegisterName(Util::StringConvert::StringToWideString(windowRegisterName))
@@ -161,10 +161,10 @@ namespace UI
             {
                 if (pWinMsgReceiver != nullptr)
                     pWinMsgReceiver->OnWinMsg(
-                            reinterpret_cast<int64>(hWnd),
-                            static_cast<uint32>(msg),
-                            static_cast<int64>(wParam),
-                            static_cast<int64>(lParam));
+                            reinterpret_cast<int64_t>(hWnd),
+                            static_cast<uint32_t>(msg),
+                            static_cast<int64_t>(wParam),
+                            static_cast<int64_t>(lParam));
             }
         }
 

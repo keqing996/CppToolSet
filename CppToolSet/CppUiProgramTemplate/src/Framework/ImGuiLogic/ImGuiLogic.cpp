@@ -1,7 +1,7 @@
 #include "ImGuiLogic.h"
-#include "Window/WinWindow.h"
+#include "Framework/Window/WinWindow.h"
 
-namespace UI
+namespace UiTemplate
 {
     ImGuiLogic::ImGuiLogic(Win32Window* topWindow)
         : _pTopWindow(topWindow)

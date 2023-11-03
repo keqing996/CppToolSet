@@ -9,7 +9,7 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-namespace UI
+namespace UiTemplate
 {
     void ImGuiRender::InitSharedFontAtlas()
     {
@@ -45,7 +45,7 @@ namespace UI
         ImGui_ImplDX11_Init(pDevice, pDeviceContext);
 
         // Scale
-        float dpiScale = GetDpiScale(reinterpret_cast<int64>(hWnd));
+        float dpiScale = GetDpiScale(reinterpret_cast<int64_t>(hWnd));
         ImGui::GetStyle().ScaleAllSizes(dpiScale);
 
         // Font
@@ -110,7 +110,7 @@ namespace UI
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     }
 
-    void ImGuiRender::OnWinMsg(int64 hWnd, uint32 msg, int64 wParam, int64 lParam)
+    void ImGuiRender::OnWinMsg(int64_t hWnd, uint32_t msg, int64_t wParam, int64_t lParam)
     {
         ImGui_ImplWin32_WndProcHandler(
                 reinterpret_cast<HWND>(hWnd),
@@ -119,7 +119,7 @@ namespace UI
                 static_cast<LPARAM>(lParam));
     }
 
-    float ImGuiRender::GetDpiScale(int64 hWnd) const
+    float ImGuiRender::GetDpiScale(int64_t hWnd) const
     {
         return ImGui_ImplWin32_GetDpiScaleForHwnd(reinterpret_cast<HWND>(hWnd));
     }
