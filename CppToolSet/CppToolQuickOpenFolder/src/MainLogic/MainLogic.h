@@ -26,7 +26,6 @@ private:
     void WriteConfig();
 
 private:
-    ImFont* _bigFont = nullptr;
     std::string _vsCodePathString;
     std::vector<Folder> _allFolder;
 };

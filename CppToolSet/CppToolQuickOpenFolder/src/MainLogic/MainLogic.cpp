@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 
+#include "Framework/Window/WinWindow.h"
 #include "imgui_impl_win32.h"
 #include "MainLogic.h"
 #include "rapidjson/document.h"
@@ -43,7 +44,7 @@ void MainLogic::UpdateVsCodePath()
 {
     static const char* title = "VS Code Path";
 
-    ImGui::PushFont(_bigFont);
+    ImGui::PushFont(_pTopWindow->GetRender()->GetLargeFont());
     {
         auto titleWidth = ImGui::CalcTextSize(title);
 

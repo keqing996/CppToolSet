@@ -8,12 +8,12 @@ class WindowExample : public UiTemplate::Win32Window
 protected:
     const char* GetWindowTitle() override
     {
-        return "UiExample";
+        return "Quick Open Folder";
     }
 
     int GetWindowInitWidth() override
     {
-        return 1200;
+        return 600;
     }
 
     int GetWindowInitHeight() override
