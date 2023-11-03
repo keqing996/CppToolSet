@@ -39,6 +39,10 @@ namespace UiTemplate
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 
+        // close imGui ini file generate
+        io.IniFilename = nullptr;
+
+        // color light
         ImGui::StyleColorsLight();
 
         ImGui_ImplWin32_Init(hWnd);
