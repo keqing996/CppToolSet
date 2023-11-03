@@ -1,20 +1,30 @@
-#include "ImGuiLogic.h"
-#include "Window/WinWindow.h"
 
-namespace UI
+#include "Framework/Window/WinWindow.h"
+#include "Framework/ImGuiLogic/ImGuiLogic.h"
+
+class WindowExample : public UiTemplate::Win32Window
 {
-    ImGuiLogic::ImGuiLogic(Win32Window* topWindow)
-        : _pTopWindow(topWindow)
+protected:
+    const char* GetWindowTitle() override
     {
-        _pTopWindow->AddImGuiLogicUpdater(this);
+        return "UiExample";
     }
 
-    ImGuiLogic::~ImGuiLogic()
+    int GetWindowInitWidth() override
     {
-        _pTopWindow->RemoveImGuiLogicUpdater(this);
+        return 1200;
     }
 
-    void ImGuiLogic::Update()
+    int GetWindowInitHeight() override
+    {
+        return 800;
+    }
+};
+
+class LogicExample : public UiTemplate::ImGuiLogic
+{
+protected:
+    void Update() override
     {
         static float f = 0.0f;
         static int counter = 0;
@@ -54,6 +64,14 @@ namespace UI
         ImGui::PopFont();
         ImGui::End();
     }
+};
 
+UiTemplate::Win32Window* CreateMainWindow()
+{
+    return new WindowExample();
+}
 
+UiTemplate::ImGuiLogic* CreateMainLogic()
+{
+    return new LogicExample();
 }
