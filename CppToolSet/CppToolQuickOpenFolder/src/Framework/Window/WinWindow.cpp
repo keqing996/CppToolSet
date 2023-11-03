@@ -5,26 +5,17 @@
 #include "WinWindow.h"
 #include "Resource/Resource.h"
 
-namespace UI
+namespace UiTemplate
 {
-    Win32Window::Win32Window(const char* windowRegisterName, const char* windowTitle, int width, int height)
-        : _windowRegisterName(Util::StringConvert::StringToWideString(windowRegisterName))
-        , _windowTitle(Util::StringConvert::StringToWideString(windowTitle))
-        , _width(width)
-        , _height(height)
-    {
-    }
-
-    Win32Window::~Win32Window()
-    {
-        ImGuiDestroyRender();
-        D3dDestroyDevice();
-        Win32DestroyWindow();
-        Win32UnRegisterWindow();
-    }
-
     bool Win32Window::SetUp()
     {
+        InitLanguage();
+
+        _width = GetWindowInitWidth();
+        _height = GetWindowInitHeight();
+        _windowRegisterName = Util::StringConvert::StringToWideString(GetWindowRegisterName());
+        _windowTitle = Util::StringConvert::StringToWideString(GetWindowTitle());
+
         Win32RegisterWindow();
         Win32CreateWindow();
 
@@ -34,6 +25,14 @@ namespace UI
         ImGuiCreateRender();
 
         return true;
+    }
+
+    void Win32Window::Destroy()
+    {
+        ImGuiDestroyRender();
+        D3dDestroyDevice();
+        Win32DestroyWindow();
+        Win32UnRegisterWindow();
     }
 
     void Win32Window::Show()
@@ -63,7 +62,7 @@ namespace UI
         std::for_each(_imGuiLogicVec.begin(), _imGuiLogicVec.end(), [](ImGuiLogic* pUpdater)
         {
             if (pUpdater != nullptr)
-                pUpdater->Update();
+                pUpdater->Loop();
         });
 
         _pImGuiRender->EndFrame();
@@ -103,6 +102,11 @@ namespace UI
     ImGuiRender* Win32Window::GetRender() const
     {
         return _pImGuiRender;
+    }
+
+    const char* Win32Window::GetWindowRegisterName()
+    {
+        return "MainWindow";
     }
 
     LRESULT Win32Window::WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -161,10 +165,10 @@ namespace UI
             {
                 if (pWinMsgReceiver != nullptr)
                     pWinMsgReceiver->OnWinMsg(
-                            reinterpret_cast<int64>(hWnd),
-                            static_cast<uint32>(msg),
-                            static_cast<int64>(wParam),
-                            static_cast<int64>(lParam));
+                            reinterpret_cast<int64_t>(hWnd),
+                            static_cast<uint32_t>(msg),
+                            static_cast<int64_t>(wParam),
+                            static_cast<int64_t>(lParam));
             }
         }
 
@@ -214,6 +218,11 @@ namespace UI
     {
         ::PostQuitMessage(0);
         return FALSE;
+    }
+
+    void Win32Window::InitLanguage()
+    {
+        std::locale::global(std::locale("zh_CN.UTF8"));
     }
 
     void Win32Window::Win32RegisterWindow()

@@ -2,20 +2,20 @@
 
 #include <d3d11.h>
 #include "WinApi/WindowsPlatform.h"
-#include "Window/IWinMsgReceiver.h"
+#include "Framework/Window/IWinMsgReceiver.h"
 #include "NonCopyable.h"
 
 struct ImFontAtlas;
 struct ImFont;
 
-namespace UI
+namespace UiTemplate
 {
 class ImGuiRender : public IWinMsgReceiver, public Util::NonCopyable
     {
     public:
         ImGuiRender();
         ~ImGuiRender();
-        void OnWinMsg(int64 hWnd, uint32 msg, int64 wParam, int64 lParam) override;
+        void OnWinMsg(int64_t hWnd, uint32_t msg, int64_t wParam, int64_t lParam) override;
 
     public:
         void SetUp(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
@@ -25,7 +25,7 @@ class ImGuiRender : public IWinMsgReceiver, public Util::NonCopyable
         void RenderDrawData();
 
     public:
-        float GetDpiScale(int64 hWnd) const;
+        float GetDpiScale(int64_t hWnd) const;
         ImFont* GetNormalFont() const;
         ImFont* GetLargeFont() const;
 

@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "imgui_impl_win32.h"
-#include "UiLogic.h"
+#include "MainLogic.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 
@@ -12,12 +12,12 @@ using RapidJsonValue = rapidjson::GenericValue<rapidjson::UTF8<>>;
 using RapidJsonStringBuffer = rapidjson::GenericStringBuffer<rapidjson::UTF8<>>;
 using RapidJsonPrettyWriter = rapidjson::PrettyWriter<RapidJsonStringBuffer, rapidjson::UTF8<>, rapidjson::UTF8<>>;
 
-UiLogic::UiLogic(UI::Win32Window* topWindow) : UI::ImGuiLogic(topWindow)
+MainLogic::MainLogic()
 {
     InitConfig();
 }
 
-void UiLogic::Update()
+void MainLogic::Update()
 {
     const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y), ImGuiCond_Always);
@@ -39,7 +39,7 @@ void UiLogic::Update()
     ImGui::End();
 }
 
-void UiLogic::UpdateVsCodePath()
+void MainLogic::UpdateVsCodePath()
 {
     static const char* title = "VS Code Path";
 
@@ -66,14 +66,14 @@ void UiLogic::UpdateVsCodePath()
     //ImGui::InputText("##", _vsCodePathString.c_str(), 0, ImGuiInputTextFlags_ReadOnly);
 }
 
-std::string UiLogic::GetConfigPath() const
+std::string MainLogic::GetConfigPath() const
 {
     auto currentPath = std::filesystem::current_path();
     auto configPath = currentPath /= "quick_open_folder.json";
     return configPath.string();
 }
 
-void UiLogic::InitConfig()
+void MainLogic::InitConfig()
 {
     auto configPath = GetConfigPath();
 
@@ -121,7 +121,7 @@ void UiLogic::InitConfig()
     }
 }
 
-void UiLogic::WriteConfig()
+void MainLogic::WriteConfig()
 {
     if (_vsCodePathString.length() == 0 && _allFolder.empty())
         return;

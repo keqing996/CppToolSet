@@ -3,12 +3,7 @@
 
 #include <vector>
 
-#include "ImGuiLogic/ImGuiLogic.h"
-
-namespace UI
-{
-    class Win32Window;
-}
+#include "Framework/ImGuiLogic/ImGuiLogic.h"
 
 struct Folder
 {
@@ -16,10 +11,10 @@ struct Folder
     std::string path;
 };
 
-class UiLogic : public UI::ImGuiLogic
+class MainLogic : public UiTemplate::ImGuiLogic
 {
 public:
-    explicit UiLogic(UI::Win32Window* topWindow);
+    MainLogic();
 
 public:
     void Update() override;
