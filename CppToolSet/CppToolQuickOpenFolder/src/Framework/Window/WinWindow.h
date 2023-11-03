@@ -40,6 +40,9 @@ namespace UiTemplate
         virtual const char* GetWindowTitle() = 0;
         virtual int GetWindowInitWidth() = 0;
         virtual int GetWindowInitHeight() = 0;
+        virtual bool WindowHasMaxBox();
+        virtual bool WindowHasMinBox();
+        virtual bool WindowCanThickFrame();
 
     private: /* message */
         static LRESULT WINAPI WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

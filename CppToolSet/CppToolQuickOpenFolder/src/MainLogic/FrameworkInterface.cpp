@@ -20,6 +20,21 @@ protected:
     {
         return 800;
     }
+
+    bool WindowHasMaxBox() override
+    {
+        return false;
+    }
+
+    bool WindowHasMinBox() override
+    {
+        return false;
+    }
+
+    bool WindowCanThickFrame() override
+    {
+        return false;
+    }
 };
 
 UiTemplate::Win32Window* CreateMainWindow()
