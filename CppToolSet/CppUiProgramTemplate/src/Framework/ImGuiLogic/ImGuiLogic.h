@@ -10,11 +10,16 @@ namespace UiTemplate
     class ImGuiLogic : public Util::NonCopyable
     {
     public:
-        explicit ImGuiLogic(Win32Window* topWindow);
+        ImGuiLogic();
         virtual ~ImGuiLogic();
 
     public:
-        virtual void Update();
+        void SetUp(Win32Window* pWindow);
+        void Loop();
+        void Destroy();
+
+    protected:
+        virtual void Update() = 0;
 
     protected:
         // Top Window
