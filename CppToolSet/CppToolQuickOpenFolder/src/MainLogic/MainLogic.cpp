@@ -5,10 +5,10 @@
 #include "Framework/Window/WinWindow.h"
 #include "StringUtil.hpp"
 #include "WinApi/WinApiFileDialog.h"
-#include "imgui_impl_win32.h"
 #include "MainLogic.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
+#include "imgui.h"
 
 using RapidJsonDoc = rapidjson::GenericDocument<rapidjson::UTF8<>>;
 using RapidJsonValue = rapidjson::GenericValue<rapidjson::UTF8<>>;
@@ -34,7 +34,11 @@ void MainLogic::Update()
 
     ImGui::Begin("Quick Open Folder", nullptr, window_flags);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5);
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2);
+
+    UpdateFolderPath();
+
+    ImGui::Dummy(ImVec2 {0, 35});
 
     UpdateVsCodePath();
 
@@ -44,16 +48,7 @@ void MainLogic::Update()
 
 void MainLogic::UpdateVsCodePath()
 {
-    static const char* title = "VS Code Path";
-
-    ImGui::PushFont(_pTopWindow->GetRender()->GetLargeFont());
-    {
-        auto titleWidth = ImGui::CalcTextSize(title);
-
-        ImGui::SetCursorPosX(0.5 * (ImGui::GetWindowWidth() - titleWidth.x));
-        ImGui::Text("%s", title);
-    }
-    ImGui::PopFont();
+    UpdateTitle("VS Code Path");
 
     if (ImGui::Button("路径", {50, 0}))
     {
@@ -73,6 +68,65 @@ void MainLogic::UpdateVsCodePath()
         ImGui::Text("...");
     else
         ImGui::Text("%s", _vsCodePathString.c_str());
+}
+
+void MainLogic::UpdateFolderPath()
+{
+    UpdateTitle("Folders");
+
+    for (const auto& folder : _allFolder)
+        UpdateSingleFolder(folder);
+
+    if (ImGui::Button("Add"))
+    {
+        auto newFolder = WinApi::FileDialog::OpenDirectory(L"Choose Folder");
+        if (newFolder.has_value())
+        {
+            _allFolder.emplace_back("NewFolder", Util::StringConvert::WideStringToString(newFolder.value()));
+            WriteConfig();
+        }
+    }
+}
+
+void MainLogic::UpdateSingleFolder(const Folder& folder)
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+    auto childHeight = (ImGui::CalcTextSize("I").y + style.FramePadding.y * 2) * 2 + 3 * style.ItemSpacing.y;
+
+    ImGui::BeginChild(folder.name.c_str(), ImVec2 {0, childHeight}, true);
+
+    auto buttonWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 3)) / 4;
+
+    // name, path
+    ImGui::Text("Name: ");
+
+    ImGui::SameLine();
+
+    ImGui::Text("...");
+
+    // function button
+
+    ImGui::Button("Open", ImVec2{buttonWidth, 0});
+    ImGui::SameLine();
+    ImGui::Button("OpenWithCode", ImVec2{buttonWidth, 0});
+    ImGui::SameLine();
+    ImGui::Button("Delete", ImVec2{buttonWidth, 0});
+    ImGui::SameLine();
+    ImGui::Button("Rename", ImVec2{buttonWidth, 0});
+
+    ImGui::EndChild();
+}
+
+void MainLogic::UpdateTitle(const char* title)
+{
+    ImGui::PushFont(_pTopWindow->GetRender()->GetLargeFont());
+    {
+        auto titleWidth = ImGui::CalcTextSize(title);
+
+        ImGui::SetCursorPosX(0.5 * (ImGui::GetWindowWidth() - titleWidth.x));
+        ImGui::Text("%s", title);
+    }
+    ImGui::PopFont();
 }
 
 std::string MainLogic::GetConfigPath() const

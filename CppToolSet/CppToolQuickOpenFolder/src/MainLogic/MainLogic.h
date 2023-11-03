@@ -20,8 +20,13 @@ public:
     void Update() override;
 
 private:
-    std::string GetConfigPath() const;
     void UpdateVsCodePath();
+    void UpdateFolderPath();
+
+    void UpdateTitle(const char* name);
+    void UpdateSingleFolder(const Folder& folder);
+
+    std::string GetConfigPath() const;
     void InitConfig();
     void WriteConfig();
 
