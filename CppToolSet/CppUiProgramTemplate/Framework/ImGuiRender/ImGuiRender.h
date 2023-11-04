@@ -26,8 +26,8 @@ class ImGuiRender : public IWinMsgReceiver, public Util::NonCopyable
 
     public:
         float GetDpiScale(int64_t hWnd) const;
-        ImFont* GetNormalFont() const;
-        ImFont* GetLargeFont() const;
+        ImFont* GetRegularFont() const;
+        ImFont* GetBoldFont() const;
 
     private:
         static constexpr int NORMAL_FONT_SIZE = 16;
@@ -38,7 +38,5 @@ class ImGuiRender : public IWinMsgReceiver, public Util::NonCopyable
     private:
         ImFont* _pFontRegular = nullptr;
         ImFont* _pFontBold = nullptr;
-        ImFont* _pFontItalic = nullptr;
-        ImFont* _pFontBoldItalic = nullptr;
     };
 }

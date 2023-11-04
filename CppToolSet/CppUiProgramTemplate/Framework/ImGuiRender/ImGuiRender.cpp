@@ -80,8 +80,6 @@ namespace UiTemplate
 
         _pFontRegular = LoadMemoryFont(RES_TTF_REGULAR);
         _pFontBold = LoadMemoryFont(RES_TTF_BOLD);
-        _pFontItalic = LoadMemoryFont(RES_TTF_ITALIC);
-        _pFontBoldItalic = LoadMemoryFont(RES_TTF_BOLD_ITALIC);
 
 #endif
 
@@ -91,11 +89,6 @@ namespace UiTemplate
         if (_pFontBold == nullptr)
             _pFontBold = LoadMemoryFromFile("c:\\Windows\\Fonts\\msyhbd.ttc");
 
-        if (_pFontItalic == nullptr)
-            _pFontItalic = LoadMemoryFromFile("c:\\Windows\\Fonts\\msyhl.ttc");
-
-        if (_pFontBoldItalic == nullptr)
-            _pFontBoldItalic = LoadMemoryFromFile("c:\\Windows\\Fonts\\msyhl.ttc");
     }
 
     void ImGuiRender::Destroy()
@@ -136,13 +129,13 @@ namespace UiTemplate
         return ImGui_ImplWin32_GetDpiScaleForHwnd(reinterpret_cast<HWND>(hWnd));
     }
 
-    ImFont* ImGuiRender::GetNormalFont() const
+    ImFont* ImGuiRender::GetRegularFont() const
     {
-        return _pFontNormalJetbrainsMonoMsYaHei;
+        return _pFontRegular;
     }
 
-    ImFont* ImGuiRender::GetLargeFont() const
+    ImFont* ImGuiRender::ImGuiRenderGetBoldFont() const
     {
-        return _pFontLargeJetbrainsMonoMsYaHei;
+        return _pFontBold;
     }
 }

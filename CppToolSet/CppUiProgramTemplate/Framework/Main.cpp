@@ -1,6 +1,6 @@
 
 
-#include "../Window/WinWindow.h"
+#include "Window/WinWindow.h"
 #include "ImGuiLogic/ImGuiLogic.h"
 
 // Imp Out Of Framework
