@@ -8,12 +8,18 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(OpenGL REQUIRED)
 
+file (GLOB_RECURSE UI_TEMPLATE_SRC Framework/*.cpp)
+file (GLOB_RECURSE UI_TEMPLATE_RESOURCE Framework/*.rc)
+file (GLOB_RECURSE UI_TEMPLATE_MANIFEST ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralResource/manifest/*.manifest)
+
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
 file (GLOB_RECURSE util_src_files ../CppUtils/src/*.cpp)
-file (GLOB_RECURSE manifest_files ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralResource/manifest/*.manifest)
 
 add_executable(${TargetName}
+        ${UI_TEMPLATE_SRC}
+        ${UI_TEMPLATE_RESOURCE}
+        ${UI_TEMPLATE_MANIFEST}
         ${src_files}
         ${util_src_files}
         ${res_files}
@@ -29,6 +35,8 @@ add_executable(${TargetName}
 set_target_properties(${TargetName} PROPERTIES
         LINK_FLAGS "/SUBSYSTEM:WINDOWS"
 )
+
+target_compile_definitions(${TargetName} PRIVATE EMBEDDED_TTF)
 
 target_include_directories(${TargetName}
         PRIVATE

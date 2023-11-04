@@ -1,6 +1,6 @@
 
-#include "Framework/Window/WinWindow.h"
-#include "Framework/ImGuiLogic/ImGuiLogic.h"
+#include "../Framework/Window/WinWindow.h"
+#include "../resource/resource.h"
 #include "WinApi/WinApiFileDialog.h"
 
 class WindowExample : public UiTemplate::Win32Window
@@ -19,6 +19,11 @@ protected:
     int GetWindowInitHeight() override
     {
         return 800;
+    }
+
+    int GetWindowIconResourceId() override
+    {
+        return IDI_ICON1;
     }
 };
 
