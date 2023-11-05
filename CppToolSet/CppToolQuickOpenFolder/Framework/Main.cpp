@@ -1,7 +1,7 @@
 
 
-#include "Framework/Window/WinWindow.h"
-#include "Framework/ImGuiLogic/ImGuiLogic.h"
+#include "Window/WinWindow.h"
+#include "ImGuiLogic/ImGuiLogic.h"
 
 // Imp Out Of Framework
 UiTemplate::Win32Window* CreateMainWindow();

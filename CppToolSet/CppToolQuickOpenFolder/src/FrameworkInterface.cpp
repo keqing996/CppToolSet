@@ -1,7 +1,7 @@
 
-#include "Framework/Window/WinWindow.h"
-#include "Framework/ImGuiLogic/ImGuiLogic.h"
+#include "../Framework/Window/WinWindow.h"
 #include "MainLogic.h"
+#include "../resource/resource.h"
 
 class WindowExample : public UiTemplate::Win32Window
 {
@@ -9,6 +9,11 @@ protected:
     const char* GetWindowTitle() override
     {
         return "Quick Open Folder";
+    }
+
+    int GetWindowIconResourceId() override
+    {
+        return IDI_ICON1;
     }
 
     int GetWindowInitWidth() override

@@ -5,7 +5,7 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
-#include "Resource/Resource.h"
+#include "../Resource/FontResource.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -53,41 +53,50 @@ namespace UiTemplate
         ImGui::GetStyle().ScaleAllSizes(dpiScale);
 
         // Font
-        auto defaultFontRes = WinApi::Resource::LoadResource<WinApi::Resource::DataResource>(IDR_TTF1);
-        if (defaultFontRes.has_value())
+        auto LoadMemoryFont = [this, dpiScale](int resId, int size) -> ImFont*
         {
-            _pFontNormalJetbrainsMonoMsYaHei = _pSharedImGuiFonts->AddFontFromMemoryTTF(
+            auto defaultFontRes = WinApi::Resource::LoadResource<WinApi::Resource::DataResource>(resId);
+            if (!defaultFontRes.has_value())
+                return nullptr;
+
+            return _pSharedImGuiFonts->AddFontFromMemoryTTF(
                     defaultFontRes.value().data,
                     defaultFontRes.value().size,
-                    dpiScale * NORMAL_FONT_SIZE,
+                    dpiScale * size,
                     nullptr,
                     _pSharedImGuiFonts->GetGlyphRangesChineseSimplifiedCommon());
+        };
 
-            _pFontLargeJetbrainsMonoMsYaHei = _pSharedImGuiFonts->AddFontFromMemoryTTF(
-                    defaultFontRes.value().data,
-                    defaultFontRes.value().size,
-                    dpiScale * LARGE_FONT_SIZE,
-                    nullptr,
-                    _pSharedImGuiFonts->GetGlyphRangesChineseSimplifiedCommon());
-        }
-
-        if (_pFontNormalJetbrainsMonoMsYaHei == nullptr)
+        auto LoadMemoryFromFile = [this, dpiScale](const char* fileName, int size) -> ImFont*
         {
-            _pFontNormalJetbrainsMonoMsYaHei = _pSharedImGuiFonts->AddFontFromFileTTF(
-                    "c:\\Windows\\Fonts\\msyhl.ttc",
-                    dpiScale * NORMAL_FONT_SIZE,
+            return _pSharedImGuiFonts->AddFontFromFileTTF(
+                    fileName,
+                    dpiScale * size,
                     nullptr,
                     _pSharedImGuiFonts->GetGlyphRangesChineseSimplifiedCommon());
-        }
+        };
 
-        if (_pFontLargeJetbrainsMonoMsYaHei == nullptr)
-        {
-            _pFontLargeJetbrainsMonoMsYaHei = _pSharedImGuiFonts->AddFontFromFileTTF(
-                    "c:\\Windows\\Fonts\\msyhl.ttc",
-                    dpiScale * LARGE_FONT_SIZE,
-                    nullptr,
-                    _pSharedImGuiFonts->GetGlyphRangesChineseSimplifiedCommon());
-        }
+#ifdef EMBEDDED_TTF
+
+        _pFontRegularNormal = LoadMemoryFont(RES_TTF_REGULAR, NORMAL_FONT_SIZE);
+        _pFontRegularLarge = LoadMemoryFont(RES_TTF_REGULAR, LARGE_FONT_SIZE);
+        _pFontBoldNormal = LoadMemoryFont(RES_TTF_BOLD, NORMAL_FONT_SIZE);
+        _pFontBoldLarge = LoadMemoryFont(RES_TTF_BOLD, LARGE_FONT_SIZE);
+
+#endif
+
+        if (_pFontRegularNormal == nullptr)
+            _pFontRegularNormal = LoadMemoryFromFile(SYSTEM_MSYH_REGULAR_FONT_PATH, NORMAL_FONT_SIZE);
+
+        if (_pFontRegularLarge == nullptr)
+            _pFontRegularLarge = LoadMemoryFromFile(SYSTEM_MSYH_REGULAR_FONT_PATH, LARGE_FONT_SIZE);
+
+        if (_pFontBoldNormal == nullptr)
+            _pFontBoldNormal = LoadMemoryFromFile(SYSTEM_MSYH_BOLD_FONT_PATH, NORMAL_FONT_SIZE);
+
+        if (_pFontBoldLarge == nullptr)
+            _pFontBoldLarge = LoadMemoryFromFile(SYSTEM_MSYH_BOLD_FONT_PATH, LARGE_FONT_SIZE);
+
     }
 
     void ImGuiRender::Destroy()
@@ -128,13 +137,23 @@ namespace UiTemplate
         return ImGui_ImplWin32_GetDpiScaleForHwnd(reinterpret_cast<HWND>(hWnd));
     }
 
-    ImFont* ImGuiRender::GetNormalFont() const
+    ImFont* ImGuiRender::GetRegularFontNormal() const
     {
-        return _pFontNormalJetbrainsMonoMsYaHei;
+        return _pFontRegularNormal;
     }
 
-    ImFont* ImGuiRender::GetLargeFont() const
+    ImFont* ImGuiRender::GetRegularFontLarge() const
     {
-        return _pFontLargeJetbrainsMonoMsYaHei;
+        return _pFontRegularLarge;
+    }
+
+    ImFont* ImGuiRender::GetBoldFontNormal() const
+    {
+        return _pFontBoldNormal;
+    }
+
+    ImFont* ImGuiRender::GetBoldFontLarge() const
+    {
+        return _pFontBoldLarge;
     }
 }

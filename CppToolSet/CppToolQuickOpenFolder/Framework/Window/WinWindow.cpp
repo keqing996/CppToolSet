@@ -3,7 +3,7 @@
 #include "WinApi/WinApiResource.h"
 #include "StringUtil.hpp"
 #include "WinWindow.h"
-#include "Resource/Resource.h"
+#include "../Resource/FontResource.h"
 
 namespace UiTemplate
 {
@@ -124,6 +124,11 @@ namespace UiTemplate
         return true;
     }
 
+    int Win32Window::GetWindowIconResourceId()
+    {
+        return 0;
+    }
+
     LRESULT Win32Window::WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         Win32Window* pThis = nullptr;
@@ -242,8 +247,13 @@ namespace UiTemplate
 
     void Win32Window::Win32RegisterWindow()
     {
-        auto loadIcon = WinApi::Resource::LoadResource<WinApi::Resource::IconResource>(IDI_ICON1);
-        HICON hIcon = loadIcon.has_value() ? static_cast<HICON>(loadIcon.value().hIcon) : nullptr;
+        int iconId = GetWindowIconResourceId();
+        HICON hIcon = nullptr;
+        if (iconId != 0)
+        {
+            auto loadIcon = WinApi::Resource::LoadResource<WinApi::Resource::IconResource>(iconId);
+            hIcon = loadIcon.has_value() ? static_cast<HICON>(loadIcon.value().hIcon) : nullptr;
+        }
 
         WNDCLASSEXW wc = {
                 sizeof(wc),

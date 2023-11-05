@@ -1,5 +1,5 @@
 #include "ImGuiLogic.h"
-#include "Framework/Window/WinWindow.h"
+#include "../Window/WinWindow.h"
 
 namespace UiTemplate
 {

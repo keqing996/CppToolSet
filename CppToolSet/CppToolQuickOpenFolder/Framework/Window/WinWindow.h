@@ -6,8 +6,8 @@
 #include <d3d11.h>
 
 #include "IWinMsgReceiver.h"
-#include "Framework/ImGuiRender/ImGuiRender.h"
-#include "Framework/ImGuiLogic/ImGuiLogic.h"
+#include "../ImGuiRender/ImGuiRender.h"
+#include "../ImGuiLogic/ImGuiLogic.h"
 #include "NonCopyable.h"
 
 namespace UiTemplate
@@ -43,6 +43,7 @@ namespace UiTemplate
         virtual bool WindowHasMaxBox();
         virtual bool WindowHasMinBox();
         virtual bool WindowCanThickFrame();
+        virtual int GetWindowIconResourceId();
 
     private: /* message */
         static LRESULT WINAPI WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

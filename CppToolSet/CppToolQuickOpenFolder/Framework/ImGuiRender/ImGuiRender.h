@@ -2,7 +2,7 @@
 
 #include <d3d11.h>
 #include "WinApi/WindowsPlatform.h"
-#include "Framework/Window/IWinMsgReceiver.h"
+#include "../Window/IWinMsgReceiver.h"
 #include "NonCopyable.h"
 
 struct ImFontAtlas;
@@ -26,18 +26,23 @@ class ImGuiRender : public IWinMsgReceiver, public Util::NonCopyable
 
     public:
         float GetDpiScale(int64_t hWnd) const;
-        ImFont* GetNormalFont() const;
-        ImFont* GetLargeFont() const;
+        ImFont* GetRegularFontNormal() const;
+        ImFont* GetRegularFontLarge() const;
+        ImFont* GetBoldFontNormal() const;
+        ImFont* GetBoldFontLarge() const;
 
     private:
         static constexpr int NORMAL_FONT_SIZE = 16;
         static constexpr int LARGE_FONT_SIZE = 20;
+        static constexpr const char* SYSTEM_MSYH_REGULAR_FONT_PATH = "c:\\Windows\\Fonts\\msyhl.ttc";
+        static constexpr const char* SYSTEM_MSYH_BOLD_FONT_PATH = "c:\\Windows\\Fonts\\msyhbd.ttc";
         static inline ImFontAtlas* _pSharedImGuiFonts = nullptr;
         static void InitSharedFontAtlas();
 
     private:
-        ImFont* _pFontNormalJetbrainsMonoMsYaHei = nullptr;
-        ImFont* _pFontLargeJetbrainsMonoMsYaHei = nullptr;
-
+        ImFont* _pFontRegularNormal = nullptr;
+        ImFont* _pFontRegularLarge = nullptr;
+        ImFont* _pFontBoldNormal = nullptr;
+        ImFont* _pFontBoldLarge = nullptr;
     };
 }

@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "Framework/Window/WinWindow.h"
+#include "../Framework/Window/WinWindow.h"
 #include "StringUtil.hpp"
 #include "WinApi/WinApiFileDialog.h"
 #include "MainLogic.h"
@@ -119,7 +119,7 @@ void MainLogic::UpdateSingleFolder(const Folder& folder)
 
 void MainLogic::UpdateTitle(const char* title)
 {
-    ImGui::PushFont(_pTopWindow->GetRender()->GetLargeFont());
+    ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontLarge());
     {
         auto titleWidth = ImGui::CalcTextSize(title);
 
