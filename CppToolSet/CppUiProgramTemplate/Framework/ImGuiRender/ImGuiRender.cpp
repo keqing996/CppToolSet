@@ -134,7 +134,7 @@ namespace UiTemplate
         return _pFontRegular;
     }
 
-    ImFont* ImGuiRender::ImGuiRenderGetBoldFont() const
+    ImFont* ImGuiRender::GetBoldFont() const
     {
         return _pFontBold;
     }

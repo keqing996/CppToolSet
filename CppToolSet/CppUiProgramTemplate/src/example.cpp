@@ -65,7 +65,7 @@ protected:
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::PushFont(_pTopWindow->GetRender()->GetLargeFont());
+        ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFont());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::PopFont();
         ImGui::End();
