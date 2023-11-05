@@ -63,11 +63,15 @@ protected:
             counter++;
 
         ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
 
-        ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFont());
+        ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontNormal());
+        ImGui::Text("counter = %d", counter);
+        ImGui::PopFont();
+
+        ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontLarge());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::PopFont();
+
         ImGui::End();
     }
 };

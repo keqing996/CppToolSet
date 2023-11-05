@@ -53,7 +53,7 @@ namespace UiTemplate
         ImGui::GetStyle().ScaleAllSizes(dpiScale);
 
         // Font
-        auto LoadMemoryFont = [this, dpiScale](int resId) -> ImFont*
+        auto LoadMemoryFont = [this, dpiScale](int resId, int size) -> ImFont*
         {
             auto defaultFontRes = WinApi::Resource::LoadResource<WinApi::Resource::DataResource>(resId);
             if (!defaultFontRes.has_value())
@@ -62,32 +62,40 @@ namespace UiTemplate
             return _pSharedImGuiFonts->AddFontFromMemoryTTF(
                     defaultFontRes.value().data,
                     defaultFontRes.value().size,
-                    dpiScale * NORMAL_FONT_SIZE,
+                    dpiScale * size,
                     nullptr,
                     _pSharedImGuiFonts->GetGlyphRangesChineseSimplifiedCommon());
         };
 
-        auto LoadMemoryFromFile = [this, dpiScale](const char* fileName) -> ImFont*
+        auto LoadMemoryFromFile = [this, dpiScale](const char* fileName, int size) -> ImFont*
         {
             return _pSharedImGuiFonts->AddFontFromFileTTF(
                     fileName,
-                    dpiScale * NORMAL_FONT_SIZE,
+                    dpiScale * size,
                     nullptr,
                     _pSharedImGuiFonts->GetGlyphRangesChineseSimplifiedCommon());
         };
 
 #ifdef EMBEDDED_TTF
 
-        _pFontRegular = LoadMemoryFont(RES_TTF_REGULAR);
-        _pFontBold = LoadMemoryFont(RES_TTF_BOLD);
+        _pFontRegularNormal = LoadMemoryFont(RES_TTF_REGULAR, NORMAL_FONT_SIZE);
+        _pFontRegularLarge = LoadMemoryFont(RES_TTF_REGULAR, LARGE_FONT_SIZE);
+        _pFontBoldNormal = LoadMemoryFont(RES_TTF_BOLD, NORMAL_FONT_SIZE);
+        _pFontBoldLarge = LoadMemoryFont(RES_TTF_BOLD, LARGE_FONT_SIZE);
 
 #endif
 
-        if (_pFontRegular == nullptr)
-            _pFontRegular = LoadMemoryFromFile("c:\\Windows\\Fonts\\msyhl.ttc");
+        if (_pFontRegularNormal == nullptr)
+            _pFontRegularNormal = LoadMemoryFromFile(SYSTEM_MSYH_REGULAR_FONT_PATH, NORMAL_FONT_SIZE);
 
-        if (_pFontBold == nullptr)
-            _pFontBold = LoadMemoryFromFile("c:\\Windows\\Fonts\\msyhbd.ttc");
+        if (_pFontRegularLarge == nullptr)
+            _pFontRegularLarge = LoadMemoryFromFile(SYSTEM_MSYH_REGULAR_FONT_PATH, LARGE_FONT_SIZE);
+
+        if (_pFontBoldNormal == nullptr)
+            _pFontBoldNormal = LoadMemoryFromFile(SYSTEM_MSYH_BOLD_FONT_PATH, NORMAL_FONT_SIZE);
+
+        if (_pFontBoldLarge == nullptr)
+            _pFontBoldLarge = LoadMemoryFromFile(SYSTEM_MSYH_BOLD_FONT_PATH, LARGE_FONT_SIZE);
 
     }
 
@@ -129,13 +137,23 @@ namespace UiTemplate
         return ImGui_ImplWin32_GetDpiScaleForHwnd(reinterpret_cast<HWND>(hWnd));
     }
 
-    ImFont* ImGuiRender::GetRegularFont() const
+    ImFont* ImGuiRender::GetRegularFontNormal() const
     {
-        return _pFontRegular;
+        return _pFontRegularNormal;
     }
 
-    ImFont* ImGuiRender::GetBoldFont() const
+    ImFont* ImGuiRender::GetRegularFontLarge() const
     {
-        return _pFontBold;
+        return _pFontRegularLarge;
+    }
+
+    ImFont* ImGuiRender::GetBoldFontNormal() const
+    {
+        return _pFontBoldNormal;
+    }
+
+    ImFont* ImGuiRender::GetBoldFontLarge() const
+    {
+        return _pFontBoldLarge;
     }
 }
