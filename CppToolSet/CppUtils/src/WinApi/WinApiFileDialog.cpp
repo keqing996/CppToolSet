@@ -43,6 +43,7 @@ namespace WinApi::FileDialog
     {
         std::optional<std::wstring> result;
         IFileDialog* pFileDialog;
+        COMDLG_FILTERSPEC* pFileFilterArray = nullptr;
 
         HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
         if (!SUCCEEDED(hr))
@@ -60,13 +61,13 @@ namespace WinApi::FileDialog
         // filter
         if (pFilter != nullptr)
         {
-            COMDLG_FILTERSPEC fileTypes[pFilter->size()];
+            pFileFilterArray = new COMDLG_FILTERSPEC[pFilter->size()];
             for (int i = 0; i < pFilter->size(); i++)
             {
-                fileTypes[i].pszName = (*pFilter)[i].name.c_str();
-                fileTypes[i].pszSpec = (*pFilter)[i].suffix.c_str();
+                pFileFilterArray[i].pszName = (*pFilter)[i].name.c_str();
+                pFileFilterArray[i].pszSpec = (*pFilter)[i].suffix.c_str();
             }
-            pFileDialog->SetFileTypes(pFilter->size() * sizeof(COMDLG_FILTERSPEC), fileTypes);
+            pFileDialog->SetFileTypes(pFilter->size() * sizeof(COMDLG_FILTERSPEC), pFileFilterArray);
         }
 
         // show
@@ -76,6 +77,8 @@ namespace WinApi::FileDialog
         pFileDialog->Release();
         CoUninitialize();
 
+        delete[] pFileFilterArray;
+
         return result;
     }
 
@@ -83,6 +86,7 @@ namespace WinApi::FileDialog
     {
         std::optional<std::wstring> result;
         IFileDialog* pFileDialog;
+        COMDLG_FILTERSPEC* pFileFilterArray = nullptr;
 
         HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
         if (!SUCCEEDED(hr))
@@ -100,13 +104,13 @@ namespace WinApi::FileDialog
         // filter
         if (pFilter != nullptr)
         {
-            COMDLG_FILTERSPEC fileTypes[pFilter->size()];
+            pFileFilterArray = new COMDLG_FILTERSPEC[pFilter->size()];
             for (int i = 0; i < pFilter->size(); i++)
             {
-                fileTypes[i].pszName = (*pFilter)[i].name.c_str();
-                fileTypes[i].pszSpec = (*pFilter)[i].suffix.c_str();
+                pFileFilterArray[i].pszName = (*pFilter)[i].name.c_str();
+                pFileFilterArray[i].pszSpec = (*pFilter)[i].suffix.c_str();
             }
-            pFileDialog->SetFileTypes(pFilter->size() * sizeof(COMDLG_FILTERSPEC), fileTypes);
+            pFileDialog->SetFileTypes(pFilter->size() * sizeof(COMDLG_FILTERSPEC), pFileFilterArray);
         }
 
         // save name
@@ -118,6 +122,8 @@ namespace WinApi::FileDialog
         // clear up
         pFileDialog->Release();
         CoUninitialize();
+
+        delete[] pFileFilterArray;
 
         return result;
     }

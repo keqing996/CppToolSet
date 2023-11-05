@@ -1,6 +1,6 @@
 
-#include "Framework/Window/WinWindow.h"
-#include "Framework/ImGuiLogic/ImGuiLogic.h"
+#include "../Framework/Window/WinWindow.h"
+#include "../resource/resource.h"
 #include "WinApi/WinApiFileDialog.h"
 
 class WindowExample : public UiTemplate::Win32Window
@@ -19,6 +19,11 @@ protected:
     int GetWindowInitHeight() override
     {
         return 800;
+    }
+
+    int GetWindowIconResourceId() override
+    {
+        return IDI_ICON1;
     }
 };
 
@@ -58,11 +63,15 @@ protected:
             counter++;
 
         ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
 
-        ImGui::PushFont(_pTopWindow->GetRender()->GetLargeFont());
+        ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontNormal());
+        ImGui::Text("counter = %d", counter);
+        ImGui::PopFont();
+
+        ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontLarge());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::PopFont();
+
         ImGui::End();
     }
 };
