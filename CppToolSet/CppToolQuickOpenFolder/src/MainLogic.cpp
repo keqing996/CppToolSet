@@ -22,9 +22,9 @@ MainLogic::MainLogic()
 
 void MainLogic::Update()
 {
-    const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(main_viewport->WorkSize, ImGuiCond_Always);
+    const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(ImVec2(mainViewport->WorkPos.x, mainViewport->WorkPos.y), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(mainViewport->WorkSize, ImGuiCond_Always);
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -35,6 +35,9 @@ void MainLogic::Update()
     ImGui::Begin("Quick Open Folder", nullptr, window_flags);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2);
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    btnWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 3)) / 4;
 
     UpdateFolderPath();
 
@@ -50,7 +53,7 @@ void MainLogic::UpdateVsCodePath()
 {
     UpdateTitle("VS Code Path");
 
-    if (ImGui::Button("路径", {50, 0}))
+    if (ImGui::Button("路径", {btnWidth, 0}))
     {
         auto newVsCodePath = WinApi::FileDialog::OpenFile(L"Choose VS Code Path");
         if (newVsCodePath.has_value())
@@ -74,10 +77,20 @@ void MainLogic::UpdateFolderPath()
 {
     UpdateTitle("Folders");
 
-    for (const auto& folder : _allFolder)
-        UpdateSingleFolder(folder);
+    std::vector<int> goingToDeleteIndex;
 
-    if (ImGui::Button("Add"))
+    for (int i = 0; i < _allFolder.size(); i++)
+        UpdateSingleFolder(i, goingToDeleteIndex);
+
+    if (!goingToDeleteIndex.empty())
+    {
+        for (int i = goingToDeleteIndex.size() - 1; i >= 0; i--)
+            _allFolder.erase(_allFolder.begin() + goingToDeleteIndex[i]);
+    }
+
+    ImGui::Dummy(ImVec2 {0, 15});
+
+    if (ImGui::Button("Add", {btnWidth, 0}))
     {
         auto newFolder = WinApi::FileDialog::OpenDirectory(L"Choose Folder");
         if (newFolder.has_value())
@@ -88,33 +101,49 @@ void MainLogic::UpdateFolderPath()
     }
 }
 
-void MainLogic::UpdateSingleFolder(const Folder& folder)
+void MainLogic::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteIndex)
 {
-    ImGuiStyle& style = ImGui::GetStyle();
-    auto childHeight = (ImGui::CalcTextSize("I").y + style.FramePadding.y * 2) * 2 + 3 * style.ItemSpacing.y;
-
-    ImGui::BeginChild(folder.name.c_str(), ImVec2 {0, childHeight}, true);
-
-    auto buttonWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 3)) / 4;
+    const auto& folder = _allFolder[index];
 
     // name, path
-    ImGui::Text("Name: ");
+    ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontNormal());
+    {
+        ImGui::Text("Name: %d", index);
+    }
+    ImGui::PopFont();
 
     ImGui::SameLine();
 
-    ImGui::Text("...");
+    ImGui::Text("%s", folder.path.c_str());
 
     // function button
 
-    ImGui::Button("Open", ImVec2{buttonWidth, 0});
-    ImGui::SameLine();
-    ImGui::Button("OpenWithCode", ImVec2{buttonWidth, 0});
-    ImGui::SameLine();
-    ImGui::Button("Delete", ImVec2{buttonWidth, 0});
-    ImGui::SameLine();
-    ImGui::Button("Rename", ImVec2{buttonWidth, 0});
+    if (ImGui::Button("Open", ImVec2{btnWidth, 0}))
+    {
 
-    ImGui::EndChild();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("VSCode", ImVec2{btnWidth, 0}))
+    {
+
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Delete", ImVec2{btnWidth, 0}))
+    {
+        goingToDeleteIndex.push_back(index);
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Rename", ImVec2{btnWidth, 0}))
+    {
+
+    }
+
 }
 
 void MainLogic::UpdateTitle(const char* title)

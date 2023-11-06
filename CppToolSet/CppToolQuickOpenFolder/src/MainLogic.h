@@ -24,7 +24,7 @@ private:
     void UpdateFolderPath();
 
     void UpdateTitle(const char* name);
-    void UpdateSingleFolder(const Folder& folder);
+    void UpdateSingleFolder(int index, std::vector<int>& goingToDeleteIndex);
 
     std::string GetConfigPath() const;
     void InitConfig();
@@ -33,4 +33,6 @@ private:
 private:
     std::string _vsCodePathString;
     std::vector<Folder> _allFolder;
+
+    float btnWidth = 45;
 };
