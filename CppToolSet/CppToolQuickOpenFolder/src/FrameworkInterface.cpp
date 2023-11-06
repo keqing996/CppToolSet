@@ -8,7 +8,7 @@ class WindowExample : public UiTemplate::Win32Window
 protected:
     const char* GetWindowTitle() override
     {
-        return "Quick Open Folder - Ver 4.0.0";
+        return "Quick Open Folder - Ver 4.0.1";
     }
 
     int GetWindowIconResourceId() override
@@ -18,7 +18,7 @@ protected:
 
     int GetWindowInitWidth() override
     {
-        return 600;
+        return 1200;
     }
 
     int GetWindowInitHeight() override
@@ -33,7 +33,7 @@ protected:
 
     bool WindowHasMinBox() override
     {
-        return false;
+        return true;
     }
 
     bool WindowCanThickFrame() override
