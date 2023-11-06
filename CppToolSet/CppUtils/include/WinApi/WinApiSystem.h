@@ -6,6 +6,10 @@ namespace WinApi::System
 {
     std::wstring GetWindowsUserName();
 
-    bool CreateDependentProcess(const std::wstring& cmdLine);
+    bool CreateIndependentProcess(const std::wstring& cmdLine);
+
+    void DoShellExecute(const std::wstring& app, const std::wstring& appPath, const std::wstring& appPara);
+
+    void DoShellExecute(const std::wstring& app, const std::wstring& appPara);
 
 }
