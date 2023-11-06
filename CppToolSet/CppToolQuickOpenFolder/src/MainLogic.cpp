@@ -9,7 +9,6 @@
 #include "MainLogic.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
-#include "imgui.h"
 
 using RapidJsonDoc = rapidjson::GenericDocument<rapidjson::UTF8<>>;
 using RapidJsonValue = rapidjson::GenericValue<rapidjson::UTF8<>>;
@@ -42,7 +41,7 @@ void MainLogic::Update()
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {1.0f, 0.64f, 0.0f, 0.7f});
 
     ImGuiStyle& style = ImGui::GetStyle();
-    btnWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 3)) / 4;
+    btnWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 4)) / 5;
 
     UpdateFolderPath();
 
@@ -143,6 +142,7 @@ void MainLogic::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteInd
     {
         // function button
         std::string openBtnLabel = std::format("Open##{}", index);
+        std::string cmdBtnLabel = std::format("Cmd##{}", index);
         std::string vsCodeBtnLabel = std::format("VsCode##{}", index);
         std::string deleteBtnLabel = std::format("Delete##{}", index);
         std::string renameBtnLabel = std::format("Rename##{}", index);
@@ -151,6 +151,15 @@ void MainLogic::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteInd
         {
             WinApi::System::DoShellExecute(L"explorer.exe",
                                            Util::StringConvert::StringToWideString(folder.path));
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(cmdBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+        {
+            std::string para = "/K \"cd " + folder.path + "\"";
+            WinApi::System::DoShellExecute(L"cmd.exe",
+                                           Util::StringConvert::StringToWideString(para));
         }
 
         ImGui::SameLine();
