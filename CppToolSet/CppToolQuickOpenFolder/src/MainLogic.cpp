@@ -117,29 +117,32 @@ void MainLogic::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteInd
     ImGui::Text("%s", folder.path.c_str());
 
     // function button
+    std::string openBtnLabel = std::format("Open##{}", index);
+    std::string vsCodeBtnLabel = std::format("VsCode##{}", index);
+    std::string deleteBtnLabel = std::format("Delete##{}", index);
+    std::string renameBtnLabel = std::format("Rename##{}", index);
 
-    if (ImGui::Button("Open", ImVec2{btnWidth, 0}))
+    if (ImGui::Button(openBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+    {
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button(vsCodeBtnLabel.c_str(), ImVec2{btnWidth, 0}))
     {
 
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("VSCode", ImVec2{btnWidth, 0}))
-    {
-
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Delete", ImVec2{btnWidth, 0}))
+    if (ImGui::Button(deleteBtnLabel.c_str(), ImVec2{btnWidth, 0}))
     {
         goingToDeleteIndex.push_back(index);
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Rename", ImVec2{btnWidth, 0}))
+    if (ImGui::Button(renameBtnLabel.c_str(), ImVec2{btnWidth, 0}))
     {
 
     }
