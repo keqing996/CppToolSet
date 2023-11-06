@@ -44,25 +44,28 @@ namespace UiTemplate
     void Win32Window::WinMessageLoop(bool* isQuit)
     {
         MSG msg;
-        BOOL msgResult;
 
         if (BlockWhenNoWindowsMessage())
         {
-            msgResult = ::GetMessage(&msg, nullptr, 0U, 0U);
+            if (::GetMessage(&msg, nullptr, 0U, 0U))
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+
+                *isQuit = msg.message == WM_QUIT;
+            }
         }
         else
         {
-            msgResult = ::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE);
-        }
+            while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
 
-        while (msgResult)
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-
-            *isQuit = msg.message == WM_QUIT;
-            if (*isQuit)
-                break;
+                *isQuit = msg.message == WM_QUIT;
+                if (*isQuit)
+                    break;
+            }
         }
     }
 
