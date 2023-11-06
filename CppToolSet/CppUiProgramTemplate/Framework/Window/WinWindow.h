@@ -44,6 +44,7 @@ namespace UiTemplate
         virtual bool WindowHasMinBox();
         virtual bool WindowCanThickFrame();
         virtual int GetWindowIconResourceId();
+        virtual bool BlockWhenNoWindowsMessage();
 
     private: /* message */
         static LRESULT WINAPI WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
