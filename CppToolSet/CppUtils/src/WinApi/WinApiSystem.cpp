@@ -2,6 +2,8 @@
 #include "../../include/WinApi/WindowsPlatform.h"
 #include "../../include/WinApi/WinApiSystem.h"
 
+#include <shellapi.h>
+
 namespace WinApi::System
 {
     std::wstring GetWindowsUserName()
@@ -12,7 +14,7 @@ namespace WinApi::System
         return { userNameBuffer };
     }
 
-    bool CreateDependentProcess(const std::wstring& cmdLine)
+    bool CreateIndependentProcess(const std::wstring& cmdLine)
     {
         STARTUPINFO si;
         ::ZeroMemory( &si, sizeof(si) );
@@ -46,5 +48,25 @@ namespace WinApi::System
         ::CloseHandle( pi.hThread );
 
         return true;
+    }
+
+    void DoShellExecute(const std::wstring& app, const std::wstring& appPath, const std::wstring& appPara)
+    {
+        ::ShellExecuteW(nullptr,
+                        nullptr,
+                        app.c_str(),
+                        appPara.c_str(),
+                        appPath.c_str(),
+                        SW_SHOWNORMAL);
+    }
+
+    void DoShellExecute(const std::wstring& app, const std::wstring& appPara)
+    {
+        ::ShellExecuteW(nullptr,
+                        nullptr,
+                        app.c_str(),
+                        appPara.c_str(),
+                        nullptr,
+                        SW_SHOWNORMAL);
     }
 }
