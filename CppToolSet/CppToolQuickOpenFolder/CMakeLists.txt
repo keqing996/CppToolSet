@@ -49,3 +49,14 @@ find_library(D3D11_LIBRARY d3d11.lib
 )
 
 target_link_libraries(${TargetName} PRIVATE d3d11.lib)
+
+# release copy artifacts
+if (CMAKE_BUILD_TYPE STREQUAL Release)
+    add_custom_command(
+            TARGET ${TargetName} POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+            -E copy
+            $<TARGET_FILE:${TargetName}>
+            "${CMAKE_CURRENT_SOURCE_DIR}/../Artifacts/${TargetName}.exe"
+    )
+endif ()

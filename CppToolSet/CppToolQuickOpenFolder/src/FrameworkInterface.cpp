@@ -8,7 +8,7 @@ class WindowExample : public UiTemplate::Win32Window
 protected:
     const char* GetWindowTitle() override
     {
-        return "Quick Open Folder";
+        return "Quick Open Folder - Ver 4.0.0";
     }
 
     int GetWindowIconResourceId() override
