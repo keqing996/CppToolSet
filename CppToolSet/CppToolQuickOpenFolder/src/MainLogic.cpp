@@ -16,6 +16,8 @@ using RapidJsonValue = rapidjson::GenericValue<rapidjson::UTF8<>>;
 using RapidJsonStringBuffer = rapidjson::GenericStringBuffer<rapidjson::UTF8<>>;
 using RapidJsonPrettyWriter = rapidjson::PrettyWriter<RapidJsonStringBuffer, rapidjson::UTF8<>, rapidjson::UTF8<>>;
 
+static int _currentChangingNameIndex = -1;
+
 MainLogic::MainLogic()
 {
     InitConfig();
@@ -36,6 +38,8 @@ void MainLogic::Update()
     ImGui::Begin("Quick Open Folder", nullptr, window_flags);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2);
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.9f, 0.32f, 0.0f, 0.2f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {1.0f, 0.64f, 0.0f, 0.7f});
 
     ImGuiStyle& style = ImGui::GetStyle();
     btnWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 3)) / 4;
@@ -46,6 +50,7 @@ void MainLogic::Update()
 
     UpdateVsCodePath();
 
+    ImGui::PopStyleColor(2);
     ImGui::PopStyleVar(2);
     ImGui::End();
 }
@@ -87,6 +92,8 @@ void MainLogic::UpdateFolderPath()
     {
         for (int i = goingToDeleteIndex.size() - 1; i >= 0; i--)
             _allFolder.erase(_allFolder.begin() + goingToDeleteIndex[i]);
+
+        WriteConfig();
     }
 
     ImGui::Dummy(ImVec2 {0, 15});
@@ -104,12 +111,12 @@ void MainLogic::UpdateFolderPath()
 
 void MainLogic::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteIndex)
 {
-    const auto& folder = _allFolder[index];
+    auto& folder = _allFolder[index];
 
     // name, path
     ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontNormal());
     {
-        ImGui::Text("Name: %d", index);
+        ImGui::Text("%s", folder.name.c_str());
     }
     ImGui::PopFont();
 
@@ -117,41 +124,58 @@ void MainLogic::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteInd
 
     ImGui::Text("%s", folder.path.c_str());
 
-    // function button
-    std::string openBtnLabel = std::format("Open##{}", index);
-    std::string vsCodeBtnLabel = std::format("VsCode##{}", index);
-    std::string deleteBtnLabel = std::format("Delete##{}", index);
-    std::string renameBtnLabel = std::format("Rename##{}", index);
-
-    if (ImGui::Button(openBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+    if (_currentChangingNameIndex == index)
     {
-        WinApi::System::DoShellExecute(L"explorer.exe",
-                                       Util::StringConvert::StringToWideString(folder.path));
+        static char nameBuffer[255];
+
+        if (ImGui::Button("Confirm", ImVec2{btnWidth, 0}))
+        {
+            _currentChangingNameIndex = -1;
+            folder.name = std::string {nameBuffer};
+            WriteConfig();
+        }
+
+        ImGui::SameLine();
+
+        ImGui::InputText("##", nameBuffer, sizeof(nameBuffer));
     }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button(vsCodeBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+    else
     {
-        WinApi::System::DoShellExecute(L"Code.exe",
-                                       Util::StringConvert::StringToWideString(_vsCodePathString),
-                                       Util::StringConvert::StringToWideString(folder.path));
+        // function button
+        std::string openBtnLabel = std::format("Open##{}", index);
+        std::string vsCodeBtnLabel = std::format("VsCode##{}", index);
+        std::string deleteBtnLabel = std::format("Delete##{}", index);
+        std::string renameBtnLabel = std::format("Rename##{}", index);
+
+        if (ImGui::Button(openBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+        {
+            WinApi::System::DoShellExecute(L"explorer.exe",
+                                           Util::StringConvert::StringToWideString(folder.path));
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(vsCodeBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+        {
+            WinApi::System::DoShellExecute(L"Code.exe",
+                                           Util::StringConvert::StringToWideString(_vsCodePathString),
+                                           Util::StringConvert::StringToWideString(folder.path));
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(deleteBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+        {
+            goingToDeleteIndex.push_back(index);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(renameBtnLabel.c_str(), ImVec2{btnWidth, 0}))
+        {
+            _currentChangingNameIndex = index;
+        }
     }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button(deleteBtnLabel.c_str(), ImVec2{btnWidth, 0}))
-    {
-        goingToDeleteIndex.push_back(index);
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button(renameBtnLabel.c_str(), ImVec2{btnWidth, 0}))
-    {
-
-    }
-
 }
 
 void MainLogic::UpdateTitle(const char* title)
