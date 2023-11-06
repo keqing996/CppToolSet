@@ -5,6 +5,7 @@
 #include "../Framework/Window/WinWindow.h"
 #include "StringUtil.hpp"
 #include "WinApi/WinApiFileDialog.h"
+#include "WinApi/WinApiSystem.h"
 #include "MainLogic.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
@@ -55,10 +56,10 @@ void MainLogic::UpdateVsCodePath()
 
     if (ImGui::Button("路径", {btnWidth, 0}))
     {
-        auto newVsCodePath = WinApi::FileDialog::OpenFile(L"Choose VS Code Path");
+        auto newVsCodePath = WinApi::FileDialog::OpenDirectory(L"Choose VS Code Path");
         if (newVsCodePath.has_value())
         {
-            _vsCodePathString = Util::StringConvert::WideStringToString(newVsCodePath.value());
+            _vsCodePathString = Util::StringConvert::WideStringToString(newVsCodePath.value() + L"\\");
             WriteConfig();
         }
     }
@@ -124,13 +125,17 @@ void MainLogic::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteInd
 
     if (ImGui::Button(openBtnLabel.c_str(), ImVec2{btnWidth, 0}))
     {
+        WinApi::System::DoShellExecute(L"explorer.exe",
+                                       Util::StringConvert::StringToWideString(folder.path));
     }
 
     ImGui::SameLine();
 
     if (ImGui::Button(vsCodeBtnLabel.c_str(), ImVec2{btnWidth, 0}))
     {
-
+        WinApi::System::DoShellExecute(L"Code.exe",
+                                       Util::StringConvert::StringToWideString(_vsCodePathString),
+                                       Util::StringConvert::StringToWideString(folder.path));
     }
 
     ImGui::SameLine();
