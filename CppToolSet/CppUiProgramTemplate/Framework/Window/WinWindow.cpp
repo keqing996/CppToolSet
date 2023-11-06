@@ -44,14 +44,28 @@ namespace UiTemplate
     void Win32Window::WinMessageLoop(bool* isQuit)
     {
         MSG msg;
-        while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
 
-            *isQuit = msg.message == WM_QUIT;
-            if (*isQuit)
-                break;
+        if (BlockWhenNoWindowsMessage())
+        {
+            if (::GetMessage(&msg, nullptr, 0U, 0U))
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+
+                *isQuit = msg.message == WM_QUIT;
+            }
+        }
+        else
+        {
+            while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+
+                *isQuit = msg.message == WM_QUIT;
+                if (*isQuit)
+                    break;
+            }
         }
     }
 
@@ -127,6 +141,11 @@ namespace UiTemplate
     int Win32Window::GetWindowIconResourceId()
     {
         return 0;
+    }
+
+    bool Win32Window::BlockWhenNoWindowsMessage()
+    {
+        return false;
     }
 
     LRESULT Win32Window::WndProcDispatch(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
