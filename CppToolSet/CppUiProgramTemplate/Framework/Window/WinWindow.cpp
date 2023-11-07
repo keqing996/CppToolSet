@@ -47,12 +47,15 @@ namespace UiTemplate
 
         if (BlockWhenNoWindowsMessage())
         {
-            if (::GetMessage(&msg, nullptr, 0U, 0U))
+            // When GetMessage() retrieves a WM_QUIT message from the queue, it will return a value of 0
+            if (::GetMessage(&msg, nullptr, 0U, 0U) == 0)
+            {
+                *isQuit = true;
+            }
+            else
             {
                 ::TranslateMessage(&msg);
                 ::DispatchMessage(&msg);
-
-                *isQuit = msg.message == WM_QUIT;
             }
         }
         else
