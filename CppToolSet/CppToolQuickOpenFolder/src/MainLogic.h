@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "../Framework/ImGuiLogic/ImGuiLogic.h"
 
