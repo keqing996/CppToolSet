@@ -35,10 +35,12 @@ void MainLogic::Update()
     window_flags |= ImGuiWindowFlags_NoCollapse;
 
     ImGui::Begin("Quick Open Folder", nullptr, window_flags);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {6, 12});
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2);
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.9f, 0.32f, 0.0f, 0.2f});
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {1.0f, 0.64f, 0.0f, 0.7f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {1.0f, 0.64f, 0.0f, 1.0f});
 
     ImGuiStyle& style = ImGui::GetStyle();
     btnWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 4)) / 5;
@@ -49,8 +51,8 @@ void MainLogic::Update()
 
     UpdateVsCodePath();
 
-    ImGui::PopStyleColor(2);
-    ImGui::PopStyleVar(2);
+    ImGui::PopStyleColor(3);
+    ImGui::PopStyleVar(3);
     ImGui::End();
 }
 
@@ -97,7 +99,7 @@ void MainLogic::UpdateFolderPath()
 
     ImGui::Dummy(ImVec2 {0, 15});
 
-    if (ImGui::Button("Add", {btnWidth, 0}))
+    if (ImGui::Button("Add", {-1, 0}))
     {
         auto newFolder = WinApi::FileDialog::OpenDirectory(L"Choose Folder");
         if (newFolder.has_value())
