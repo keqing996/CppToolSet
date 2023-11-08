@@ -36,14 +36,52 @@ namespace UiTemplate
         ImGuiRender* GetRender() const;
 
     protected: /* init para */
+
+        /**
+         * @brief Get win32 window register name.
+         */
         virtual const char* GetWindowRegisterName();
+
+        /**
+         * @brief Get window title in utf-8.
+         */
         virtual const char* GetWindowTitle() = 0;
+
+        /**
+         * @brief Window init width.
+         */
         virtual int GetWindowInitWidth() = 0;
+
+        /**
+         * @brief Window init height.
+         */
         virtual int GetWindowInitHeight() = 0;
+
+        /**
+         * @brief Does window have max box.
+         */
         virtual bool WindowHasMaxBox();
+
+        /**
+         * @brief Does window have min box.
+         */
         virtual bool WindowHasMinBox();
+
+        /**
+         * @brief Can window be resized by user.
+         */
         virtual bool WindowCanThickFrame();
+
+        /**
+         * @brief Window's icon id in rc file.
+         */
         virtual int GetWindowIconResourceId();
+
+        /**
+         * @brief Does window update render when no message received.
+         * @note If return true, main loop will use GetMessage to let thread sleep,
+         * reduce cpu usage. If return false, use PeekMessage to keep main loop always running.
+         */
         virtual bool BlockWhenNoWindowsMessage();
 
     private: /* message */
