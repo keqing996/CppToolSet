@@ -15,7 +15,7 @@ int Window::GetWindowIconResourceId()
 
 int Window::GetWindowInitWidth()
 {
-    return 1200;
+    return 600;
 }
 
 int Window::GetWindowInitHeight()
@@ -35,10 +35,10 @@ bool Window::WindowHasMinBox()
 
 bool Window::WindowCanThickFrame()
 {
-    return true;
+    return false;
 }
 
 bool Window::BlockWhenNoWindowsMessage()
 {
-    return false;
+    return true;
 }
