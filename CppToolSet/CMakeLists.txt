@@ -6,6 +6,8 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
     add_compile_definitions(BUILD_DEBUG)
 endif ()
 
+set(UI_TEMPLATE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CppUiProgramTemplate)
+
 add_subdirectory(ThirdParty/src/gtest)
 add_subdirectory(CppUtils)
 add_subdirectory(CppUiProgramTemplate)
