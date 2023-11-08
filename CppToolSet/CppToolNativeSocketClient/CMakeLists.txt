@@ -6,13 +6,13 @@ set(TargetName tool_socket_client)
 set(CMAKE_CXX_STANDARD 20)
 set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/imgui/)
 
-file (GLOB_RECURSE UI_TEMPLATE_SRC      ${UI_TEMPLATE_PATH}/Framework/*.cpp)
-file (GLOB_RECURSE UI_TEMPLATE_RESOURCE ${UI_TEMPLATE_PATH}/Framework/*.rc)
+file (GLOB_RECURSE UI_TEMPLATE_SRC Framework/*.cpp)
+file (GLOB_RECURSE UI_TEMPLATE_RESOURCE Framework/*.rc)
 file (GLOB_RECURSE UI_TEMPLATE_MANIFEST ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralResource/manifest/*.manifest)
 
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
-file (GLOB_RECURSE util_src_files ../CppUtils/Util/*.cpp)
+file (GLOB_RECURSE util_src_files ../CppUtils/src/*.cpp)
 
 add_executable(${TargetName}
         ${UI_TEMPLATE_SRC}
@@ -33,9 +33,8 @@ add_executable(${TargetName}
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/Util/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/include/ # util
         ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/ # json
-        ${UI_TEMPLATE_PATH}/ # ui template framework
         ${IM_GUI_DIR}
         ${IM_GUI_DIR}/backends
 )
@@ -51,9 +50,6 @@ find_library(D3D11_LIBRARY d3d11.lib
 
 target_link_libraries(${TargetName} PRIVATE d3d11.lib)
 
-if (CMAKE_BUILD_TYPE STREQUAL Debug)
-    target_compile_definitions(${TargetName} PRIVATE ENABLE_CONSOLE_LOG)
-endif ()
 
 # release copy artifacts
 if (CMAKE_BUILD_TYPE STREQUAL Release)
