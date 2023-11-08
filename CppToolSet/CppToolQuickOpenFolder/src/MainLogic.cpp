@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "../Framework/Window/WinWindow.h"
+#include "Framework/Window/WinWindow.h"
 #include "StringUtil.hpp"
 #include "WinApi/WinApiFileDialog.h"
 #include "WinApi/WinApiSystem.h"
