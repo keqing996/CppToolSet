@@ -6,8 +6,8 @@ set(TargetName tool_socket_client)
 set(CMAKE_CXX_STANDARD 20)
 set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/imgui/)
 
-file (GLOB_RECURSE UI_TEMPLATE_SRC      ${UI_TEMPLATE_PATH}/Framework/*.cpp)
-file (GLOB_RECURSE UI_TEMPLATE_RESOURCE ${UI_TEMPLATE_PATH}/Framework/*.rc)
+file (GLOB_RECURSE UI_TEMPLATE_SRC Framework/*.cpp)
+file (GLOB_RECURSE UI_TEMPLATE_RESOURCE Framework/*.rc)
 file (GLOB_RECURSE UI_TEMPLATE_MANIFEST ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralResource/manifest/*.manifest)
 
 file (GLOB_RECURSE res_files resource/*.rc)
@@ -35,7 +35,6 @@ target_include_directories(${TargetName}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
         ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/include/ # util
         ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/ # json
-        ${UI_TEMPLATE_PATH}/ # ui template framework
         ${IM_GUI_DIR}
         ${IM_GUI_DIR}/backends
 )
