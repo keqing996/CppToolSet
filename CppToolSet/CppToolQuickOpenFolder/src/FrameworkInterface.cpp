@@ -1,5 +1,5 @@
 
-#include "../Framework/Window/WinWindow.h"
+#include "Framework/Window/WinWindow.h"
 #include "MainLogic.h"
 #include "../resource/resource.h"
 
