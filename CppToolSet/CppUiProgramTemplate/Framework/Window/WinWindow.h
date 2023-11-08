@@ -79,8 +79,8 @@ namespace UiTemplate
 
         /**
          * @brief Does window update render when no message received.
-         * If return true, use GetMessage to let thread sleep, reduce cpu usage.
-         * If return false, use PeekMessage to keep main loop always running.
+         * @note If return true, main loop will use GetMessage to let thread sleep,
+         * reduce cpu usage. If return false, use PeekMessage to keep main loop always running.
          */
         virtual bool BlockWhenNoWindowsMessage();
 
