@@ -1,5 +1,5 @@
 
-#include "../include/DebugConsole.h"
+#include "../include/Logger.h"
 #include "../include/WinApi/WinApiConsole.h"
 
 #include <iostream>
