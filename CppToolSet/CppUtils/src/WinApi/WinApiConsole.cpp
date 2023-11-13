@@ -108,6 +108,11 @@ namespace WinApi::Console
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
 
+    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
+    {
+        SetColor(GetStdOutputHandle(), foreground, background, foregroundIntensity, backgroundIntensity);
+    }
+
     void SetColor(HANDLE handle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
     {
         WORD result = 0;
