@@ -1,15 +1,21 @@
 
 #include "../include/DebugConsole.h"
+#include "../include/WinApi/WinApiConsole.h"
 
 #include <iostream>
 
-#ifdef BUILD_DEBUG
-#   include "../include/WinApi/WinApiConsole.h"
-#endif
-
-
 namespace Util
 {
+    void Logger::SetFilterLevel(Logger::Level targetLevel)
+    {
+        _filterLevel = targetLevel;
+    }
+
+    Logger::Level Logger::GetCurrentFilterLevel()
+    {
+        return _filterLevel;
+    }
+
     void Logger::InitConsoleLogger()
     {
 #ifdef BUILD_DEBUG
@@ -43,85 +49,92 @@ namespace Util
 
             delete _pFileStream;
         }
+
+#ifdef BUILD_DEBUG
+        WinApi::Console::DetachConsole();
+#endif
     }
 
     void Logger::LogInfo(const std::string& message)
     {
-        std::cout << message << std::endl;
-    }
+        if (static_cast<int>(_filterLevel) > static_cast<int>(Logger::Level::Info))
+            return;
 
-    void Logger::LogInfo(const std::string_view& message)
-    {
-        std::cout << message << std::endl;
+        LogInfo(message.c_str());
     }
 
     void Logger::LogInfo(const char* message)
     {
-        std::cout << message << std::endl;
+        if (static_cast<int>(_filterLevel) > static_cast<int>(Logger::Level::Info))
+            return;
+
+        std::lock_guard<std::mutex> guard(_mutex);
+
+        if (_enableConsoleLogger)
+        {
+            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::White, WinApi::Console::ConsoleColor::None);
+            std::cout << "[I] " << message << std::endl;
+        }
+
+        if (_enableFileLogger && _pFileStream != nullptr)
+        {
+            (*_pFileStream) << "[I] " << message << std::endl;
+        }
     }
 
     void Logger::LogWarn(const std::string& message)
     {
+        if (static_cast<int>(_filterLevel) > static_cast<int>(Logger::Level::Warning))
+            return;
 
+        LogWarn(message.c_str());
     }
 
-    void Logger::WriteConsole(const std::string& message)
+    void Logger::LogWarn(const char* message)
     {
-#ifdef BUILD_DEBUG
-        if (!_enableConsoleLogger)
+        if (static_cast<int>(_filterLevel) > static_cast<int>(Logger::Level::Warning))
             return;
 
         std::lock_guard<std::mutex> guard(_mutex);
-        std::cout << message << std::endl;
-#endif
+
+        if (_enableConsoleLogger)
+        {
+            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::Yellow, WinApi::Console::ConsoleColor::None);
+            std::cout << "[W] " << message << std::endl;
+            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::White, WinApi::Console::ConsoleColor::None);
+        }
+
+        if (_enableFileLogger && _pFileStream != nullptr)
+        {
+            (*_pFileStream) << "[W] " << message << std::endl;
+        }
     }
 
-    void Logger::WriteConsole(const std::string_view& message)
+    void Logger::LogError(const std::string& message)
     {
-#ifdef BUILD_DEBUG
-        if (!_enableConsoleLogger)
+        if (static_cast<int>(_filterLevel) > static_cast<int>(Logger::Level::Error))
+            return;
+
+        LogError(message.c_str());
+    }
+
+    void Logger::LogError(const char* message)
+    {
+        if (static_cast<int>(_filterLevel) > static_cast<int>(Logger::Level::Error))
             return;
 
         std::lock_guard<std::mutex> guard(_mutex);
-        std::cout << message << std::endl;
-#endif
-    }
 
-    void Logger::WriteConsole(const char* message)
-    {
-#ifdef BUILD_DEBUG
-        if (!_enableConsoleLogger)
-            return;
+        if (_enableConsoleLogger)
+        {
+            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::Red, WinApi::Console::ConsoleColor::None);
+            std::cout << "[E] " << message << std::endl;
+            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::White, WinApi::Console::ConsoleColor::None);
+        }
 
-        std::lock_guard<std::mutex> guard(_mutex);
-        std::cout << message << std::endl;
-#endif
-    }
-
-    void Logger::WriteFile(const std::string& message)
-    {
-        if (!_enableFileLogger || _pFileStream == nullptr)
-            return;
-
-        std::lock_guard<std::mutex> guard(_mutex);
-        (*_pFileStream) << message << std::endl;
-    }
-
-    void Logger::WriteFile(const std::string_view& message)
-    {
-        if (!_enableFileLogger || _pFileStream == nullptr)
-            return;
-
-        std::lock_guard<std::mutex> guard(_mutex);
-        (*_pFileStream) << message << std::endl;
-    }
-
-    void Logger::WriteFile(const char* message)
-    {
-        if (!_enableFileLogger || _pFileStream == nullptr)
-            return;
-
-        std::lock_guard<std::mutex> guard(_mutex);
-        (*_pFileStream) << message << std::endl;
+        if (_enableFileLogger && _pFileStream != nullptr)
+        {
+            (*_pFileStream) << "[E] " << message << std::endl;
+        }
     }
 }
