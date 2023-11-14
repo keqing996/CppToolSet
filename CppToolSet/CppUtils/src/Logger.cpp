@@ -18,7 +18,7 @@ namespace Util
 
     void Logger::InitConsoleLogger()
     {
-#ifdef BUILD_DEBUG
+#ifdef ENABLE_CONSOLE_LOG
         WinApi::Console::CreateConsole();
         WinApi::Console::SetConsoleOutputUtf8();
         _enableConsoleLogger = true;
@@ -50,7 +50,7 @@ namespace Util
             delete _pFileStream;
         }
 
-#ifdef BUILD_DEBUG
+#ifdef ENABLE_CONSOLE_LOG
         WinApi::Console::DetachConsole();
 #endif
     }
