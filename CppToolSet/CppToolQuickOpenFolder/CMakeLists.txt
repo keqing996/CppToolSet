@@ -51,6 +51,10 @@ find_library(D3D11_LIBRARY d3d11.lib
 
 target_link_libraries(${TargetName} PRIVATE d3d11.lib)
 
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    target_compile_definitions(${TargetName} PRIVATE ENABLE_CONSOLE_LOG)
+endif ()
+
 # release copy artifacts
 if (CMAKE_BUILD_TYPE STREQUAL Release)
     add_custom_command(
