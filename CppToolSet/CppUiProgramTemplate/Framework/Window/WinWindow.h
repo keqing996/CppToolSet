@@ -97,7 +97,6 @@ namespace UiTemplate
         void SwapChain();
 
     private:
-        void InitLanguage();
         void Win32RegisterWindow();
         void Win32CreateWindow();
         void Win32DestroyWindow();

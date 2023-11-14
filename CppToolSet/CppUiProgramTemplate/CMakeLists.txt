@@ -60,3 +60,9 @@ add_executable(${TargetNameSystemTtf} ${ALL_SOURCE})
 set_target_properties(${TargetNameSystemTtf} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 target_include_directories(${TargetNameSystemTtf} PRIVATE ${ALL_INCLUDE_DIR})
 target_link_libraries(${TargetNameSystemTtf} d3d11.lib )
+
+## Debug macro
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    target_compile_definitions(${TargetNameEmbeddedTtf} PRIVATE ENABLE_CONSOLE_LOG)
+    target_compile_definitions(${TargetNameSystemTtf} PRIVATE ENABLE_CONSOLE_LOG)
+endif ()
