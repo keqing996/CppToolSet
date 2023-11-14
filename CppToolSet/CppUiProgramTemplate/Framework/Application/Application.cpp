@@ -18,16 +18,18 @@ namespace UiTemplate
         }
 
         // Main Window
-        Win32Window* pMainWindow = CreateMainWindow();
+        pMainWindow = CreateMainWindow();
 
         if (!pMainWindow->SetUp())
             return false;
 
         // Logic
-        ImGuiLogic* pLogic = CreateMainLogic();
+        pLogic = CreateMainLogic();
         pLogic->SetUp(pMainWindow);
 
         pMainWindow->Show();
+
+        Util::Logger::LogInfo("[UiTemplate] Main window & logic init finish.");
 
         return true;
     }

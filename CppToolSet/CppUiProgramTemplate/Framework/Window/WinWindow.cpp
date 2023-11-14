@@ -9,8 +9,6 @@ namespace UiTemplate
 {
     bool Win32Window::SetUp()
     {
-        InitLanguage();
-
         _width = GetWindowInitWidth();
         _height = GetWindowInitHeight();
         _windowRegisterName = Util::StringConvert::StringToWideString(GetWindowRegisterName());
