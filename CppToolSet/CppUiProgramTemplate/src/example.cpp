@@ -1,5 +1,6 @@
 
-#include "../Framework/Window/WinWindow.h"
+#include <memory>
+#include "../Framework/Application/Application.h"
 #include "../resource/resource.h"
 #include "WinApi/WinApiFileDialog.h"
 
@@ -76,12 +77,40 @@ protected:
     }
 };
 
-UiTemplate::Win32Window* CreateMainWindow()
+class ApplicationExample: public UiTemplate::Application
 {
-    return new WindowExample();
-}
+public:
+    UiTemplate::Win32Window* CreateMainWindow() override
+    {
+        return new WindowExample();
+    }
 
-UiTemplate::ImGuiLogic* CreateMainLogic()
+    UiTemplate::ImGuiLogic* CreateMainLogic() override
+    {
+        return new LogicExample();
+    }
+
+    bool EnableFileLog() override
+    {
+        return true;
+    }
+
+    std::string GetFileLogPath() override
+    {
+        return "log.txt";
+    }
+};
+
+int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PWSTR lpCmdLine, int nCmdShow)
 {
-    return new LogicExample();
+    std::shared_ptr<UiTemplate::Application> pApp = std::make_shared<ApplicationExample>();
+
+    if (!pApp->Init())
+        return 1;
+
+    pApp->Loop();
+
+    pApp->Destroy();
+
+    return 0;
 }

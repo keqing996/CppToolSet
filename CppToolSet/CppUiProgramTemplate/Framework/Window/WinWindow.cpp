@@ -9,8 +9,6 @@ namespace UiTemplate
 {
     bool Win32Window::SetUp()
     {
-        InitLanguage();
-
         _width = GetWindowInitWidth();
         _height = GetWindowInitHeight();
         _windowRegisterName = Util::StringConvert::StringToWideString(GetWindowRegisterName());
@@ -260,11 +258,6 @@ namespace UiTemplate
     {
         ::PostQuitMessage(0);
         return FALSE;
-    }
-
-    void Win32Window::InitLanguage()
-    {
-        std::locale::global(std::locale("zh_CN.UTF8"));
     }
 
     void Win32Window::Win32RegisterWindow()
