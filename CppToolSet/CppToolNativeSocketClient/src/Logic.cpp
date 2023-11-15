@@ -1,6 +1,10 @@
 
 #include "Framework/ImGuiLogic/ImGuiLogic.h"
 #include "Logic.h"
+#include "Logger.h"
+
+static char ipInputField[255];
+static char portInputField[255];
 
 Logic::Logic() : _port(6666)
 {
@@ -28,7 +32,9 @@ void Logic::Update()
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {1.0f, 0.64f, 0.0f, 0.7f});
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {1.0f, 0.64f, 0.0f, 1.0f});
 
-    // ...
+    UpdateIpAndPortInput();
+
+    ImGui::Dummy(ImVec2 {0, 35});
 
     ImGui::PopStyleColor(3);
     ImGui::PopStyleVar(3);
@@ -36,7 +42,47 @@ void Logic::Update()
     ImGui::End();
 }
 
+void Logic::UpdateIpAndPortInput()
+{
+    if (!_connected)
+    {
+        ImGui::Text("Ip");
+        ImGui::SameLine();
+        ImGui::InputText("##Ip", ipInputField, sizeof(ipInputField));
+
+        ImGui::Text("Port");
+        ImGui::SameLine();
+        ImGui::InputText("##Port", portInputField, sizeof(portInputField));
+
+        if (ImGui::Button("Connect"))
+        {
+            Connect();
+        }
+    }
+    else
+    {
+        ImGui::Text("Ip: %s", ipInputField);
+        ImGui::SameLine();
+        ImGui::Text("Port: %s", portInputField);
+
+        if (ImGui::Button("Disconnect"))
+        {
+            Disconnect();
+        }
+    }
+}
+
+void Logic::UpdateInfoWindow()
+{
+
+}
+
 void Logic::Connect()
+{
+    Util::Logger::LogInfo(std::format("Try connect with ip: {}:{}", ipInputField, portInputField));
+}
+
+void Logic::Disconnect()
 {
 
 }

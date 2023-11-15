@@ -11,7 +11,44 @@
 #include "WinApi/WindowsPlatform.h"
 #include "WinApi/WinApiSocket.h"
 #include "WinApi/WinApiConsole.h"
-#include "StringUtil.hpp"
+
+#include "Framework/Application/Application.h"
+
+#include "Window.h"
+#include "Logic.h"
+
+class MainApplication: public UiTemplate::Application
+{
+public:
+    UiTemplate::Win32Window* CreateMainWindow() override
+    {
+        return new Window();
+    }
+
+    UiTemplate::ImGuiLogic* CreateMainLogic() override
+    {
+        return new Logic();
+    }
+
+    bool EnableFileLog() override
+    {
+        return false;
+    }
+};
+
+int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PWSTR lpCmdLine, int nCmdShow)
+{
+    std::shared_ptr<UiTemplate::Application> pApp = std::make_shared<MainApplication>();
+
+    if (!pApp->Init())
+        return 1;
+
+    pApp->Loop();
+
+    pApp->Destroy();
+
+    return 0;
+}
 
 HANDLE hConsoleHandle;
 int SEND_BUFFER_SIZE = 1024;
@@ -36,7 +73,7 @@ void LogError(const std::wstring& message)
     SetConsoleColor(WinApi::Console::ConsoleColor::None);
 }
 
-int main(int argc, char* argv[])
+int main1(int argc, char* argv[])
 {
     CmdLine::Parser cmd;
 
