@@ -47,11 +47,13 @@ void Logic::UpdateIpAndPortInput()
     if (!_connected)
     {
         ImGui::Text("Ip");
-        ImGui::SameLine();
+        ImGui::SameLine(50);
+        ImGui::SetNextItemWidth(150);
         ImGui::InputText("##Ip", ipInputField, sizeof(ipInputField));
 
         ImGui::Text("Port");
-        ImGui::SameLine();
+        ImGui::SameLine(50);
+        ImGui::SetNextItemWidth(150);
         ImGui::InputText("##Port", portInputField, sizeof(portInputField));
 
         if (ImGui::Button("Connect"))
@@ -79,7 +81,7 @@ void Logic::UpdateInfoWindow()
 
 void Logic::Connect()
 {
-    Util::Logger::LogInfo(std::format("Try connect with ip: {}:{}", ipInputField, portInputField));
+    Util::Logger::LogInfo(std::format("Try connect with {}:{}", ipInputField, portInputField));
 }
 
 void Logic::Disconnect()
