@@ -10,6 +10,7 @@ set(UI_TEMPLATE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CppUiProgramTemplate)
 
 add_subdirectory(ThirdParty/src/gtest)
 add_subdirectory(CppUtils)
+add_subdirectory(CppGraphics)
 add_subdirectory(CppUiProgramTemplate)
 add_subdirectory(CppToolVsNewProjWin32Deleter)
 add_subdirectory(CppToolFileToCharArray)
