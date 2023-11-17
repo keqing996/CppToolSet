@@ -29,6 +29,10 @@ set_target_properties(${TargetName} PROPERTIES
         LINK_FLAGS "/SUBSYSTEM:WINDOWS"
 )
 
+set_target_properties(${TargetName} PROPERTIES
+        INTERPROCEDURAL_OPTIMIZATION TRUE
+)
+
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
