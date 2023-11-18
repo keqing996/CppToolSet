@@ -7,7 +7,7 @@ namespace UiTemplate
 {
     class Win32Window;
 
-    class ImGuiLogic : public Util::NonCopyable
+    class ImGuiLogic : public NonCopyable
     {
     public:
         ImGuiLogic();

@@ -12,7 +12,7 @@
 
 namespace UiTemplate
 {
-    class Win32Window: public Util::NonCopyable
+    class Win32Window: public NonCopyable
     {
     public:
         Win32Window() = default;

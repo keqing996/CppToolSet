@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "Logger.h"
+#include "Logger/Logger.h"
 
 namespace UiTemplate
 {

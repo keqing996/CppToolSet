@@ -7,7 +7,7 @@
 
 namespace UiTemplate
 {
-    class Application: public Util::NonCopyable
+    class Application: public NonCopyable
     {
     public:
         bool Init();
