@@ -10,7 +10,7 @@ struct ImFont;
 
 namespace UiTemplate
 {
-class ImGuiRender : public IWinMsgReceiver, public Util::NonCopyable
+class ImGuiRender : public IWinMsgReceiver, public NonCopyable
     {
     public:
         ImGuiRender();
