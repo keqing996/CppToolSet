@@ -33,27 +33,27 @@ namespace Util
         static void LogInfo(const char* message);
 
         template <class... Types>
-        static void LogInfo(const std::format_string<Types...> Fmt, const Types&... Args)
+        static void LogInfo(const std::format_string<Types...> Fmt, Types&&... Args)
         {
-            LogInfo(std::format(Fmt, Args...));
+            LogInfo(std::format(Fmt, std::forward<Types&&...>(Args...)));
         }
 
         static void LogWarn(const std::string& message);
         static void LogWarn(const char* message);
 
         template <class... Types>
-        static void LogWarn(const std::format_string<Types...> Fmt, const Types&... Args)
+        static void LogWarn(const std::format_string<Types...> Fmt, Types&&... Args)
         {
-            LogWarn(std::format(Fmt, Args...));
+            LogWarn(std::format(Fmt, std::forward<Types&&...>(Args...)));
         }
 
         static void LogError(const std::string& message);
         static void LogError(const char* message);
 
         template <class... Types>
-        static void LogError(const std::format_string<Types...> Fmt, const Types&... Args)
+        static void LogError(const std::format_string<Types...> Fmt, Types&&... Args)
         {
-            LogError(std::format(Fmt, Args...));
+            LogError(std::format(Fmt, std::forward<Types&&...>(Args...)));
         }
 
     private:
