@@ -1,7 +1,7 @@
 
 #include "Framework/ImGuiLogic/ImGuiLogic.h"
 #include "Logic.h"
-#include "Logger.h"
+#include "Logger/Logger.h"
 
 static char ipInputField[255];
 static char portInputField[255];
