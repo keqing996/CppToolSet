@@ -138,9 +138,6 @@ protected:
         ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontLarge());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::PopFont();
-
-        // auto scroll field
-        ImGui::InputTextMultiline()
     }
 
     void DisableButton(const char* label, std::function<bool()> disable, std::function<void()> callback)
