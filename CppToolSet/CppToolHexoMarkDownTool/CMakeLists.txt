@@ -7,13 +7,13 @@ set(TargetName tool_hexo_md)
 set(CMAKE_CXX_STANDARD 20)
 
 file (GLOB_RECURSE src_files src/*.cpp)
-file (GLOB_RECURSE util_src_files ../CppUtils/src/*.cpp)
+file (GLOB_RECURSE util_src_files ../CppUtils/Util/*.cpp)
 
 add_executable(${TargetName} ${src_files} ${util_src_files})
 
 target_include_directories(${TargetName}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/include/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/Util/ # util
 )
 
 # release copy artifacts
