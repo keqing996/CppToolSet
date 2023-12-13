@@ -1,5 +1,8 @@
 
 #include <memory>
+#include <array>
+#include <string>
+#include <vector>
 #include "../Framework/Application/Application.h"
 #include "../resource/resource.h"
 #include "WinApi/WinApiFileDialog.h"
@@ -114,30 +117,42 @@ protected:
     {
         ImGuiIO& io = ImGui::GetIO();
 
-        ImGui::Text("This is some useful text.");
-
-        ImGui::SameLine();
-
-        ImGui::InputText("Input", input_array, 256);
-
-        ImGui::Checkbox("Demo Window", &show_demo_window);
-        ImGui::Checkbox("Another Window", &show_another_window);
-
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-        ImGui::ColorEdit3("clear color", (float*)&clear_color);
-
-        if (ImGui::Button("Button"))
-            counter++;
-
-        ImGui::SameLine();
-
-        ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontNormal());
-        ImGui::Text("counter = %d", counter);
-        ImGui::PopFont();
-
         ImGui::PushFont(_pTopWindow->GetRender()->GetBoldFontLarge());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::PopFont();
+
+        UpdateMessageSubWindow();
+        UpdateCommandLine();
+    }
+
+    void UpdateMessageSubWindow()
+    {
+        ImVec2 avail_space = ImGui::GetContentRegionAvail();
+        float commandline_height = ImGui::CalcTextSize("I").y + ImGui::GetStyle().FramePadding.y * 4.f;
+
+        ImGui::BeginChild("terminal:logs_window",
+                          ImVec2(avail_space.x, avail_space.y - commandline_height - 2),
+                          true,
+                          ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoTitleBar);
+
+        ImGui::TextWrapped("Equivalent to multiple alignas specifiers applied to the same declaration, one for each member of the parameter pack, which can be either type or non-type parameter pack.");
+        ImGui::TextWrapped("The object or the type declared by such a declaration will have its alignment requirement equal to the strictest (largest) non-zero expression of all alignas specifiers used in the declaration, unless it would weaken the natural alignment of the type.");
+        ImGui::TextWrapped("If the strictest (largest) alignas on a declaration is weaker than the alignment it would have without any alignas specifiers (that is, weaker than its natural alignment or weaker than alignas on another declaration of the same object or type), the program is ill-formed");
+        ImGui::TextWrapped("Invalid non-zero alignments, such as alignas(3) are ill-formed.");
+        ImGui::TextWrapped("As of the ISO C11 standard, the C language has the _Alignas keyword and defines alignas as a preprocessor macro expanding to the keyword in the header <stdalign.h>.");
+        //ImGui::SetScrollHereY(1.f);
+
+        ImGui::EndChild();
+    }
+
+    void UpdateCommandLine()
+    {
+        static std::array<char, 1024> commandLineBuffer {};
+
+        ImGui::Separator();
+
+        ImGui::SetNextItemWidth(-1.f);
+        ImGui::InputText("##terminal:input_text", commandLineBuffer.data(), commandLineBuffer.size());
     }
 
     void DisableButton(const char* label, std::function<bool()> disable, std::function<void()> callback)
