@@ -1,6 +1,3 @@
 [submodule "CppToolSet/ThirdParty/src/imgui"]
 	path = CppToolSet/ThirdParty/src/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "CppToolSet/ThirdParty/src/gtest"]
-	path = CppToolSet/ThirdParty/src/gtest
-	url = https://github.com/google/googletest.git
