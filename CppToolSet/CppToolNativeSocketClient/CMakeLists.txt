@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 
 project(NativeSocketClient)
 
-set(TargetName tool_socket_client)
+set(TargetName socket_client)
 set(CMAKE_CXX_STANDARD 20)
 set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/imgui/)
 

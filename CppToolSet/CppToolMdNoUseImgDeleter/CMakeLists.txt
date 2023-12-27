@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 
 project(MarkdownNoUseImgDeleter)
 
-set(TargetName tool_md_no_use_img_deleter)
+set(TargetName md_no_use_img_deleter)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -12,7 +12,7 @@ add_executable(${TargetName} ${src_files})
 
 target_include_directories(${TargetName}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/include/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/ # util
 )
 
 # release copy artifacts

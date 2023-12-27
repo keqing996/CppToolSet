@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 
 project (QuickOpenFolder)
 
-set(TargetName tool_quick_open_folder)
+set(TargetName quick_open_folder)
 set(CMAKE_CXX_STANDARD 20)
 set(IM_GUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/imgui/)
 

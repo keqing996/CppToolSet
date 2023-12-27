@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 
 project(HexoMarkDownTool)
 
-set(TargetName tool_hexo_md)
+set(TargetName hexo_md_converter)
 
 set(CMAKE_CXX_STANDARD 20)
 
