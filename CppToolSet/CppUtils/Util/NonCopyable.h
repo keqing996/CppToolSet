@@ -2,11 +2,11 @@
 
 class NonCopyable
 {
-protected:
-    NonCopyable() {}
-    ~NonCopyable() {}
+public:
+    NonCopyable() = default;
+    ~NonCopyable() = default;
 
-private:
-    NonCopyable( const NonCopyable& );
-    const NonCopyable& operator=( const NonCopyable& );
+public:
+    NonCopyable( const NonCopyable& ) = delete;
+    const NonCopyable& operator=( const NonCopyable& ) = delete;
 };

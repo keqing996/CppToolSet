@@ -1,12 +1,12 @@
 
 #include "Logger.h"
-#include "../WinApi/WinApiConsole.h"
+#include "Util/WinApi/WinApiConsole.h"
 
 #include <iostream>
 
 namespace Util
 {
-    void Logger::SetFilterLevel(Logger::Level targetLevel)
+    void Logger::SetFilterLevel(Level targetLevel)
     {
         _filterLevel = targetLevel;
     }

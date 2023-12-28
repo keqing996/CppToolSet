@@ -9,7 +9,7 @@ namespace Util
     public:
         void SetNow();
 
-        int64_t GetIntervalMsAndSetNow();
+        int64_t GetIntervalAndSetNow();
 
         int64_t GetInterval();
 
