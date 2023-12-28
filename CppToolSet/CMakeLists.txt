@@ -8,7 +8,6 @@ endif ()
 
 set(UI_TEMPLATE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CppUiProgramTemplate)
 
-add_subdirectory(CppUtils)
 add_subdirectory(CppUiProgramTemplate)
 add_subdirectory(CppToolVsNewProjWin32Deleter)
 add_subdirectory(CppToolFileToCharArray)

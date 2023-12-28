@@ -12,7 +12,7 @@ file (GLOB_RECURSE UI_TEMPLATE_MANIFEST ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralRe
 
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
-file (GLOB_RECURSE util_src_files ../CppUtils/Util/*.cpp)
+file (GLOB_RECURSE util_src_files ../Util/*.cpp)
 
 add_executable(${TargetName}
         ${UI_TEMPLATE_SRC}
@@ -33,7 +33,7 @@ add_executable(${TargetName}
 target_include_directories(${TargetName}
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${CMAKE_CURRENT_SOURCE_DIR}/../CppUtils/Util/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Util/ # util
         ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/src/ # json
         ${UI_TEMPLATE_PATH}/ # ui template framework
         ${IM_GUI_DIR}
