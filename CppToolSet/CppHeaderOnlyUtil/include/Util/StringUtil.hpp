@@ -6,7 +6,7 @@
 #include <ranges>
 #include <algorithm>
 
-namespace Util
+namespace Util::String
 {
     template <typename Encoding>
     using Str = std::basic_string<Encoding>;
@@ -21,7 +21,7 @@ namespace Util
 
         std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [](EncodeFrom c)
         {
-            return (EncodeTo)c;
+            return static_cast<EncodeTo>(c);
         });
 
         return toStr;
@@ -34,7 +34,7 @@ namespace Util
 
         std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [](EncodeFrom c)
         {
-            return (EncodeTo)c;
+            return static_cast<EncodeTo>(c);
         });
 
         return toStr;
@@ -48,7 +48,7 @@ namespace Util
 
         std::transform(sourceStrView.begin(), sourceStrView.end(), toStr.begin(), [](EncodeFrom c)
         {
-            return (EncodeTo)c;
+            return static_cast<EncodeTo>(c);
         });
 
         return toStr;
