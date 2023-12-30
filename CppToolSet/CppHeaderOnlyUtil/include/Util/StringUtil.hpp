@@ -14,147 +14,144 @@ namespace Util
     template<typename Encoding>
     using StrView = std::basic_string_view<Encoding>;
 
-    class StringConvert
+    template<typename EncodeFrom, typename EncodeTo>
+    Str<EncodeTo> CharByCharConvert(const Str<EncodeFrom>& sourceStr)
     {
-    public:
-        StringConvert() = delete;
+        Str<EncodeTo> toStr(sourceStr.length(), 0);
 
-    private:
-        template<typename EncodeFrom, typename EncodeTo>
-        static Str<EncodeTo> CharByCharConvert(const Str<EncodeFrom>& sourceStr)
+        std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [] (EncodeFrom c)
         {
-            Str<EncodeTo> toStr(sourceStr.length(), 0);
+            return (EncodeTo)c;
+        });
 
-            std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [] (EncodeFrom c)
-            {
-                return (EncodeTo)c;
-            });
+        return toStr;
+    }
 
-            return toStr;
-        }
+    template<typename EncodeFrom, typename EncodeTo>
+    Str<EncodeTo> CharByCharConvert(const StrView<EncodeFrom>& sourceStr)
+    {
+        Str<EncodeTo> toStr(sourceStr.length(), 0);
 
-        template<typename EncodeFrom, typename EncodeTo>
-        static Str<EncodeTo> CharByCharConvert(const StrView<EncodeFrom>& sourceStr)
+        std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [] (EncodeFrom c)
         {
-            Str<EncodeTo> toStr(sourceStr.length(), 0);
+            return (EncodeTo)c;
+        });
 
-            std::transform(sourceStr.begin(), sourceStr.end(), toStr.begin(), [] (EncodeFrom c)
-            {
-                return (EncodeTo)c;
-            });
+        return toStr;
+    }
 
-            return toStr;
-        }
+    template<typename EncodeFrom, typename EncodeTo>
+    Str<EncodeTo> CharByCharConvert(const EncodeFrom* sourceStr)
+    {
+        StrView<EncodeFrom> sourceStrView(sourceStr);
+        Str<EncodeTo> toStr(sourceStrView.length(), 0);
 
-        template<typename EncodeFrom, typename EncodeTo>
-        static Str<EncodeTo> CharByCharConvert(const EncodeFrom* sourceStr)
+        std::transform(sourceStrView.begin(), sourceStrView.end(), toStr.begin(), [] (EncodeFrom c)
         {
-            StrView<EncodeFrom> sourceStrView(sourceStr);
-            Str<EncodeTo> toStr(sourceStrView.length(), 0);
+            return (EncodeTo)c;
+        });
 
-            std::transform(sourceStrView.begin(), sourceStrView.end(), toStr.begin(), [] (EncodeFrom c)
-            {
-                return (EncodeTo)c;
-            });
+        return toStr;
+    }
 
-            return toStr;
-        }
+    inline
+    std::string U8StringToString(const std::u8string& u8str)
+    {
+        return CharByCharConvert<char8_t, char>(u8str);
+    }
 
-    public:
-        inline static std::string U8StringToString(const std::u8string& u8str)
-        {
-            return CharByCharConvert<char8_t, char>(u8str);
-        }
+    inline
+    std::string U8StringToString(const std::u8string_view & u8str)
+    {
+        return CharByCharConvert<char8_t, char>(u8str);
+    }
 
-        inline static std::string U8StringToString(const std::u8string_view & u8str)
-        {
-            return CharByCharConvert<char8_t, char>(u8str);
-        }
+    inline
+    std::string U8StringToString(const char8_t* u8str)
+    {
+        return CharByCharConvert<char8_t, char>(u8str);
+    }
 
-        inline static std::string U8StringToString(const char8_t* u8str)
-        {
-            return CharByCharConvert<char8_t, char>(u8str);
-        }
+    inline
+    std::u8string StringToU8String(const std::string& str)
+    {
+        return CharByCharConvert<char, char8_t>(str);
+    }
 
-        inline static std::u8string StringToU8String(const std::string& str)
-        {
-            return CharByCharConvert<char, char8_t>(str);
-        }
+    inline
+    std::u8string StringToU8String(const std::string_view& str)
+    {
+        return CharByCharConvert<char, char8_t>(str);
+    }
 
-        inline static std::u8string StringToU8String(const std::string_view& str)
-        {
-            return CharByCharConvert<char, char8_t>(str);
-        }
+    inline
+    std::u8string StringToU8String(const char* str)
+    {
+        return CharByCharConvert<char, char8_t>(str);
+    }
 
-        inline static std::u8string StringToU8String(const char* str)
-        {
-            return CharByCharConvert<char, char8_t>(str);
-        }
+    inline
+    wchar_t CharToWideChar(char c)
+    {
+        wchar_t ret;
+        mbtowc(&ret, &c, 1);
+        return ret;
+    }
 
-        inline static wchar_t CharToWideChar(char c)
-        {
-            wchar_t ret;
-            mbtowc(&ret, &c, 1);
-            return ret;
-        }
+    inline
+    char WideChatToChar(wchar_t c)
+    {
+        char ret;
+        wctomb_s(nullptr, &ret, c, 1);	return ret;
+    }
 
-        inline static char WideChatToChar(wchar_t c)
-        {
-            char ret;
-            wctomb_s(NULL, &ret, c, 1);	return ret;
-        }
+    inline
+    std::wstring StringToWideString(const std::string& str)
+    {
+        if (str.empty())
+            return {};
 
-        inline static std::wstring StringToWideString(const std::string& str)
-        {
-            if (str.empty())
-                return {};
+        const char* cstr = str.c_str();
+        size_t reqsize = 0;
 
-            const char* cstr = str.c_str();
-            size_t len = str.length() + 1;
-            size_t reqsize = 0;
-            int convertResult;
+        int convertResult = mbstowcs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
+        if (convertResult != 0)
+            return {};
 
-            convertResult = mbstowcs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
-            if (convertResult != 0)
-                return {};
+        if (reqsize == 0)
+            return {};
 
-            if (reqsize == 0)
-                return {};
+        std::vector<wchar_t> buffer(reqsize, 0);
+        convertResult = mbstowcs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
+        if (convertResult != 0)
+            return {};
 
-            std::vector<wchar_t> buffer(reqsize, 0);
-            convertResult = mbstowcs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
-            if (convertResult != 0)
-                return {};
+        return std::wstring(buffer.begin(), buffer.end() - 1);
+    }
 
-            return std::wstring(buffer.begin(), buffer.end() - 1);
-        }
+    inline
+    std::string WideStringToString(const std::wstring& wStr)
+    {
+        if (wStr.empty())
+            return {};
 
-        inline static std::string WideStringToString(const std::wstring& wStr)
-        {
-            if (wStr.empty())
-                return {};
+        const wchar_t* cstr = wStr.c_str();
+        size_t reqsize = 0;
 
-            const wchar_t* cstr = wStr.c_str();
-            size_t len = wStr.length() + 1;
-            size_t reqsize = 0;
-            int convertResult;
+        int convertResult = wcstombs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
+        if (convertResult != 0)
+            return {};
 
-            convertResult = wcstombs_s(&reqsize, nullptr, 0, cstr, _TRUNCATE);
-            if (convertResult != 0)
-                return {};
+        if (reqsize == 0)
+            return {};
 
-            if (reqsize == 0)
-                return {};
+        std::vector<char> buffer(reqsize, 0);
+        convertResult = wcstombs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
+        if (convertResult != 0)
+            return {};
 
-            std::vector<char> buffer(reqsize, 0);
-            convertResult = wcstombs_s(nullptr, &buffer[0], reqsize, cstr, _TRUNCATE);
-            if (convertResult != 0)
-                return {};
-
-            return std::string(buffer.begin(), buffer.end() - 1);
-        }
-
-    };
+        return std::string(buffer.begin(), buffer.end() - 1);
+    }
 
     class StringOperation
     {

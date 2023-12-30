@@ -1,12 +1,15 @@
 #pragma once
 
-class NonCopyable
+namespace Util
 {
-public:
-    NonCopyable() = default;
-    ~NonCopyable() = default;
+    class NonCopyable
+    {
+    public:
+        NonCopyable() = default;
+        ~NonCopyable() = default;
 
-public:
-    NonCopyable( const NonCopyable& ) = delete;
-    const NonCopyable& operator=( const NonCopyable& ) = delete;
-};
+    public:
+        NonCopyable( const NonCopyable& ) = delete;
+        const NonCopyable& operator=( const NonCopyable& ) = delete;
+    };
+}

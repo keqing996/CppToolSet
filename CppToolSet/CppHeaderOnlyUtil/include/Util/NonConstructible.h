@@ -1,8 +1,11 @@
 #pragma once
 
-class NonConstructible
+namespace Util
 {
-public:
-    NonConstructible() = delete;
-    ~NonConstructible() = delete;
-};
+    class NonConstructible
+    {
+    public:
+        NonConstructible() = delete;
+        ~NonConstructible() = delete;
+    };
+}
