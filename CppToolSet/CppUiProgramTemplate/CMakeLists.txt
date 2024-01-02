@@ -16,7 +16,7 @@ file (GLOB_RECURSE UI_TEMPLATE_MANIFEST ${CMAKE_CURRENT_SOURCE_DIR}/../GeneralRe
 
 file (GLOB_RECURSE res_files resource/*.rc)
 file (GLOB_RECURSE src_files src/*.cpp)
-file (GLOB_RECURSE util_src_files ../Util/*.cpp)
+file (GLOB_RECURSE util_src_files ../CppGeneralHelper/*.cpp)
 
 set (ALL_SOURCE
         ${UI_TEMPLATE_SRC}
@@ -36,7 +36,7 @@ set (ALL_SOURCE
 
 set (ALL_INCLUDE_DIR
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Util/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppGeneralHelper/ # util
         ${IM_GUI_DIR}   # imgui
         ${IM_GUI_DIR}/backends # imgui backend)
 )

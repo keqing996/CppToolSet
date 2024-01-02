@@ -7,13 +7,13 @@ set(TargetName hexo_md_converter)
 set(CMAKE_CXX_STANDARD 20)
 
 file (GLOB_RECURSE src_files src/*.cpp)
-file (GLOB_RECURSE util_src_files ../Util/*.cpp)
+file (GLOB_RECURSE util_src_files ../CppGeneralHelper/*.cpp)
 
 add_executable(${TargetName} ${src_files} ${util_src_files})
 
 target_include_directories(${TargetName}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Util/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppGeneralHelper/ # util
 )
 
 # release copy artifacts

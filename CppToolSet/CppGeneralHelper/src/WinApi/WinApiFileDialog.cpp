@@ -1,6 +1,6 @@
 
-#include "WindowsPlatform.h"
-#include "WinApiFileDialog.h"
+#include "../../include/WinApi/WindowsPlatform.h"
+#include "../../include/WinApi/WinApiFileDialog.h"
 
 #include <shobjidl.h>
 

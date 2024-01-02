@@ -15,6 +15,5 @@ add_subdirectory(CppToolMdNoUseImgDeleter)
 add_subdirectory(CppToolHexoMarkDownTool)
 add_subdirectory(CppToolNativeSocketClient)
 add_subdirectory(CppToolQuickOpenFolder)
-add_subdirectory(CppHeaderOnlyUtil)
 
 
