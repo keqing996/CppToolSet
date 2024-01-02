@@ -1,6 +1,6 @@
 #include "../include/Timer.h"
 
-namespace Util
+namespace Helper
 {
 
     void Timer::SetNow()

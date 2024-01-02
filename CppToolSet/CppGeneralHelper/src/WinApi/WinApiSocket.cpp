@@ -7,7 +7,7 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-namespace WinApi::Socket
+namespace Helper::Win::Socket
 {
 
     static std::string gLastError {};

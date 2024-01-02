@@ -5,7 +5,7 @@
 #include <optional>
 #include <array>
 
-namespace WinApi::Socket
+namespace Helper::Win::Socket
 {
     using Byte = char;
     using SocketHandle = void*;

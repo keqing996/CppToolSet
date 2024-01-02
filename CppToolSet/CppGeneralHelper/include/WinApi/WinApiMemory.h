@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace WinApi::Memory
+namespace Helper::Win::Memory
 {
 
 }

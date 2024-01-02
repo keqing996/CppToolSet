@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace WinApi::Console
+namespace Helper::Win::Console
 {
     enum class ConsoleColor
     {

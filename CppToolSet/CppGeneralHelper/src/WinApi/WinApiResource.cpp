@@ -2,7 +2,7 @@
 #include "../../include/WinApi/WindowsPlatform.h"
 #include "../../include/WinApi/WinApiResource.h"
 
-namespace WinApi::Resource
+namespace Helper::Win::Resource
 {
     template<>
     std::optional<DataResource> LoadResource(int id)

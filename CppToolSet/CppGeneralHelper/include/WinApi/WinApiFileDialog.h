@@ -4,7 +4,7 @@
 #include <vector>
 #include <optional>
 
-namespace WinApi::FileDialog
+namespace Helper::Win::FileDialog
 {
     /*
      * example { { L"Text Files", L"*.txt" }, { L"All Files", L"*.*" } }

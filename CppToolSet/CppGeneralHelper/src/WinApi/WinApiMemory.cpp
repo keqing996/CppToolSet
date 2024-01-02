@@ -1,6 +1,6 @@
 #include "../../include/WinApi/WindowsPlatform.h"
 
-namespace WinApi::Memory
+namespace Helper::Win::Memory
 {
 
 }

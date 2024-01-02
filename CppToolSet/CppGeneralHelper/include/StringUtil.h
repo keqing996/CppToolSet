@@ -6,7 +6,7 @@
 #include <ranges>
 #include <algorithm>
 
-namespace Util
+namespace Helper::String
 {
     template<typename Encoding>
     using Str = std::basic_string<Encoding>;

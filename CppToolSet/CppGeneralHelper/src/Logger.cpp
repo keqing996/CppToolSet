@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace Util
+namespace Helper
 {
     void Logger::SetFilterLevel(Level targetLevel)
     {

@@ -5,7 +5,7 @@
 #include <fstream>
 #include <mutex>
 
-namespace Util
+namespace Helper
 {
     class Logger
     {

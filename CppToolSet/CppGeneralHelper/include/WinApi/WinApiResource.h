@@ -4,7 +4,7 @@
 #include <optional>
 #include <concepts>
 
-namespace WinApi::Resource
+namespace Helper::Win::Resource
 {
     struct WinRcResource {};
 

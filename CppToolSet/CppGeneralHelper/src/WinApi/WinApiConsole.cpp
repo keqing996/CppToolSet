@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-namespace WinApi::Console
+namespace Helper::Win::Console
 {
     HWND GetWindowHandle()
     {

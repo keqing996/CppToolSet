@@ -4,7 +4,7 @@
 
 #include <shellapi.h>
 
-namespace WinApi::System
+namespace Helper::Win::System
 {
     std::wstring GetWindowsUserName()
     {

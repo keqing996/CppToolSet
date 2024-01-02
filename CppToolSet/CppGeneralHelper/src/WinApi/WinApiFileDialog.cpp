@@ -4,7 +4,7 @@
 
 #include <shobjidl.h>
 
-namespace WinApi::FileDialog
+namespace Helper::Win::FileDialog
 {
     std::optional<std::wstring> ShowShellDialogAndGetResult(IFileDialog* pFileDialog)
     {

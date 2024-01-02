@@ -18,7 +18,7 @@
 
 #include <Windows.h>
 
-namespace WinApi
+namespace Helper::Win
 {
     template<typename T>
     struct Coord
