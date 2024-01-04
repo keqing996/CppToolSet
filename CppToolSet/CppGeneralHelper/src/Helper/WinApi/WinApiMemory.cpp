@@ -1,4 +1,4 @@
-#include "../../include/Helper/WinApi/WindowsPlatform.h"
+#include "WindowsPlatform.h"
 
 namespace Helper::Win::Memory
 {

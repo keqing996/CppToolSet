@@ -1,5 +1,5 @@
-#include "../../include/Helper/WinApi/WindowsPlatform.h"
-#include "../../include/Helper/WinApi/WinApiSocket.h"
+#include "WindowsPlatform.h"
+#include "WinApiSocket.h"
 #include <WinSock2.h>
 #include <iphlpapi.h>
 #include <ws2tcpip.h>
