@@ -6,7 +6,8 @@
 #include <unordered_set>
 #include <string>
 #include <format>
-#include "Util/StringUtil.hpp"
+
+#include <Helper/String.h>
 
 int main()
 {
@@ -56,7 +57,7 @@ int main()
                 continue;
 
             std::wstring imgPathStr = currPath.wstring() + L"\\" + regexResult[2].str();
-            Util::StringOperation::Replace<wchar_t>(imgPathStr, L"%20", L" ");
+            Helper::String::Replace<wchar_t>(imgPathStr, L"%20", L" ");
             std::filesystem::path imgPath {imgPathStr};
 
             if (_allImgSet.contains(imgPath))

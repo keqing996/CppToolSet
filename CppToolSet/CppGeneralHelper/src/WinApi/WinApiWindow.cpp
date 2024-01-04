@@ -21,7 +21,7 @@ namespace Helper::Win::Window
         const WNDCLASSEXW wc = {
             sizeof(wc),
             CS_CLASSDC,
-            static_cast<WNDPROC>(info.pWinMsgProc),
+            reinterpret_cast<WNDPROC>(info.pWinMsgProc),
             0L,
             0L,
             ::GetModuleHandle(nullptr),
@@ -118,6 +118,6 @@ namespace Helper::Win::Window
 
     void* GetDefaultWinMsgProc()
     {
-        return &DefaultWindowProc;
+        return reinterpret_cast<void*>(&DefaultWindowProc);
     }
 }

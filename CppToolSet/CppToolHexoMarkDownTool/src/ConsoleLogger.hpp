@@ -1,32 +1,31 @@
 #pragma once
 
 #include <iostream>
-
-#include "WinApi/WindowsPlatform.h"
-#include "WinApi/WinApiConsole.h"
+#include <Helper/WinApi/WindowsPlatform.h>
+#include <Helper/WinApi/WinApiConsole.h>
 
 HANDLE hConsoleHandle;
 
 void InitConsoleLogger()
 {
-    hConsoleHandle = WinApi::Console::GetStdOutputHandle();
+    hConsoleHandle = Helper::Win::Console::GetStdOutputHandle();
 }
 
-void SetConsoleColor(WinApi::Console::ConsoleColor c)
+void SetConsoleColor(Helper::Win::Console::Color c)
 {
-    WinApi::Console::SetColor(hConsoleHandle, c, WinApi::Console::ConsoleColor::Black);
+    Helper::Win::Console::SetColor(hConsoleHandle, c, Helper::Win::Console::Color::Black);
 }
 
 void LogError(const std::string& message)
 {
-    SetConsoleColor(WinApi::Console::ConsoleColor::Red);
+    SetConsoleColor(Helper::Win::Console::Color::Red);
     std::cout << message << std::endl;
-    SetConsoleColor(WinApi::Console::ConsoleColor::None);
+    SetConsoleColor(Helper::Win::Console::Color::None);
 }
 
 void LogError(const std::wstring& message)
 {
-    SetConsoleColor(WinApi::Console::ConsoleColor::Red);
+    SetConsoleColor(Helper::Win::Console::Color::Red);
     std::wcout << message << std::endl;
-    SetConsoleColor(WinApi::Console::ConsoleColor::None);
+    SetConsoleColor(Helper::Win::Console::Color::None);
 }

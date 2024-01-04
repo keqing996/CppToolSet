@@ -4,7 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <filesystem>
-#include "StringUtil.hpp"
+#include <Helper/String.h>
 #include "ConsoleLogger.hpp"
 
 using wRegex = std::basic_regex<wchar_t>;
@@ -25,7 +25,7 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
 
     // abstract file name
     std::string mdFileName = mdPath.filename().stem().string();
-    std::wstring mdFileNameW = Util::StringConvert::StringToWideString(mdFileName);
+    std::wstring mdFileNameW = Helper::String::StringToWideString(mdFileName);
 
     // change resource folder name
     auto targetResPath = mdPath.parent_path() / mdFileName;
@@ -62,18 +62,18 @@ void ProcessMarkdownFile(const std::filesystem::path& mdPath)
             continue;
         }
 
-        SetConsoleColor(WinApi::Console::ConsoleColor::Cyan);
+        SetConsoleColor(Helper::Win::Console::Color::Cyan);
         std::wcout << std::format(L"\t<--: {}", oneLineContent) << std::endl;
 
         std::wstring title = regexResult[1];
         std::wstring imgPath = regexResult[2];
-        Util::StringOperation::Replace<wchar_t>(imgPath, L"Resource/", L"");
+        Helper::String::Replace<wchar_t>(imgPath, L"Resource/", L"");
         oneLineContent = std::format(L"{{% asset_img {} {} %}}", imgPath, title);
 
-        SetConsoleColor(WinApi::Console::ConsoleColor::Green);
+        SetConsoleColor(Helper::Win::Console::Color::Green);
         std::wcout << std::format(L"\t-->: {}", oneLineContent) << std::endl;
 
-        SetConsoleColor(WinApi::Console::ConsoleColor::None);
+        SetConsoleColor(Helper::Win::Console::Color::None);
 
         gFileContentBuffer.push_back(oneLineContent);
     }
