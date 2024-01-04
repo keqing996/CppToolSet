@@ -53,7 +53,7 @@ int main()
     {
         void* hWnd = Helper::Win::Window::Show(L"Window", L"Title", 800, 600, style);
 
-        Helper::Timer timer;
+        Helper::Timer<Helper::TimePrecision::Seconds> timer;
         timer.SetNow();
         while (true)
         {
@@ -61,7 +61,7 @@ int main()
             if (quit)
                 break;
 
-            if (timer.GetInterval() > 2000 * 1000)
+            if (timer.GetInterval() > 3)
                 break;
         }
 
