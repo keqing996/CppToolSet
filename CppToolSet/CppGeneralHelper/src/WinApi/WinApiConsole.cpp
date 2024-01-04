@@ -108,40 +108,40 @@ namespace Helper::Win::Console
         ::SetWindowLongPtr(hWnd, GWL_STYLE, style);
     }
 
-    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
+    void SetColor(Color foreground, Color background, bool foregroundIntensity, bool backgroundIntensity)
     {
         SetColor(GetStdOutputHandle(), foreground, background, foregroundIntensity, backgroundIntensity);
     }
 
-    void SetColor(HANDLE handle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity, bool backgroundIntensity)
+    void SetColor(HANDLE handle, Color foreground, Color background, bool foregroundIntensity, bool backgroundIntensity)
     {
         WORD result = 0;
 
         switch (foreground)
         {
-            case ConsoleColor::None:
-            case ConsoleColor::White:
+            case Color::None:
+            case Color::White:
                 result |= FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_GREEN;
                 break;
-            case ConsoleColor::Black:
+            case Color::Black:
                 result |= 0;
                 break;
-            case ConsoleColor::Green:
+            case Color::Green:
                 result |= FOREGROUND_GREEN;
                 break;
-            case ConsoleColor::Blue:
+            case Color::Blue:
                 result |= FOREGROUND_BLUE;
                 break;
-            case ConsoleColor::Red:
+            case Color::Red:
                 result |= FOREGROUND_RED;
                 break;
-            case ConsoleColor::Purple:
+            case Color::Purple:
                 result |= FOREGROUND_BLUE | FOREGROUND_RED;
                 break;
-            case ConsoleColor::Cyan:
+            case Color::Cyan:
                 result |= FOREGROUND_BLUE | FOREGROUND_GREEN;
                 break;
-            case ConsoleColor::Yellow:
+            case Color::Yellow:
                 result |= FOREGROUND_RED | FOREGROUND_GREEN;
                 break;
             default:
@@ -153,29 +153,29 @@ namespace Helper::Win::Console
 
         switch (background)
         {
-            case ConsoleColor::None:
-            case ConsoleColor::Black:
+            case Color::None:
+            case Color::Black:
                 result |= 0;
                 break;
-            case ConsoleColor::White:
+            case Color::White:
                 result |= BACKGROUND_BLUE | BACKGROUND_RED | BACKGROUND_GREEN;
                 break;
-            case ConsoleColor::Green:
+            case Color::Green:
                 result |= BACKGROUND_GREEN;
                 break;
-            case ConsoleColor::Blue:
+            case Color::Blue:
                 result |= BACKGROUND_BLUE;
                 break;
-            case ConsoleColor::Red:
+            case Color::Red:
                 result |= BACKGROUND_RED;
                 break;
-            case ConsoleColor::Purple:
+            case Color::Purple:
                 result |= BACKGROUND_BLUE | BACKGROUND_RED;
                 break;
-            case ConsoleColor::Cyan:
+            case Color::Cyan:
                 result |= BACKGROUND_BLUE | BACKGROUND_GREEN;
                 break;
-            case ConsoleColor::Yellow:
+            case Color::Yellow:
                 result |= BACKGROUND_RED | BACKGROUND_GREEN;
                 break;
             default:

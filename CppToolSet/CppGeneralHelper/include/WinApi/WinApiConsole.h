@@ -1,10 +1,8 @@
 #pragma once
 
-#include <string>
-
 namespace Helper::Win::Console
 {
-    enum class ConsoleColor
+    enum class Color
     {
         None,
         Green,
@@ -37,9 +35,9 @@ namespace Helper::Win::Console
 
     void SetWindowMinEnable(bool enable);
 
-    void SetColor(ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
+    void SetColor(Color foreground, Color background, bool foregroundIntensity = false, bool backgroundIntensity = false);
 
-    void SetColor(void* consoleHandle, ConsoleColor foreground, ConsoleColor background, bool foregroundIntensity = false, bool backgroundIntensity = false);
+    void SetColor(void* consoleHandle, Color foreground, Color background, bool foregroundIntensity = false, bool backgroundIntensity = false);
 
     void ClearScreen();
 }
