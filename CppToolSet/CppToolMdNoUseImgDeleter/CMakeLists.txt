@@ -13,7 +13,7 @@ add_executable(${TargetName} ${src_files} ${util_src_files})
 
 target_include_directories(${TargetName}
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../CppGeneralHelper/include/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppGeneralHelper/src/ # util
 )
 
 # release copy artifacts

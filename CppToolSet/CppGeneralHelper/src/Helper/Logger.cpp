@@ -1,6 +1,6 @@
 
-#include "../include/Helper/Logger.h"
-#include "../include/Helper/WinApi/WinApiConsole.h"
+#include "Logger.h"
+#include "WinApi/WinApiConsole.h"
 
 #include <iostream>
 

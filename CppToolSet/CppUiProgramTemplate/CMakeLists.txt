@@ -36,7 +36,7 @@ set (ALL_SOURCE
 
 set (ALL_INCLUDE_DIR
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ # self root
-        ${CMAKE_CURRENT_SOURCE_DIR}/../CppGeneralHelper/include/ # util
+        ${CMAKE_CURRENT_SOURCE_DIR}/../CppGeneralHelper/src/ # util
         ${IM_GUI_DIR}   # imgui
         ${IM_GUI_DIR}/backends # imgui backend)
 )
