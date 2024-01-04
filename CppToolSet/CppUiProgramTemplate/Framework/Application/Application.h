@@ -1,13 +1,13 @@
 #pragma once
 
 #include <string>
-#include "NonCopyable.h"
+#include <Helper/NonCopyable.h>
 #include "../Window/WinWindow.h"
 #include "../ImGuiLogic/ImGuiLogic.h"
 
 namespace UiTemplate
 {
-    class Application: public NonCopyable
+    class Application: public Helper::NonCopyable
     {
     public:
         bool Init();

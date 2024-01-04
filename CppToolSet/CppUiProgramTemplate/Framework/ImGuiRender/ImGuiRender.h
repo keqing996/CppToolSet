@@ -1,16 +1,16 @@
 #pragma once
 
 #include <d3d11.h>
-#include "WinApi/WindowsPlatform.h"
+#include <Helper/WinApi/WindowsPlatform.h>
+#include <Helper/NonCopyable.h>
 #include "../Window/IWinMsgReceiver.h"
-#include "NonCopyable.h"
 
 struct ImFontAtlas;
 struct ImFont;
 
 namespace UiTemplate
 {
-class ImGuiRender : public IWinMsgReceiver, public NonCopyable
+class ImGuiRender : public IWinMsgReceiver, public Helper::NonCopyable
     {
     public:
         ImGuiRender();

@@ -19,8 +19,8 @@ namespace Helper
     void Logger::InitConsoleLogger()
     {
 #ifdef ENABLE_CONSOLE_LOG
-        WinApi::Console::CreateConsole();
-        WinApi::Console::SetConsoleOutputUtf8();
+        Helper::Win::Console::CreateConsole();
+        Helper::Win::Console::SetConsoleOutputUtf8();
         _enableConsoleLogger = true;
 #endif
     }
@@ -51,7 +51,7 @@ namespace Helper
         }
 
 #ifdef ENABLE_CONSOLE_LOG
-        WinApi::Console::DetachConsole();
+        Helper::Win::Console::DetachConsole();
 #endif
     }
 

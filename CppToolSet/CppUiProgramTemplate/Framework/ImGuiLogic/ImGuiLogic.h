@@ -1,13 +1,13 @@
 #pragma once
 
 #include "imgui.h"
-#include "NonCopyable.h"
+#include <Helper/NonCopyable.h>
 
 namespace UiTemplate
 {
     class Win32Window;
 
-    class ImGuiLogic : public NonCopyable
+    class ImGuiLogic : public Helper::NonCopyable
     {
     public:
         ImGuiLogic();

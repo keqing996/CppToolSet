@@ -1,7 +1,7 @@
 
-#include "WinApi/WindowsPlatform.h"
-#include "WinApi/WinApiResource.h"
-#include "StringUtil.hpp"
+#include <Helper/WinApi/WindowsPlatform.h>
+#include <Helper/WinApi/WinApiResource.h>
+#include <Helper/String.h>
 #include "WinWindow.h"
 #include "../Resource/FontResource.h"
 
@@ -11,8 +11,8 @@ namespace UiTemplate
     {
         _width = GetWindowInitWidth();
         _height = GetWindowInitHeight();
-        _windowRegisterName = Util::StringConvert::StringToWideString(GetWindowRegisterName());
-        _windowTitle = Util::StringConvert::StringToWideString(GetWindowTitle());
+        _windowRegisterName = Helper::String::StringToWideString(GetWindowRegisterName());
+        _windowTitle = Helper::String::StringToWideString(GetWindowTitle());
 
         Win32RegisterWindow();
         Win32CreateWindow();
@@ -266,7 +266,7 @@ namespace UiTemplate
         HICON hIcon = nullptr;
         if (iconId != 0)
         {
-            auto loadIcon = WinApi::Resource::LoadResource<WinApi::Resource::IconResource>(iconId);
+            auto loadIcon = Helper::Win::Resource::LoadResource<Helper::Win::Resource::IconResource>(iconId);
             hIcon = loadIcon.has_value() ? static_cast<HICON>(loadIcon.value().hIcon) : nullptr;
         }
 

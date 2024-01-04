@@ -1,5 +1,5 @@
 #include "Application.h"
-#include "Logger/Logger.h"
+#include <Helper/Logger.h>
 
 namespace UiTemplate
 {
@@ -10,11 +10,11 @@ namespace UiTemplate
         InitLanguage();
 
         // Logger
-        Util::Logger::InitConsoleLogger();
+        Helper::Logger::InitConsoleLogger();
 
         if (EnableFileLog())
         {
-            Util::Logger::InitFileLogger(GetFileLogPath());
+            Helper::Logger::InitFileLogger(GetFileLogPath());
         }
 
         // Main Window
@@ -29,7 +29,7 @@ namespace UiTemplate
 
         pMainWindow->Show();
 
-        Util::Logger::LogInfo("[UiTemplate] Main window & logic init finish.");
+        Helper::Logger::LogInfo("[UiTemplate] Main window & logic init finish.");
 
         return true;
     }
@@ -56,7 +56,7 @@ namespace UiTemplate
         delete pLogic;
         delete pMainWindow;
 
-        Util::Logger::Close();
+        Helper::Logger::Close();
     }
 
     void Application::InitLanguage()

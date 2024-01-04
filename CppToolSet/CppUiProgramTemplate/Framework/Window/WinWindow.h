@@ -2,17 +2,16 @@
 
 #include <string>
 #include <vector>
-#include <functional>
 #include <d3d11.h>
 
 #include "IWinMsgReceiver.h"
 #include "../ImGuiRender/ImGuiRender.h"
 #include "../ImGuiLogic/ImGuiLogic.h"
-#include "NonCopyable.h"
+#include <Helper/NonCopyable.h>
 
 namespace UiTemplate
 {
-    class Win32Window: public NonCopyable
+    class Win32Window: public Helper::NonCopyable
     {
     public:
         Win32Window() = default;

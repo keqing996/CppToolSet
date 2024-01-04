@@ -1,5 +1,5 @@
 
-#include "WinApi/WinApiResource.h"
+#include <Helper/WinApi/WinApiResource.h>
 
 #include "ImGuiRender.h"
 #include "imgui.h"
@@ -55,7 +55,7 @@ namespace UiTemplate
         // Font
         auto LoadMemoryFont = [this, dpiScale](int resId, int size) -> ImFont*
         {
-            auto defaultFontRes = WinApi::Resource::LoadResource<WinApi::Resource::DataResource>(resId);
+            auto defaultFontRes = Helper::Win::Resource::LoadResource<Helper::Win::Resource::DataResource>(resId);
             if (!defaultFontRes.has_value())
                 return nullptr;
 
