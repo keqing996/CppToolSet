@@ -12,16 +12,17 @@ namespace Helper::Win::Window
         void* pWinMsgProc;
     };
 
-    struct SystemMenuStyle
+    struct StyleInfo
     {
         bool hasSysmenu;
         bool hasMaxBtn;
         bool hasMinBtn;
+        bool canResize;
     };
 
     void Register(const std::wstring& windowRegisterName, RegisterInfo info);
 
-    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, SystemMenuStyle menuStyle);
+    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, StyleInfo menuStyle);
 
     void Destroy(void* hWnd);
 

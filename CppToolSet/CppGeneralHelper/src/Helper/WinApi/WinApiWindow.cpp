@@ -36,10 +36,9 @@ namespace Helper::Win::Window
         ::RegisterClassExW(&wc);
     }
 
-    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, SystemMenuStyle menuStyle)
+    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, StyleInfo menuStyle)
     {
-        DWORD windowStyle = WS_OVERLAPPED | WS_THICKFRAME;
-        windowStyle |= WS_CAPTION;
+        DWORD windowStyle = WS_OVERLAPPED | WS_CAPTION;
 
         if (menuStyle.hasSysmenu)
         {
@@ -51,6 +50,9 @@ namespace Helper::Win::Window
             if (menuStyle.hasMinBtn)
                 windowStyle |= WS_MINIMIZEBOX;
         }
+
+        if (menuStyle.canResize)
+            windowStyle = WS_THICKFRAME;
 
         HWND hWnd = ::CreateWindowW(
                         windowRegisterName.c_str(),

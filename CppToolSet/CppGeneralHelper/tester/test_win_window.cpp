@@ -13,10 +13,11 @@ int main()
 
     Helper::Win::Window::Register(L"Window", info);
 
-    Helper::Win::Window::SystemMenuStyle style {
+    Helper::Win::Window::StyleInfo style {
         true,
         true,
-        true
+        true,
+        false
     };
 
     {

@@ -16,19 +16,19 @@ namespace Helper
     class Timer
     {
     public:
-        void Timer::SetNow()
+        void SetNow()
         {
             _timePoint = std::chrono::steady_clock::now();
         }
 
-        int64_t Timer::GetIntervalAndSetNow()
+        int64_t GetIntervalAndSetNow()
         {
             auto interval = GetInterval();
             SetNow();
             return interval;
         }
 
-        int64_t Timer::GetInterval() const
+        int64_t GetInterval() const
         {
             int64_t value;
             if constexpr (T == TimePrecision::Nanoseconds)
