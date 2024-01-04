@@ -72,7 +72,7 @@ namespace Helper
 
         if (_enableConsoleLogger)
         {
-            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::White, WinApi::Console::ConsoleColor::None);
+            Win::Console::SetColor(Win::Console::Color::White, Win::Console::Color::None);
             std::cout << "[I] " << message << std::endl;
         }
 
@@ -99,9 +99,9 @@ namespace Helper
 
         if (_enableConsoleLogger)
         {
-            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::Yellow, WinApi::Console::ConsoleColor::None);
+            Win::Console::SetColor(Win::Console::Color::Yellow, Win::Console::Color::None);
             std::cout << "[W] " << message << std::endl;
-            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::White, WinApi::Console::ConsoleColor::None);
+            Win::Console::SetColor(Win::Console::Color::White, Win::Console::Color::None);
         }
 
         if (_enableFileLogger && _pFileStream != nullptr)
@@ -127,9 +127,9 @@ namespace Helper
 
         if (_enableConsoleLogger)
         {
-            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::Red, WinApi::Console::ConsoleColor::None);
+            Win::Console::SetColor(Win::Console::Color::Red, Win::Console::Color::None);
             std::cout << "[E] " << message << std::endl;
-            WinApi::Console::SetColor(WinApi::Console::ConsoleColor::White, WinApi::Console::ConsoleColor::None);
+            Win::Console::SetColor(Win::Console::Color::White, Win::Console::Color::None);
         }
 
         if (_enableFileLogger && _pFileStream != nullptr)
