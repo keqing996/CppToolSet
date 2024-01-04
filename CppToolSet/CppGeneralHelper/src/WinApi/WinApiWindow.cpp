@@ -16,7 +16,7 @@ namespace Helper::Win::Window
         }
     }
 
-    void Register(const std::wstring& windowRegisterName, WindowRegisterInfo info)
+    void Register(const std::wstring& windowRegisterName, RegisterInfo info)
     {
         const WNDCLASSEXW wc = {
             sizeof(wc),
@@ -36,7 +36,7 @@ namespace Helper::Win::Window
         ::RegisterClassExW(&wc);
     }
 
-    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, WindowCreateStyle style)
+    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, CreateStyle style)
     {
         DWORD windowStyle = WS_OVERLAPPED;
         if (style.hasCaption)
@@ -83,6 +83,40 @@ namespace Helper::Win::Window
     void UnRegister(const std::wstring& windowRegisterName)
     {
         ::UnregisterClassW(windowRegisterName.c_str(), GetModuleHandle(nullptr));
+    }
+
+    bool MessageLoop(bool blockWhenNoWindowsMessage)
+    {
+        bool shouldQuit = false;
+        MSG msg;
+
+        if (blockWhenNoWindowsMessage)
+        {
+            // When GetMessage() retrieves a WM_QUIT message from the queue, it will return a value of 0
+            if (::GetMessage(&msg, nullptr, 0U, 0U) == 0)
+            {
+                shouldQuit = true;
+            }
+            else
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+            }
+        }
+        else
+        {
+            while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+            {
+                ::TranslateMessage(&msg);
+                ::DispatchMessage(&msg);
+
+                shouldQuit = msg.message == WM_QUIT;
+                if (shouldQuit)
+                    break;
+            }
+        }
+
+        return shouldQuit;
     }
 
     void* GetDefaultWinMsgProc()

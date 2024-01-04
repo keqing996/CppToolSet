@@ -4,7 +4,7 @@
 
 namespace Helper::Win::Window
 {
-    struct WindowRegisterInfo
+    struct RegisterInfo
     {
         void* hIcon;
         void* hIconSmall;
@@ -12,7 +12,7 @@ namespace Helper::Win::Window
         void* pWinMsgProc;
     };
 
-    struct WindowCreateStyle
+    struct CreateStyle
     {
         bool hasCaption;
         bool hasSysmenu;
@@ -20,13 +20,15 @@ namespace Helper::Win::Window
         bool hasMinBtn;
     };
 
-    void Register(const std::wstring& windowRegisterName, WindowRegisterInfo info);
+    void Register(const std::wstring& windowRegisterName, RegisterInfo info);
 
-    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, WindowCreateStyle style);
+    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, CreateStyle style);
 
     void Destroy(void* hWnd);
 
     void UnRegister(const std::wstring& windowRegisterName);
+
+    bool MessageLoop(bool blockWhenNoWindowsMessage = false);
 
     void* GetDefaultWinMsgProc();
 
