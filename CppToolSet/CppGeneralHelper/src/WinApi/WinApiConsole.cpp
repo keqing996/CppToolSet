@@ -1,6 +1,6 @@
 
-#include "../../include/WinApi/WindowsPlatform.h"
-#include "../../include/WinApi/WinApiConsole.h"
+#include "../../include/Helper/WinApi/WindowsPlatform.h"
+#include "../../include/Helper/WinApi/WinApiConsole.h"
 
 #include <iostream>
 

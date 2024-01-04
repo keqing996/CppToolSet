@@ -1,6 +1,6 @@
 
-#include "../../include/WinApi/WindowsPlatform.h"
-#include "../../include/WinApi/WinApiResource.h"
+#include "../../include/Helper/WinApi/WindowsPlatform.h"
+#include "../../include/Helper/WinApi/WinApiResource.h"
 
 namespace Helper::Win::Resource
 {

@@ -1,5 +1,5 @@
-#include "../../include/WinApi/WindowsPlatform.h"
-#include "../../include/WinApi/WinApiWindow.h"
+#include "../../include/Helper/WinApi/WindowsPlatform.h"
+#include "../../include/Helper/WinApi/WinApiWindow.h"
 
 namespace Helper::Win::Window
 {
