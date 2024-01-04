@@ -36,37 +36,34 @@ namespace Helper::Win::Window
         ::RegisterClassExW(&wc);
     }
 
-    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, CreateStyle style)
+    void* Show(const std::wstring& windowRegisterName, const std::wstring& windowTitleName, int width, int height, SystemMenuStyle menuStyle)
     {
-        DWORD windowStyle = WS_OVERLAPPED;
-        if (style.hasCaption)
+        DWORD windowStyle = WS_OVERLAPPED | WS_THICKFRAME;
+        windowStyle |= WS_CAPTION;
+
+        if (menuStyle.hasSysmenu)
         {
-            windowStyle |= WS_CAPTION;
+            windowStyle |= WS_SYSMENU;
 
-            if (style.hasSysmenu)
-            {
-                windowStyle |= WS_SYSMENU;
+            if (menuStyle.hasMaxBtn)
+                windowStyle |= WS_MAXIMIZEBOX;
 
-                if (style.hasMaxBtn)
-                    windowStyle |= WS_MAXIMIZEBOX;
-
-                if (style.hasMinBtn)
-                    windowStyle |= WS_MINIMIZEBOX;
-            }
+            if (menuStyle.hasMinBtn)
+                windowStyle |= WS_MINIMIZEBOX;
         }
 
         HWND hWnd = ::CreateWindowW(
-                windowRegisterName.c_str(),
-                windowTitleName.c_str(),
-                windowStyle,
-                100,
-                100,
-                width,
-                height,
-                nullptr,
-                nullptr,
-                ::GetModuleHandle(nullptr),
-                nullptr);
+                        windowRegisterName.c_str(),
+                        windowTitleName.c_str(),
+                        windowStyle,
+                        100,
+                        100,
+                        width,
+                        height,
+                        nullptr,
+                        nullptr,
+                        ::GetModuleHandle(nullptr),
+                        nullptr);
 
         ::SetWindowTextW(hWnd, windowTitleName.c_str());
         ::ShowWindow(hWnd, SW_SHOWDEFAULT);
