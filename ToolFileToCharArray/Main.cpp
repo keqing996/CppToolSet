@@ -3,6 +3,21 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
+#include <thread>
+
+void UpdateProgress(float progress)
+{
+    int barWidth = 70;
+    std::cout << "[";
+    int pos = barWidth * progress;
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos) std::cout << ">";
+        else std::cout << " ";
+    }
+    std::cout << "] " << int(progress * 100.0) << " %\r";
+    std::cout.flush();
+}
 
 int main(int argc, char** argv)
 {
@@ -58,23 +73,50 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    outputStream << "#pragma once\n";
-    outputStream << "\n";
-    outputStream << "// Auto Generated File.\n";
-    outputStream << std::format("// Generated from: {}\n", inputFile.filename().string());
-    outputStream << "\n";
-    outputStream << "#include <array>\n";
-    outputStream << "\n";
-    outputStream << std::format("inline static std::array<unsigned char, {}> {} = \n", size, inputFileName);
-    outputStream << "{";
-
-    for (int i = 0; i < size - 1; i++)
+    // main thread only read, so no lock/atomic
+    float progress = 0;
+    bool finish = false;
+    std::thread worker([&]() -> void
     {
-        if (i % 15 == 0)
-            outputStream << std::format("\n\t0x{:02X}, ", static_cast<unsigned char>(content[i]));
-        else
-            outputStream << std::format("0x{:02X}, ", static_cast<unsigned char>(content[i]));
+        outputStream << "#pragma once\n";
+        outputStream << "\n";
+        outputStream << "// Auto Generated File.\n";
+        outputStream << std::format("// Generated from: {}\n", inputFile.filename().string());
+        outputStream << "\n";
+        outputStream << "#include <array>\n";
+        outputStream << "\n";
+        outputStream << std::format("inline static std::array<unsigned char, {}> {} = \n", size, inputFileName);
+        outputStream << "{";
+
+        for (int i = 0; i < size - 1; i++)
+        {
+            if (i % 15 == 0)
+            {
+                outputStream << std::format("\n\t0x{:02X}, ", static_cast<unsigned char>(content[i]));
+            }
+            else
+                outputStream << std::format("0x{:02X}, ", static_cast<unsigned char>(content[i]));
+
+            progress = (float) i / (size - 1);
+        }
+
+        outputStream << "\n};\n";
+
+        finish = true;
+    });
+
+    while (true)
+    {
+        if (finish)
+            break;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        UpdateProgress(progress);
     }
 
-    outputStream << "\n};\n";
+    worker.join();
+
+    UpdateProgress(1.0f);
+
+    return 0;
 }
