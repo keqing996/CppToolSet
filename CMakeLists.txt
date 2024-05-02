@@ -16,3 +16,7 @@ target_include_directories  (file_to_char_array PRIVATE ${INFRA_INCLUDE_PATH})
 # Tool VS Win32 Deleter
 add_executable              (vs_win32_deleter ./ToolVsWin32Deleter/Main.cpp)
 target_include_directories  (vs_win32_deleter PRIVATE ${RAPID_XML_INCLUDE_PATH})
+
+# Tool Markdown No Use Image Deleter
+add_executable              (md_no_use_img_deleter ./ToolMarkdownNoUseImgDeleter/Main.cpp)
+target_include_directories  (md_no_use_img_deleter PRIVATE ${INFRA_INCLUDE_PATH})
