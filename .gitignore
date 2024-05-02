@@ -41,7 +41,7 @@ output/
 *.lib
 
 # Executables
-*.exe
+*.ilk
 *.out
 *.app
 
