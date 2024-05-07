@@ -1,6 +1,0 @@
-[submodule "ThirdParty/ImGuiWinAppFrameWorkd"]
-	path = thirdparty/ImGuiWinAppFrameWorkd
-	url = https://github.com/keqing996/IMGuiWinAppFramework.git
-[submodule "ThirdParty/Infra"]
-	path = thirdparty/Infra
-	url = https://github.com/keqing996/CppHelper.git
