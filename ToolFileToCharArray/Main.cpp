@@ -4,20 +4,7 @@
 #include <format>
 #include <iostream>
 #include <thread>
-
-void UpdateProgress(float progress)
-{
-    int barWidth = 70;
-    std::cout << "[";
-    int pos = barWidth * progress;
-    for (int i = 0; i < barWidth; ++i) {
-        if (i < pos) std::cout << "=";
-        else if (i == pos) std::cout << ">";
-        else std::cout << " ";
-    }
-    std::cout << "] " << int(progress * 100.0) << " %\r";
-    std::cout.flush();
-}
+#include <Infra/Windows/Console.hpp>
 
 int main(int argc, char** argv)
 {
@@ -111,12 +98,12 @@ int main(int argc, char** argv)
             break;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        UpdateProgress(progress);
+        Infra::Console::ProgressBar(progress);
     }
 
     worker.join();
 
-    UpdateProgress(1.0f);
+    Infra::Console::ProgressBar(1.0f);
 
     return 0;
 }
