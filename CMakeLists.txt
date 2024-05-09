@@ -33,5 +33,6 @@ add_executable              (hexo_md_converter ./ToolHexoMdConverter/Main.cpp)
 target_include_directories  (hexo_md_converter PRIVATE ${INFRA_INCLUDE_PATH})
 
 # Tool Quick Open Folder
-add_executable              (quick_open_folder ./ToolQuickOpenFolder/Main.cpp ./ToolQuickOpenFolder/QuickOpenFolder.cpp)
+add_executable              (quick_open_folder ./ToolQuickOpenFolder/Main.cpp ./ToolQuickOpenFolder/QuickOpenFolder.cpp ./ToolQuickOpenFolder/Resource/BundledResource.rc)
+target_include_directories  (quick_open_folder PRIVATE ./ThirdParty/NlohmannJson/include/)
 target_link_libraries       (quick_open_folder PRIVATE imgui_frame_work)
