@@ -11,6 +11,10 @@ set (RAPID_XML_INCLUDE_PATH     ./ThirdParty/RapidXml/include)
 
 add_subdirectory(SubModule/Infra)
 
+# Tool CMake Quick Start
+add_executable              (cmake_quick_start ./ToolCMakeQuickStart/Main.cpp)
+target_include_directories  (cmake_quick_start PRIVATE ${INFRA_INCLUDE_PATH})
+
 # Tool File To Char Array
 add_executable              (file_to_char_array ./ToolFileToCharArray/Main.cpp)
 target_include_directories  (file_to_char_array PRIVATE ${INFRA_INCLUDE_PATH})
