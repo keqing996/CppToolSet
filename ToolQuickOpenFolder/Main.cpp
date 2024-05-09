@@ -2,7 +2,7 @@
 #include <locale>
 #include "QuickOpenFolder.h"
 
-int main()
+int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PWSTR lpCmdLine, int nCmdShow)
 {
     std::locale::global(std::locale("zh_CN.UTF8"));
 
