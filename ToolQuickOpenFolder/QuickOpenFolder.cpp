@@ -16,7 +16,7 @@ QuickOpenFolder::QuickOpenFolder()
     InitConfig();
 }
 
-void QuickOpenFolder::Update(Infra::ImGuiWinApp& window)
+void QuickOpenFolder::Update()
 {
     const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(ImVec2(mainViewport->WorkPos.x, mainViewport->WorkPos.y), ImGuiCond_Always);
@@ -28,31 +28,36 @@ void QuickOpenFolder::Update(Infra::ImGuiWinApp& window)
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_NoCollapse;
 
-    ImGui::Begin("Quick Open Folder", nullptr, window_flags);
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {6, 12});
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2);
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.9f, 0.32f, 0.0f, 0.2f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {1.0f, 0.64f, 0.0f, 0.7f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {1.0f, 0.64f, 0.0f, 1.0f});
+    ImGui::PushFont(_pFontRegularNormal);
+    {
+        ImGui::Begin("Quick Open Folder", nullptr, window_flags);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {6, 12});
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 6});
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 2);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.9f, 0.32f, 0.0f, 0.2f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {1.0f, 0.64f, 0.0f, 0.7f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {1.0f, 0.64f, 0.0f, 1.0f});
 
-    ImGuiStyle& style = ImGui::GetStyle();
-    btnWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 4)) / 5;
+        ImGuiStyle& style = ImGui::GetStyle();
+        btnWidth = (ImGui::GetContentRegionAvail().x - (style.ItemSpacing.x * 4)) / 5;
 
-    UpdateFolderPath(window);
+        UpdateFolderPath();
 
-    ImGui::Dummy(ImVec2 {0, 35});
+        ImGui::Dummy(ImVec2 {0, 35});
 
-    UpdateVsCodePath(window);
+        UpdateVsCodePath();
 
-    ImGui::PopStyleColor(3);
-    ImGui::PopStyleVar(3);
+        ImGui::PopStyleColor(3);
+        ImGui::PopStyleVar(3);
+    }
+    ImGui::PopFont();
+
     ImGui::End();
 }
 
-void QuickOpenFolder::UpdateVsCodePath(Infra::ImGuiWinApp& window)
+void QuickOpenFolder::UpdateVsCodePath()
 {
-    UpdateTitle("VS Code Path", window);
+    UpdateTitle("VS Code Path");
 
     if (ImGui::Button((const char*)u8"路径", {btnWidth, 0}))
     {
@@ -74,14 +79,14 @@ void QuickOpenFolder::UpdateVsCodePath(Infra::ImGuiWinApp& window)
         ImGui::Text("%s", _vsCodePathString.c_str());
 }
 
-void QuickOpenFolder::UpdateFolderPath(Infra::ImGuiWinApp& window)
+void QuickOpenFolder::UpdateFolderPath()
 {
-    UpdateTitle("Folders", window);
+    UpdateTitle("Folders");
 
     std::vector<int> goingToDeleteIndex;
 
     for (int i = 0; i < _allFolder.size(); i++)
-        UpdateSingleFolder(i, goingToDeleteIndex, window);
+        UpdateSingleFolder(i, goingToDeleteIndex);
 
     if (!goingToDeleteIndex.empty())
     {
@@ -104,12 +109,12 @@ void QuickOpenFolder::UpdateFolderPath(Infra::ImGuiWinApp& window)
     }
 }
 
-void QuickOpenFolder::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteIndex, Infra::ImGuiWinApp& window)
+void QuickOpenFolder::UpdateSingleFolder(int index, std::vector<int>& goingToDeleteIndex)
 {
     auto& folder = _allFolder[index];
 
     // name, path
-    ImGui::PushFont(window.GetFontBoldNormal());
+    ImGui::PushFont(_pFontBoldNormal);
     {
         ImGui::Text("%s", folder.name.c_str());
     }
@@ -179,9 +184,9 @@ void QuickOpenFolder::UpdateSingleFolder(int index, std::vector<int>& goingToDel
     }
 }
 
-void QuickOpenFolder::UpdateTitle(const char* title, Infra::ImGuiWinApp& window)
+void QuickOpenFolder::UpdateTitle(const char* title)
 {
-    ImGui::PushFont(window.GetFontBoldLarge());
+    ImGui::PushFont(_pFontBoldLarge);
     {
         auto titleWidth = ImGui::CalcTextSize(title);
 
@@ -277,4 +282,15 @@ void QuickOpenFolder::WriteConfig()
     fs << std::setw(4) << doc << std::endl;
 
     fs.close();
+}
+
+void QuickOpenFolder::LoadChineseFonts(Infra::ImGuiWinApp& window)
+{
+    static constexpr const char* SYSTEM_MSYH_REGULAR_FONT_PATH = "c:\\Windows\\Fonts\\msyhl.ttc";
+    static constexpr const char* SYSTEM_MSYH_BOLD_FONT_PATH = "c:\\Windows\\Fonts\\msyhbd.ttc";
+
+    _pFontRegularNormal = window.CreateImGuiFont(SYSTEM_MSYH_REGULAR_FONT_PATH, window.GetNormalFontSize());
+    _pFontRegularLarge = window.CreateImGuiFont(SYSTEM_MSYH_REGULAR_FONT_PATH, window.GetLargeFontSize());
+    _pFontBoldNormal = window.CreateImGuiFont(SYSTEM_MSYH_BOLD_FONT_PATH, window.GetNormalFontSize());
+    _pFontBoldLarge = window.CreateImGuiFont(SYSTEM_MSYH_BOLD_FONT_PATH, window.GetLargeFontSize());
 }

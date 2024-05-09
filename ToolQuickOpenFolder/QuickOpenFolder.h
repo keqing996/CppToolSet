@@ -15,20 +15,26 @@ public:
     QuickOpenFolder();
 
 public:
-    void Update(Infra::ImGuiWinApp& window);
+    void LoadChineseFonts(Infra::ImGuiWinApp& window);
+    void Update();
 
 private:
     std::string GetConfigPath() const;
     void InitConfig();
     void WriteConfig();
-    void UpdateVsCodePath(Infra::ImGuiWinApp& window);
-    void UpdateFolderPath(Infra::ImGuiWinApp& window);
-    void UpdateSingleFolder(int index, std::vector<int>& goingToDeleteIndex, Infra::ImGuiWinApp& window);
-    void UpdateTitle(const char* title, Infra::ImGuiWinApp& window);
+    void UpdateVsCodePath();
+    void UpdateFolderPath();
+    void UpdateSingleFolder(int index, std::vector<int>& goingToDeleteIndex);
+    void UpdateTitle(const char* title);
 
 private:
     std::string _vsCodePathString;
     std::vector<Folder> _allFolder;
 
     float btnWidth = 45;
+
+    ImFont* _pFontRegularNormal = nullptr;
+    ImFont* _pFontRegularLarge = nullptr;
+    ImFont* _pFontBoldNormal = nullptr;
+    ImFont* _pFontBoldLarge = nullptr;
 };

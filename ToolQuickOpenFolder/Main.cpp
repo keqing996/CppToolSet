@@ -10,9 +10,11 @@ int main()
 
     Infra::ImGuiWinApp app(800, 600, "Quick Open Fold - v5.0.0", (int)Infra::WindowStyle::HaveTitleBar | (int)Infra::WindowStyle::HaveClose);
 
+    logic.LoadChineseFonts(app);
+
     auto tick = [&](Infra::ImGuiWinApp& window) -> void
     {
-        logic.Update(window);
+        logic.Update();
     };
 
     app.SetTickFunction<Infra::ImGuiWinApp::TickStage::OnFrame>(tick);
