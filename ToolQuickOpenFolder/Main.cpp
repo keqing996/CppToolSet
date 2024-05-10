@@ -1,6 +1,7 @@
 
 #include <locale>
 #include "QuickOpenFolder.h"
+#include "Resource/Resource.h"
 
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PWSTR lpCmdLine, int nCmdShow)
 {
@@ -8,7 +9,9 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PWSTR lpCmdLine, int n
 
     QuickOpenFolder logic;
 
-    Infra::ImGuiWinApp app(800, 600, "Quick Open Fold - v5.0.0", (int)Infra::WindowStyle::HaveTitleBar | (int)Infra::WindowStyle::HaveClose);
+    Infra::ImGuiWinApp app(800, 600, "Quick Open Fold - v5.0.1", (int)Infra::WindowStyle::HaveTitleBar | (int)Infra::WindowStyle::HaveClose);
+
+    app.GetNativeWindow().SetIcon(IDI_ICON1);
 
     logic.LoadChineseFonts(app);
 
