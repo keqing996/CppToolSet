@@ -37,3 +37,8 @@ add_executable              (quick_open_folder ./ToolQuickOpenFolder/Main.cpp ./
 target_include_directories  (quick_open_folder PRIVATE ./ThirdParty/NlohmannJson/include/)
 target_link_libraries       (quick_open_folder PRIVATE imgui_frame_work)
 set_target_properties       (quick_open_folder PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+
+# Tool Socket Client
+add_executable              (socket_client ./ToolSocketClient/Main.cpp ./ToolSocketClient/Resource/BundledResource.rc)
+target_link_libraries       (socket_client PRIVATE imgui_frame_work)
+set_target_properties       (socket_client PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
