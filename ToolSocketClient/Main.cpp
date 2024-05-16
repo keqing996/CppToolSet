@@ -1,20 +1,13 @@
 
 #include <locale>
 #include <Infra/Windows/WindowsDefine.hpp>
-#include "SocketClient.hpp"
-#include "Resource/Resource.h"
+#include "TargtInputWindow.h"
 
 int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PWSTR lpCmdLine, int nCmdShow)
 {
-    std::locale::global(std::locale("zh_CN.UTF8"));
+    TargetInputWindow* pInputWindow = new TargetInputWindow();
 
-    Infra::ImGuiWinApp app(800, 600, "Socket Clint", (int)Infra::WindowStyle::HaveTitleBar | (int)Infra::WindowStyle::HaveClose);
-
-    app.GetNativeWindow().SetIcon(IDI_ICON1);
-
-    //app.SetTickFunction<Infra::ImGuiWinApp::TickStage::OnFrame>(tick);
-    app.EnableVSync(true);
-    app.AppLoop();
+    pInputWindow->Loop();
 
     return 0;
 }
