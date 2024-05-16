@@ -11,6 +11,8 @@ TargetInputWindow::TargetInputWindow()
     {
         UpdateView(window);
     });
+
+    std::fill(_inputBuffer.begin(), _inputBuffer.end(), 0);
 }
 
 void TargetInputWindow::UpdateView(Infra::ImGuiWinApp& window)
@@ -35,8 +37,33 @@ void TargetInputWindow::UpdateView(Infra::ImGuiWinApp& window)
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {1.0f, 0.64f, 0.0f, 0.7f});
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {1.0f, 0.64f, 0.0f, 1.0f});
 
-        ImGui::TextUnformatted("SetTargetIp");
-        ImGui::InputText("##Ip", _inputBuffer.data(), 256);
+        ImGuiStyle& style = ImGui::GetStyle();
+
+        // Label
+        {
+            std::string title = "SetTargetIp";
+            float size = ImGui::CalcTextSize(title.c_str()).x + style.FramePadding.x * 2.0f;
+            float avail = ImGui::GetContentRegionAvail().x;
+
+            float off = (avail - size) * 0.5f;
+            if (off > 0.0f)
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+
+            ImGui::TextUnformatted(title.c_str());
+        }
+
+        // Input field
+        {
+            float size = 150 + style.FramePadding.x * 2.0f;
+            float avail = ImGui::GetContentRegionAvail().x;
+
+            float off = (avail - size) * 0.5f;
+            if (off > 0.0f)
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+
+            ImGui::PushItemWidth(150);
+            ImGui::InputText("##Ip", _inputBuffer.data(), 256);
+        }
 
         ImGui::PopStyleColor(3);
         ImGui::PopStyleVar(3);
