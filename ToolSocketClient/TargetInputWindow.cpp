@@ -1,3 +1,4 @@
+#include "Infra/Socket.hpp"
 #include "TargtInputWindow.h"
 #include "imgui.h"
 #include "Resource/Resource.h"
@@ -65,6 +66,20 @@ void TargetInputWindow::UpdateView(Infra::ImGuiWinApp& window)
             ImGui::InputText("##Ip", _inputBuffer.data(), 256);
         }
 
+        // Button
+        {
+            float size = 80 + style.FramePadding.x * 2.0f;
+            float avail = ImGui::GetContentRegionAvail().x;
+
+            float off = (avail - size) * 0.5f;
+            if (off > 0.0f)
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+
+            ImGui::PushItemWidth(80);
+            if (ImGui::Button("Connect"))
+                Connect();
+        }
+
         ImGui::PopStyleColor(3);
         ImGui::PopStyleVar(3);
     }
@@ -76,4 +91,17 @@ void TargetInputWindow::UpdateView(Infra::ImGuiWinApp& window)
 void TargetInputWindow::Loop()
 {
     _pWindow->AppLoop();
+}
+
+std::string TargetInputWindow::GetInputContent()
+{
+    return std::string(_inputBuffer.data());
+}
+
+void TargetInputWindow::Connect()
+{
+    std::string ip = GetInputContent();
+    auto pSocket = Infra::Socket::Create(Infra::Socket::AddressFamily::IpV4, Infra::Socket::Protocol::Tcp);
+
+
 }
