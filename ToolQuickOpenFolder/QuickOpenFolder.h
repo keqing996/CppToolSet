@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <ImGuiWinApp/ImGuiWinApp.h>
+#include <ImGuiWinAppFramework/ImGuiWinApp.h>
 
 struct Folder
 {
@@ -15,7 +15,7 @@ public:
     QuickOpenFolder();
 
 public:
-    void LoadChineseFonts(Infra::ImGuiWinApp& window);
+    void LoadChineseFonts(IMWinApp::ImGuiWinApp& window);
     void Update();
 
 private:

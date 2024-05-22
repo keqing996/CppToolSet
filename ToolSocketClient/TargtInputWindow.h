@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 #include "ImGuiWinApp/ImGuiWinApp.h"
+#include "Infra/Socket.hpp"
 
 class TargetInputWindow
 {
@@ -20,6 +21,7 @@ private:
 private:
     std::unique_ptr<Infra::ImGuiWinApp> _pWindow = nullptr;
     std::array<char, 256> _inputBuffer;
+    Infra::Socket::SocketHandle _socketHandle {};
 };
 
 

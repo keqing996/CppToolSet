@@ -1,4 +1,4 @@
-#include "Infra/Socket.hpp"
+
 #include "TargtInputWindow.h"
 #include "imgui.h"
 #include "Resource/Resource.h"
@@ -14,6 +14,20 @@ TargetInputWindow::TargetInputWindow()
     });
 
     std::fill(_inputBuffer.begin(), _inputBuffer.end(), 0);
+}
+
+void AlignCenter(float itemWidth, const std::function<void()> imGuiDraw)
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    float size = itemWidth + style.FramePadding.x * 2.0f;
+    float avail = ImGui::GetContentRegionAvail().x;
+
+    float off = (avail - size) * 0.5f;
+    if (off > 0.0f)
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+
+    imGuiDraw();
 }
 
 void TargetInputWindow::UpdateView(Infra::ImGuiWinApp& window)
@@ -40,45 +54,32 @@ void TargetInputWindow::UpdateView(Infra::ImGuiWinApp& window)
 
         ImGuiStyle& style = ImGui::GetStyle();
 
+        // Space
+        ImGui::Spacing();
+
         // Label
+        const std::string title = "SetTargetIp";
+        AlignCenter(ImGui::CalcTextSize(title.c_str()).x, [&title]()-> void
         {
-            std::string title = "SetTargetIp";
-            float size = ImGui::CalcTextSize(title.c_str()).x + style.FramePadding.x * 2.0f;
-            float avail = ImGui::GetContentRegionAvail().x;
-
-            float off = (avail - size) * 0.5f;
-            if (off > 0.0f)
-                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-
             ImGui::TextUnformatted(title.c_str());
-        }
+        });
 
         // Input field
+        float inputFieldSize = 150;
+        AlignCenter(inputFieldSize, [&inputFieldSize, this]()-> void
         {
-            float size = 150 + style.FramePadding.x * 2.0f;
-            float avail = ImGui::GetContentRegionAvail().x;
-
-            float off = (avail - size) * 0.5f;
-            if (off > 0.0f)
-                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-
-            ImGui::PushItemWidth(150);
+            ImGui::PushItemWidth(inputFieldSize);
             ImGui::InputText("##Ip", _inputBuffer.data(), 256);
-        }
+        });
 
         // Button
+        float buttonSize = 80 ;
+        AlignCenter(buttonSize, [&buttonSize, this]()-> void
         {
-            float size = 80 + style.FramePadding.x * 2.0f;
-            float avail = ImGui::GetContentRegionAvail().x;
-
-            float off = (avail - size) * 0.5f;
-            if (off > 0.0f)
-                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
-
-            ImGui::PushItemWidth(80);
+            ImGui::PushItemWidth(buttonSize);
             if (ImGui::Button("Connect"))
                 Connect();
-        }
+        });
 
         ImGui::PopStyleColor(3);
         ImGui::PopStyleVar(3);
@@ -101,7 +102,8 @@ std::string TargetInputWindow::GetInputContent()
 void TargetInputWindow::Connect()
 {
     std::string ip = GetInputContent();
-    auto pSocket = Infra::Socket::Create(Infra::Socket::AddressFamily::IpV4, Infra::Socket::Protocol::Tcp);
+    auto optSocketHandle = Infra::Socket::Create(Infra::Socket::AddressFamily::IpV4, Infra::Socket::Protocol::Tcp);
 
-
+    if (optSocketHandle.has_value())
+        _socketHandle = optSocketHandle.value();
 }

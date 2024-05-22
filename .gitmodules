@@ -1,3 +1,6 @@
 [submodule "SubModule/Infra"]
 	path = SubModule/Infra
 	url = https://github.com/keqing996/CppHelper.git
+[submodule "SubModule/ImGuiFramework"]
+	path = SubModule/ImGuiFramework
+	url = https://github.com/keqing996/IMGuiWinAppFramework.git

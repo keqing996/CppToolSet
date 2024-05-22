@@ -9,18 +9,18 @@ int WINAPI wWinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PWSTR lpCmdLine, int n
 
     QuickOpenFolder logic;
 
-    Infra::ImGuiWinApp app(800, 600, "Quick Open Fold - v5.0.1", (int)Infra::WindowStyle::HaveTitleBar | (int)Infra::WindowStyle::HaveClose);
+    IMWinApp::ImGuiWinApp app(800, 600, "Quick Open Fold - v5.0.1", (int)NWA::WindowStyle::HaveTitleBar | (int)NWA::WindowStyle::HaveClose);
 
     app.GetNativeWindow().SetIcon(IDI_ICON1);
 
     logic.LoadChineseFonts(app);
 
-    auto tick = [&](Infra::ImGuiWinApp& window) -> void
+    auto tick = [&](IMWinApp::ImGuiWinApp& window) -> void
     {
         logic.Update();
     };
 
-    app.SetTickFunction<Infra::ImGuiWinApp::TickStage::OnFrame>(tick);
+    app.SetTickFunction<IMWinApp::ImGuiWinApp::TickStage::OnFrame>(tick);
     app.EnableVSync(true);
     app.AppLoop();
 

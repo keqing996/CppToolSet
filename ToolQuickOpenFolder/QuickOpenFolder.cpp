@@ -284,7 +284,7 @@ void QuickOpenFolder::WriteConfig()
     fs.close();
 }
 
-void QuickOpenFolder::LoadChineseFonts(Infra::ImGuiWinApp& window)
+void QuickOpenFolder::LoadChineseFonts(IMWinApp::ImGuiWinApp& window)
 {
     static constexpr const char* SYSTEM_MSYH_REGULAR_FONT_PATH = "c:\\Windows\\Fonts\\msyhl.ttc";
     static constexpr const char* SYSTEM_MSYH_BOLD_FONT_PATH = "c:\\Windows\\Fonts\\msyhbd.ttc";
