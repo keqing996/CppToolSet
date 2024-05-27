@@ -45,5 +45,5 @@ add_executable              (socket_client  ./ToolSocketClient/Main.cpp
                                             ./ToolSocketClient/TargetInputWindow.cpp
                                             ./ToolSocketClient/SocketWindow.cpp
                                             ./ToolSocketClient/Resource/BundledResource.rc)
-target_link_libraries       (socket_client PRIVATE imgui_frame_work)
+target_link_libraries       (socket_client PRIVATE infra imgui_win_app_framework)
 set_target_properties       (socket_client PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")

@@ -2,7 +2,7 @@
 
 #include <array>
 #include <memory>
-#include "ImGuiWinApp/ImGuiWinApp.h"
+#include "ImGuiWinAppFramework/ImGuiWinApp.h"
 #include "Infra/Socket.hpp"
 
 class TargetInputWindow
@@ -15,11 +15,11 @@ public:
     std::string GetInputContent();
 
 private:
-    void UpdateView(Infra::ImGuiWinApp& window);
+    void UpdateView(IMWinApp::ImGuiWinApp& window);
     void Connect();
 
 private:
-    std::unique_ptr<Infra::ImGuiWinApp> _pWindow = nullptr;
+    std::unique_ptr<IMWinApp::ImGuiWinApp> _pWindow = nullptr;
     std::array<char, 256> _inputBuffer;
     Infra::Socket::SocketHandle _socketHandle {};
 };

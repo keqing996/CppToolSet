@@ -1,19 +1,30 @@
-
+#include <imgui.h>
+#include <functional>
 #include "TargtInputWindow.h"
-#include "imgui.h"
 #include "Resource/Resource.h"
 
+using namespace NWA;
+using namespace IMWinApp;
+using namespace Infra;
+
+static bool SocketValid(const Socket::SocketHandle& handle)
+{
+    return handle.handle != nullptr;
+}
+
 TargetInputWindow::TargetInputWindow()
-    : _pWindow(std::make_unique<Infra::ImGuiWinApp>(400, 200, "Simple Socket", (int)Infra::WindowStyle::HaveTitleBar | (int)Infra::WindowStyle::HaveClose))
+    : _pWindow(std::make_unique<ImGuiWinApp>(400, 200, "Simple Socket", (int)WindowStyle::HaveTitleBar | (int)WindowStyle::HaveClose))
 {
     _pWindow->EnableVSync(true);
     _pWindow->GetNativeWindow().SetIcon(IDI_ICON1);
-    _pWindow->SetTickFunction<Infra::ImGuiWinApp::TickStage::OnFrame>([this](Infra::ImGuiWinApp& window)->void
+    _pWindow->SetTickFunction<ImGuiWinApp::TickStage::OnFrame>([this](ImGuiWinApp& window)->void
     {
         UpdateView(window);
     });
 
     std::fill(_inputBuffer.begin(), _inputBuffer.end(), 0);
+
+    _socketHandle.handle = nullptr;
 }
 
 void AlignCenter(float itemWidth, const std::function<void()> imGuiDraw)
@@ -30,7 +41,7 @@ void AlignCenter(float itemWidth, const std::function<void()> imGuiDraw)
     imGuiDraw();
 }
 
-void TargetInputWindow::UpdateView(Infra::ImGuiWinApp& window)
+void TargetInputWindow::UpdateView(ImGuiWinApp& window)
 {
     const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(ImVec2(mainViewport->WorkPos.x, mainViewport->WorkPos.y), ImGuiCond_Always);
@@ -102,8 +113,10 @@ std::string TargetInputWindow::GetInputContent()
 void TargetInputWindow::Connect()
 {
     std::string ip = GetInputContent();
-    auto optSocketHandle = Infra::Socket::Create(Infra::Socket::AddressFamily::IpV4, Infra::Socket::Protocol::Tcp);
-
+    auto optSocketHandle = Socket::Create(Socket::AddressFamily::IpV4, Socket::Protocol::Tcp);
     if (optSocketHandle.has_value())
         _socketHandle = optSocketHandle.value();
+
+    Socket::Connect(_socketHandle, )
+
 }
