@@ -40,10 +40,3 @@ target_include_directories  (quick_open_folder PRIVATE ./ThirdParty/NlohmannJson
 target_link_libraries       (quick_open_folder PRIVATE infra imgui_win_app_framework)
 set_target_properties       (quick_open_folder PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 
-# Tool Socket Client
-add_executable              (socket_client  ./ToolSocketClient/Main.cpp
-                                            ./ToolSocketClient/TargetInputWindow.cpp
-                                            ./ToolSocketClient/SocketWindow.cpp
-                                            ./ToolSocketClient/Resource/BundledResource.rc)
-target_link_libraries       (socket_client PRIVATE infra imgui_win_app_framework)
-set_target_properties       (socket_client PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
