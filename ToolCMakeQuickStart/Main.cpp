@@ -77,5 +77,55 @@ int main()
 
     cppFileStream.close();
 
+    // create vscode config
+    std::filesystem::path vsCfgPath = workDirectory / L"VscSetting.json";
+    std::ofstream vsCfgFileStream(vsCfgPath);
+    if (!vsCfgFileStream.is_open())
+    {
+        std::wcout << std::format(L"Failed to create file: {}", vsCfgPath.c_str());
+        return 1;
+    }
+
+    vsCfgFileStream << "{" << std::endl;
+    vsCfgFileStream << "\t\"cmake.generator\": \"Ninja\"," << std::endl;
+    vsCfgFileStream << "\t\"cmake.configureArgs\": [" << std::endl;
+    vsCfgFileStream << "\t\t\"-DCMAKE_MAKE_PROGRAM=path/to/ninja/ninja.exe\"," << std::endl;
+    vsCfgFileStream << "\t\t\"-DCMAKE_C_COMPILER=path/to/llvm/bin/clang.exe\"," << std::endl;
+    vsCfgFileStream << "\t\t\"-DCMAKE_CXX_COMPILER=path/to/llvm/bin/clang++.exe\"" << std::endl;
+    vsCfgFileStream << "\t]" << std::endl;
+    vsCfgFileStream << "}" << std::endl;
+
+    vsCfgFileStream.close();
+
+    // create cmake bat file
+    std::filesystem::path cmakeConfigureBatPath = workDirectory / L"CmakeConfigure.bat";
+    std::ofstream cmakeConfigureBatFileStream(cmakeConfigureBatPath);
+    if (!cmakeConfigureBatFileStream.is_open())
+    {
+        std::wcout << std::format(L"Failed to create file: {}", cmakeConfigureBatPath.c_str());
+        return 1;
+    }
+
+    cmakeConfigureBatFileStream << "cmake -G Ninja -S . -B build ";
+    cmakeConfigureBatFileStream << "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE ";
+    cmakeConfigureBatFileStream << "-DCMAKE_MAKE_PROGRAM=path/to/ninja/ninja.exe ";
+    cmakeConfigureBatFileStream << "-DCMAKE_C_COMPILER=path/to/llvm/bin/clang.exe ";
+    cmakeConfigureBatFileStream << "-DCMAKE_CXX_COMPILER=path/to/llvm/bin/clang++.exe";
+    cmakeConfigureBatFileStream << std::endl;
+
+    cmakeConfigureBatFileStream.close();
+
+    std::filesystem::path cmakeBuildBatPath = workDirectory / L"CmakeBuild.bat";
+    std::ofstream cmakeBuildBatFileStream(cmakeBuildBatPath);
+    if (!cmakeBuildBatFileStream.is_open())
+    {
+        std::wcout << std::format(L"Failed to create file: {}", cmakeBuildBatPath.c_str());
+        return 1;
+    }
+
+    cmakeBuildBatFileStream << "cmake --build \"./build/\"" << std::endl;
+
+    cmakeBuildBatFileStream.close();
+
     return 0;
 }
